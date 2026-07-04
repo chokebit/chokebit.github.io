@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><title>Hardware Reverse Engineering Basics — A Complete PCB Analysis Guide</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Chokebit Wiki"/><meta property="og:title" content="Hardware Reverse Engineering Basics — A Complete PCB Analysis Guide"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Hardware Reverse Engineering Basics — A Complete PCB Analysis Guide"/><meta name="twitter:description" content="Errors are inevitable — read critically."/><meta property="og:description" content="Errors are inevitable — read critically."/><meta property="og:image:alt" content="Errors are inevitable — read critically."/><meta property="og:image" content="https://undefined/static/og-image.png"/><meta property="og:image:url" content="https://undefined/static/og-image.png"/><meta name="twitter:image" content="https://undefined/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="Errors are inevitable — read critically."/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://undefined/index.xml"/></head><body data-slug="tech/pcb-reverse-engineering-guide"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Chokebit Wiki</a></h2><div class="flex-component" style="flex-direction: row; flex-wrap: wrap; gap: 0.25rem;"><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="language-toggle"><button class="lang-btn active" data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn " data-lang="cn" data-href="tech/pcb-reverse-engineering-guide.cn" aria-label="中文">中文</button></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div></div><div class="explorer desktop-only" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-22"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>All Posts</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-22" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Notes</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>Hardware Reverse Engineering Basics — A Complete PCB Analysis Guide</a></div></nav><h1 class="article-title">Hardware Reverse Engineering Basics — A Complete PCB Analysis Guide</h1><p show-comma="true" class="content-meta"><time datetime="2026-07-04T06:35:11.702Z">Jul 04, 2026</time><span>12 min read</span></p><ul class="tags"><li><a href="../tags/hardware" class="internal tag-link">hardware</a></li><li><a href="../tags/reverse-engineering" class="internal tag-link">reverse-engineering</a></li><li><a href="../tags/firmware" class="internal tag-link">firmware</a></li></ul></div></div><article class="popover-hint"><blockquote>
+<p>Errors are inevitable — read critically.</p>
+</blockquote>
+<h2 id="contents">Contents<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#contents" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>Pull-up / Pull-down Resistors</strong>: The logical foundation of digital circuits, and why Flash chips need pull-down resistors.</li>
+<li><strong>Chip Pin Identification</strong>: Universal pin-1 locating methods and the counterclockwise numbering rule.</li>
+<li><strong>The Three Storage Chips (SDRAM / NOR / NAND)</strong>: Purpose, package, markings, and reverse-engineering value compared side by side.</li>
+<li><strong>Locating Firmware</strong>: How board layout reveals which chip holds the firmware.</li>
+<li><strong>PCB Reverse Engineering in Practice</strong>: Without silkscreen — serpentine traces → RAM, BGA → CPU, SOP → Flash.</li>
+<li><strong>Debug Interface Identification</strong>: Pin count, layout, and telltale signs for UART / SWD / JTAG / Boot Pins.</li>
+<li><strong>Non-Standard Jumper Points</strong>: Via matrices, I²C/SPI sniffing, test points, and blind circuit tracing.</li>
+</ul>
+<hr/>
+<h2 id="i-pull-up-and-pull-down-resistors">I. Pull-Up and Pull-Down Resistors<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#i-pull-up-and-pull-down-resistors" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Pull-up and pull-down resistors are two common configurations used in digital circuits to hold a signal line at a defined logic level when it is not being actively driven.</p>
+<p>Voltage and logic relationship:</p>
+<ul>
+<li><strong>Logic 1 (High Level)</strong>: Typically equals the supply voltage (e.g., 3.3V or 5V).</li>
+<li><strong>Logic 0 (Low Level)</strong>: Typically equals ground voltage (GND, i.e., 0V).</li>
+</ul>
+<h3 id="1-pull-up-resistor">1. Pull-Up Resistor<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-pull-up-resistor" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Definition</strong>: Connected between the power supply (Vcc) and the signal line. When the signal line is not driven, the resistor pulls it to logic high (1).</li>
+<li><strong>Purpose</strong>:
+<ul>
+<li>Keeps the input at a defined high level when floating, preventing undefined states.</li>
+<li>Commonly used for push buttons, switches, etc.</li>
+</ul>
+</li>
+<li><strong>Example</strong>:
+<ul>
+<li>Button not pressed → signal line connected to Vcc via pull-up resistor → logic high (1).</li>
+<li>Button pressed → signal line shorted directly to ground, whose resistance is far lower than the pull-up resistor → logic low (0).</li>
+</ul>
+</li>
+</ul>
+<p><strong>Q: Why is a pull-up resistor needed? (Solving the “floating” problem)</strong></p>
+<p><strong>A:</strong> From a digital chip input pin’s perspective, if it’s connected to nothing (floating), it is highly susceptible to ambient electromagnetic interference, causing the level to bounce randomly between 0 and 1. This is a logic disaster — the chip has no idea what it’s reading. The pull-up resistor’s job: when nothing is actively pulling the line, forcibly drag it to high.</p>
+<h3 id="2-pull-down-resistor">2. Pull-Down Resistor<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-pull-down-resistor" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Definition</strong>: Connected between the signal line and ground (GND). When the signal line is not driven, the resistor pulls it to logic low (0).</li>
+<li><strong>Purpose</strong>:
+<ul>
+<li>Keeps the input at a defined low level when floating.</li>
+<li>Current is near zero with no external signal, creating a stable input state; current flows only when an external signal is present.</li>
+</ul>
+</li>
+<li><strong>Example</strong>:
+<ul>
+<li>Switch not pressed → signal line grounded via pull-down resistor → logic low (0).</li>
+<li>Switch pressed → signal line connected to Vcc via switch → logic high (1).</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-when-to-use-which">3. When to Use Which<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-when-to-use-which" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Bus Idle State</th><th>Resistor Type</th><th>Typical Use Cases</th></tr></thead><tbody><tr><td>High</td><td>Pull-Up</td><td>UART RX, I²C (SCL/SDA)</td></tr><tr><td>Low</td><td>Pull-Down</td><td>Some Chip Select signals</td></tr></tbody></table></div>
+<blockquote>
+<p><strong>Bus idle state</strong>: The default voltage level of a bus or interface when no data is being transmitted.</p>
+</blockquote>
+<p>Common protocol idle states:</p>
+<ul>
+<li><strong>UART</strong>: Idle is high. A high line means no data; a low (start bit) signals the beginning of transmission.</li>
+<li><strong>I²C</strong>: Both SCL and SDA idle high. A falling edge on SDA while SCL is high = start condition.</li>
+<li><strong>SPI</strong>: Idle state depends on Clock Polarity (CPOL) and Chip Select. Usually, the interface is idle when chip select is high.</li>
+</ul>
+<h3 id="4-why-flash-chips-use-pull-down-resistors-stabilizing-logic-0">4. Why Flash Chips Use Pull-Down Resistors (Stabilizing Logic 0)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-why-flash-chips-use-pull-down-resistors-stabilizing-logic-0" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>When power is applied to a Flash chip, the controller/programmer reads pin states (address lines, data lines, mode select pins). These pins must stabilize at their specified logic levels the moment power is applied.</p>
+<ul>
+<li>
+<p><strong>Problem with too large a pull-down resistor</strong>: Large resistance → low current → leakage current / coupled noise / internal weak pull-ups can cause the level to drift → Flash fails to recognize control signals → read failure.</p>
+</li>
+<li>
+<p><strong>Analogy (water flow model)</strong>:</p>
+<ul>
+<li>Voltage source = water tank level</li>
+<li>Resistor = pipe diameter</li>
+<li>Current = water flow rate</li>
+<li>Pull-down resistor too large = pipe too thin, flow insufficient to pull the water level down.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>Conclusion</strong>: Flash chips use pull-down resistors to ensure pin voltages are reliably held at logic low at power-on, preventing floating or interference from causing erroneous states, and ensuring the chip enters the correct operating mode.</p>
+</blockquote>
+<h3 id="5-summary-pull-down-vs-pull-up">5. Summary: Pull-Down vs. Pull-Up<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-summary-pull-down-vs-pull-up" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Characteristic</th><th>Pull-Down Resistor</th><th>Pull-Up Resistor</th></tr></thead><tbody><tr><td><strong>Default State</strong></td><td>Logic 0 (GND)</td><td>Logic 1 (Vcc)</td></tr><tr><td><strong>Primary Goal</strong></td><td>Keep system in “quiet / off” state</td><td>Keep system in “ready / enabled” state</td></tr><tr><td><strong>Safety</strong></td><td>Prevents accidental triggers, safer for data</td><td>Can inadvertently activate the chip</td></tr><tr><td><strong>Common Applications</strong></td><td>Mode selection, reset pins, write-protect pins</td><td>I²C bus, interrupt signals, handshake signals</td></tr></tbody></table></div>
+<hr/>
+<h2 id="ii-identifying-chip-pins">II. Identifying Chip Pins<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ii-identifying-chip-pins" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="pin-1-location-markers">Pin 1 Location Markers<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#pin-1-location-markers" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>A hollow dot</li>
+<li>An arrow mark</li>
+<li>The number “1” printed directly</li>
+</ul>
+<h3 id="pin-numbering-rule">Pin Numbering Rule<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#pin-numbering-rule" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Starting from pin 1, pins are numbered <strong>counterclockwise</strong> (this applies to all chips).</p>
+<hr/>
+<h2 id="iii-nand-flash-data-handling-notes">III. NAND Flash Data Handling Notes<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#iii-nand-flash-data-handling-notes" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="core-concepts">Core Concepts<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#core-concepts" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Data Area</strong>: Stores the actual content. What the programmer reads = data + ECC information.</li>
+<li><strong>OOB (Out of Band)</strong>: The extra data region used to store ECC (Error Correction Code).</li>
+<li><strong>Actual space allocation</strong>: Check the chip datasheet. A common layout is <code>0x800 (data) + 0x40 (ECC)</code>.</li>
+<li><strong>Runtime behavior</strong>: When the program loads into memory, only the data content is loaded; the ECC data is not read into RAM.</li>
+</ul>
+<h3 id="nor-flash-vs-nand-flash">NOR Flash vs. NAND Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nor-flash-vs-nand-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Type</th><th>Purpose</th><th>Volatile</th><th>Typical Contents</th></tr></thead><tbody><tr><td>SDRAM</td><td>Runtime memory</td><td>Yes</td><td>Code/data loaded at boot</td></tr><tr><td>NOR Flash</td><td>Boot + firmware (sometimes full rootfs)</td><td>No</td><td>Bootloader, Kernel, rootfs</td></tr><tr><td>NAND Flash</td><td>Storage</td><td>No</td><td>rootfs, config files, logs</td></tr></tbody></table></div>
+<p>References:</p>
+<ul>
+<li><a href="https://www.zhiwanyuzhou.com/index.php/2024/08/28/nand%e9%97%aa%e5%ad%98%e4%b9%8boob/" class="external">NAND Flash OOB Explained<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://www.zhiwanyuzhou.com/index.php/2022/06/03/mrctf2022-iot%e9%a2%98%e7%9b%ae%e4%b9%8bnand%e6%9c%89%e6%95%88%e6%95%b0%e6%8d%ae%e5%88%86%e6%9e%90%ef%bc%881%ef%bc%89/" class="external">MRCTF2022 IoT Challenge — NAND Data Analysis<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://blog.csdn.net/weixin_45209963/article/details/124502211" class="external">CSDN: NAND Flash Analysis<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://www.ctfiot.com/38677.html" class="external">CTF IoT Analysis Examples<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul>
+<h3 id="identifying-valid-data">Identifying Valid Data<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#identifying-valid-data" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p>“Since there is no uniform format for BootLoader file structures, one must analyze regions further into the file, looking for patterned data blocks (e.g., all-0x00 regions, consecutive string regions, special file structures).”</p>
+</blockquote>
+<p>These patterned regions help distinguish valid data from invalid data. Observing byte patterns allows you to reconstruct the correct byte ordering.</p>
+<hr/>
+<h2 id="iv-identifying-sdram--nor-flash--nand-flash">IV. Identifying SDRAM / NOR Flash / NAND Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#iv-identifying-sdram--nor-flash--nand-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="quick-comparison">Quick Comparison<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#quick-comparison" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Type</th><th>Purpose</th><th>Volatile</th><th>Typical Contents</th></tr></thead><tbody><tr><td><strong>SDRAM</strong></td><td>Runtime memory</td><td>✅ Yes</td><td>Code/data loaded at boot</td></tr><tr><td><strong>NOR Flash</strong></td><td>Boot + firmware (sometimes full rootfs)</td><td>❌ No</td><td>Bootloader, Kernel, rootfs</td></tr><tr><td><strong>NAND Flash</strong></td><td>Storage</td><td>❌ No</td><td>rootfs, config files, logs</td></tr></tbody></table></div>
+<h3 id="sdram-synchronous-dynamic-random-access-memory">SDRAM (Synchronous Dynamic Random Access Memory)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#sdram-synchronous-dynamic-random-access-memory" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Common markings</strong>: <code>DDR</code>, <code>SDRAM</code>, <code>MT</code>, <code>H5</code>, <code>K4</code></li>
+</ul>
+<h3 id="nor-flash">NOR Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nor-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>Supports <strong>XIP (Execute-In-Place)</strong> — code can run directly from the Flash chip.</li>
+<li><strong>Characteristics</strong>:
+<ul>
+<li>Smaller capacity (typically 8–64 MB)</li>
+<li>SPI or parallel interface</li>
+<li>8-pin SOIC (SPI NOR) or TSOP package</li>
+</ul>
+</li>
+<li><strong>Common markings</strong>: <code>W25Q</code>, <code>MX25</code>, <code>S25</code>, <code>EN25</code></li>
+<li><strong>Reverse-engineering value</strong>: Easiest chip to dump, clean offsets, virtually no wear-leveling interference.</li>
+</ul>
+<h3 id="nand-flash">NAND Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nand-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>Block-based storage, requires ECC.</li>
+<li><strong>Characteristics</strong>:
+<ul>
+<li>Larger capacity (128 MB+)</li>
+<li>TSOP-48 or BGA package</li>
+<li>Numerous address/data lines</li>
+</ul>
+</li>
+<li><strong>Common markings</strong>: <code>MT29F</code>, <code>K9F</code>, <code>TC58</code></li>
+<li><strong>Complications</strong>: Bad blocks, ECC, wear leveling — raw dumps often appear “corrupt” without controller logic.</li>
+</ul>
+<hr/>
+<h2 id="v-locating-firmware--filesystem-position">V. Locating Firmware / Filesystem Position<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#v-locating-firmware--filesystem-position" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="step-1-identify-storage-chips">Step 1: Identify Storage Chips<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#step-1-identify-storage-chips" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>Read chip markings → search the part number</li>
+<li>Check the package type</li>
+</ul>
+<h3 id="step-2-use-board-layout-clues">Step 2: Use Board Layout Clues<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#step-2-use-board-layout-clues" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>Flash closest to the CPU → usually boot NOR</li>
+<li>Largest Flash chip → usually NAND (filesystem)</li>
+<li>SDRAM hallmarks: many length-matched traces, nearby termination resistors</li>
+</ul>
+<h3 id="step-3-dump-the-flash">Step 3: Dump the Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#step-3-dump-the-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>SPI NOR → use <code>flashrom</code></li>
+<li>NAND → use a programmer, or desolder and use a reader</li>
+</ul>
+<h3 id="common-filesystem-layout-patterns">Common Filesystem Layout Patterns<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#common-filesystem-layout-patterns" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>NOR-only device</strong>:</p>
+<pre><code>[ bootloader ][ kernel ][ rootfs ]
+</code></pre>
+<p><strong>NOR + NAND device</strong>:</p>
+<pre><code>NOR:  bootloader + kernel
+NAND: rootfs + data
+</code></pre>
+<blockquote>
+<p>Once you know these patterns, you can often tell at a glance which chip to dump first.</p>
+</blockquote>
+<h3 id="pcb-reverse-engineering-tricks">PCB Reverse-Engineering Tricks<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#pcb-reverse-engineering-tricks" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Follow the boot pins</strong>: SPI traces → NOR; wide parallel bus → NAND; DDR traces → SDRAM</li>
+<li><strong>UART boot logs</strong>: Often print lines like <code>Loading kernel from SPI flash...</code> or <code>Mounting rootfs from NAND...</code>, giving you the answer instantly.</li>
+</ul>
+<h3 id="vulnerability-research-angle">Vulnerability Research Angle<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vulnerability-research-angle" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Target</th><th>Storage Type</th></tr></thead><tbody><tr><td>Bootloader bugs</td><td>NOR Flash</td></tr><tr><td>Web / service bugs</td><td>NAND rootfs</td></tr><tr><td>Runtime RCE (Remote Code Execution)</td><td>SDRAM only</td></tr></tbody></table></div>
+<blockquote>
+<p><strong>Attack surface mapping starts from memory type.</strong></p>
+</blockquote>
+<hr/>
+<h2 id="vi-reverse-engineering-a-pcb">VI. Reverse-Engineering a PCB<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vi-reverse-engineering-a-pcb" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>When you cannot read chip silkscreen markings, PCB reverse engineering relies on layout logic, trace characteristics, peripheral component patterns, and signal integrity design principles.</p>
+<p><img src=".././assets/pcb-board-reverse-engineering-example.webp" alt/></p>
+<h3 id="1-locate-the-cpu--soc-system-on-chip">1. Locate the CPU / SoC (System on Chip)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-locate-the-cpu--soc-system-on-chip" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Central role</strong>: The BGA (Ball Grid Array) chip with the most pins, largest package, and densest routing.</li>
+<li><strong>Bus hub</strong>: All signals converge here. Massive numbers of traces radiate out to RAM, Flash, Ethernet, etc.</li>
+<li><strong>Power characteristics</strong>: Surrounded by multiple inductors (square black components) and many small decoupling capacitors, since the main controller requires multiple low-voltage, high-current supply rails.</li>
+</ul>
+<h3 id="2-locate-dram-memory">2. Locate DRAM (Memory)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-locate-dram-memory" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Length-matched traces (serpentine traces)</strong>: The most reliable indicator of RAM. To ensure high-speed data synchronization, traces between the CPU and RAM must be equal in length, appearing as parallel wiggly lines.</li>
+<li><strong>Adjacent to the CPU</strong>: DDR signals operate at extremely high frequencies; to minimize interference, the RAM chip is placed right next to the CPU.</li>
+<li><strong>Package</strong>: Typically a rectangular BGA.</li>
+</ul>
+<p><img src=".././assets/pcb-dram-length-matched-traces.webp" alt/></p>
+<h3 id="3-locate-flash-firmware-storage">3. Locate Flash (Firmware Storage)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-locate-flash-firmware-storage" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Relatively sparse routing</strong>: SPI Flash usually has only 8–16 pins, with far simpler routing than RAM.</li>
+<li><strong>Common packages</strong>: SOP-8 or wide SOP-16; large-capacity NAND Flash uses rectangular multi-pin TSOP.</li>
+<li><strong>Position</strong>: Close to the CPU, but distance requirements are less strict than for RAM.</li>
+</ul>
+<h3 id="4-locate-debug-ports-uart">4. Locate Debug Ports (UART)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-locate-debug-ports-uart" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Header/pad characteristics</strong>: Usually 3–4 consecutive unpopulated pads or soldered pin headers.</li>
+<li><strong>Signal logic</strong>: One pad connected to the large ground plane (GND), one to 3.3V power, and the other two (TX/RX) routed directly to the CPU.</li>
+<li><strong>Silkscreen hints</strong>: May have <code>VCC, GND, TX, RX</code> labels, or no markings at all but neatly aligned near the CPU.</li>
+</ul>
+<h3 id="5-other-functional-modules-for-triangulation">5. Other Functional Modules for Triangulation<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-other-functional-modules-for-triangulation" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Module</th><th>Identifying Features</th><th>Reverse-Engineering Logic</th></tr></thead><tbody><tr><td>Network Interface (PHY / Switch)</td><td>Near RJ45 jack, connected to a black rectangular network transformer</td><td>The chip on the other side of the transformer = switch chip or CPU</td></tr><tr><td>RF (Wi-Fi / Radio)</td><td>Under a shield can, connected to black or grey antenna coax</td><td>Follow the antenna cable to its endpoint = wireless chip (or directly to SoC if integrated)</td></tr><tr><td>PMU (Power Management Unit)</td><td>Near the DC power jack, surrounded by large inductors and electrolytic capacitors</td><td>Handles voltage conversion, supplies power to CPU and RAM</td></tr></tbody></table></div>
+<h3 id="reverse-engineering-cheat-sheet">Reverse-Engineering Cheat Sheet<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#reverse-engineering-cheat-sheet" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li><strong>Follow the traces</strong>: Serpentine → RAM, thick traces → power, dense traces → CPU.</li>
+<li><strong>Follow the peripherals</strong>: Ethernet jack → PHY, antenna → RF, power jack → PMU.</li>
+<li><strong>Read the package</strong>: Large square → SoC, rectangle → RAM, small rectangle → Flash.</li>
+</ol>
+<hr/>
+<h2 id="vii-debug-pin-reverse-identification">VII. Debug Pin Reverse Identification<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vii-debug-pin-reverse-identification" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="1-bootstrap-pins-boot-configuration-pins">1. Bootstrap Pins (Boot Configuration Pins)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-bootstrap-pins-boot-configuration-pins" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>These are not used for ongoing communication, but determine where the chip boots from (Flash boot vs. USB programming mode).</p>
+<ul>
+<li><strong>How to spot them</strong>:
+<ul>
+<li>A cluster of neatly aligned small resistors (0402 or 0201 package) near the CPU. One end connects to CPU signal lines; the other end connects to either a high level (3.3V/1.8V) or ground.</li>
+<li>Three pads side by side: the middle one carries the signal, the outer two go to high and ground. Soldering a 0Ω resistor to one side changes the boot mode.</li>
+</ul>
+</li>
+<li><strong>Reverse-engineering logic</strong>: If you need to force the chip into programming mode (e.g., to bypass the original bootloader), find these resistors and short them.</li>
+</ul>
+<p><img src=".././assets/pcb-bootstrap-resistors.webp" alt/></p>
+<h3 id="2-common-debug-interfaces-at-a-glance">2. Common Debug Interfaces at a Glance<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-common-debug-interfaces-at-a-glance" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Interface</th><th>Pin Count</th><th>Typical Layout</th><th>How to Identify</th></tr></thead><tbody><tr><td><strong>UART</strong></td><td>3–4</td><td>1×4 linear</td><td>TX/RX show voltage fluctuation; levels typically 3.3V</td></tr><tr><td><strong>SWD</strong> (ARM only)</td><td>2–4</td><td>1×4 or pads</td><td>ARM cores only; CLK pin shows a steady frequency</td></tr><tr><td><strong>JTAG</strong></td><td>5–20</td><td>2×N array or continuous pads</td><td>Matching resistors between pins; signals route directly to CPU core</td></tr><tr><td><strong>Boot Pin</strong></td><td>1–4</td><td>Resistor cluster</td><td>Near CPU; connected to VCC or GND via resistors</td></tr></tbody></table></div>
+<hr/>
+<h2 id="viii-finding-jumper-points-on-non-standard-interfaces">VIII. Finding Jumper Points on Non-Standard Interfaces<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#viii-finding-jumper-points-on-non-standard-interfaces" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Once you’ve ruled out UART, SWD, and JTAG, you’re dealing with non-standard debugging or low-level hardware configuration.</p>
+<h3 id="1-find-bootstrap--strapping-pins">1. Find Bootstrap / Strapping Pins<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-find-bootstrap--strapping-pins" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>Look for rows of 0Ω resistors or unpopulated resistor pads near the CPU (one end to a signal, the other to 3.3V or GND).</li>
+<li>Changing one pin’s level (e.g., high → low) may force the system into Recovery Mode — which is a form of debugging in itself.</li>
+</ul>
+<h3 id="2-probe-through-the-via-matrix">2. Probe Through the Via Matrix<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-probe-through-the-via-matrix" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>The vias surrounding a BGA chip are natural test points.</li>
+<li><strong>Method</strong>: Use a multimeter in continuity mode. Hold one probe on a Flash chip pin (e.g., CLK), and sweep the other probe across the via array near the CPU to identify which vias connect directly to the core bus.</li>
+<li><strong>Scrape the solder mask</strong>: For vias without exposed pads, gently scrape off the green solder mask with a scalpel to expose the copper underneath, allowing you to solder a jump wire for logic analysis.</li>
+</ul>
+<h3 id="3-find-ic--spi-sniffing-points">3. Find I²C / SPI Sniffing Points<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-find-ic--spi-sniffing-points" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Targets</strong>: 8-pin or 16-pin small chips on the board (e.g., EEPROMs or sensors).</li>
+<li><strong>I²C</strong>: Look for a pair of pull-up resistors (typically 4.7kΩ) connected to 3.3V.</li>
+<li><strong>SPI</strong>: Look for pins 1, 2, 5, and 6 of a Winbond Flash chip.</li>
+<li>These buses often carry critical configuration data or encryption keys. Hooking up a logic analyzer to these points enables side-channel debugging.</li>
+</ul>
+<h3 id="4-identify-isolated-test-points-tp">4. Identify Isolated Test Points (TP)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-identify-isolated-test-points-tp" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Small gold circles scattered across the board, often labeled with <code>TP</code> numbers:</p>
+<ul>
+<li><strong>Static TPs</strong>: Measure voltages (1.1V core, 1.8V RAM, 3.3V I/O).</li>
+<li><strong>Dynamic TPs</strong>: Key clock signals (CLK) or reset signals (RESET).</li>
+<li><strong>How to tell</strong>: Probe with an oscilloscope. A steady 25MHz or 40MHz sine wave = crystal oscillator clock test point. A signal that jumps at power-on then stays high = Reset pin.</li>
+</ul>
+<h3 id="5-blind-circuit-tracing">5. Blind Circuit Tracing<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-blind-circuit-tracing" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li>Identify the ground plane (GND): Large copper pours or the negative terminal of electrolytic capacitors.</li>
+<li>Trace the power tree: Start at the DC power jack → follow inductors (components marked <code>1R2</code> or <code>4R7</code>) → the vias after the inductor are the main power rails.</li>
+<li>Map interconnects:
+<ul>
+<li>CPU → RAM: Groups of length-matched serpentine traces.</li>
+<li>CPU → Ethernet: Trace backwards from the network transformer pins.</li>
+<li>CPU → Storage: Trace backwards from the Flash chip’s 8 pins.</li>
+</ul>
+</li>
+</ol>
+<h3 id="the-golden-jumper-location">The Golden Jumper Location<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#the-golden-jumper-location" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><strong>The 6 SPI bus traces between the CPU and the Flash chip.</strong></p>
+</blockquote>
+<p>Once you attach jump wires to the SPI bus, you can read the entire instruction stream at runtime — and even attach your own external Flash to replace the original firmware.</p></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-10" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#contents" data-for="contents">Contents</a></li><li class="depth-0"><a href="#i-pull-up-and-pull-down-resistors" data-for="i-pull-up-and-pull-down-resistors">I. Pull-Up and Pull-Down Resistors</a></li><li class="depth-1"><a href="#1-pull-up-resistor" data-for="1-pull-up-resistor">1. Pull-Up Resistor</a></li><li class="depth-1"><a href="#2-pull-down-resistor" data-for="2-pull-down-resistor">2. Pull-Down Resistor</a></li><li class="depth-1"><a href="#3-when-to-use-which" data-for="3-when-to-use-which">3. When to Use Which</a></li><li class="depth-1"><a href="#4-why-flash-chips-use-pull-down-resistors-stabilizing-logic-0" data-for="4-why-flash-chips-use-pull-down-resistors-stabilizing-logic-0">4. Why Flash Chips Use Pull-Down Resistors (Stabilizing Logic 0)</a></li><li class="depth-1"><a href="#5-summary-pull-down-vs-pull-up" data-for="5-summary-pull-down-vs-pull-up">5. Summary: Pull-Down vs. Pull-Up</a></li><li class="depth-0"><a href="#ii-identifying-chip-pins" data-for="ii-identifying-chip-pins">II. Identifying Chip Pins</a></li><li class="depth-1"><a href="#pin-1-location-markers" data-for="pin-1-location-markers">Pin 1 Location Markers</a></li><li class="depth-1"><a href="#pin-numbering-rule" data-for="pin-numbering-rule">Pin Numbering Rule</a></li><li class="depth-0"><a href="#iii-nand-flash-data-handling-notes" data-for="iii-nand-flash-data-handling-notes">III. NAND Flash Data Handling Notes</a></li><li class="depth-1"><a href="#core-concepts" data-for="core-concepts">Core Concepts</a></li><li class="depth-1"><a href="#nor-flash-vs-nand-flash" data-for="nor-flash-vs-nand-flash">NOR Flash vs. NAND Flash</a></li><li class="depth-1"><a href="#identifying-valid-data" data-for="identifying-valid-data">Identifying Valid Data</a></li><li class="depth-0"><a href="#iv-identifying-sdram--nor-flash--nand-flash" data-for="iv-identifying-sdram--nor-flash--nand-flash">IV. Identifying SDRAM / NOR Flash / NAND Flash</a></li><li class="depth-1"><a href="#quick-comparison" data-for="quick-comparison">Quick Comparison</a></li><li class="depth-1"><a href="#sdram-synchronous-dynamic-random-access-memory" data-for="sdram-synchronous-dynamic-random-access-memory">SDRAM (Synchronous Dynamic Random Access Memory)</a></li><li class="depth-1"><a href="#nor-flash" data-for="nor-flash">NOR Flash</a></li><li class="depth-1"><a href="#nand-flash" data-for="nand-flash">NAND Flash</a></li><li class="depth-0"><a href="#v-locating-firmware--filesystem-position" data-for="v-locating-firmware--filesystem-position">V. Locating Firmware / Filesystem Position</a></li><li class="depth-1"><a href="#step-1-identify-storage-chips" data-for="step-1-identify-storage-chips">Step 1: Identify Storage Chips</a></li><li class="depth-1"><a href="#step-2-use-board-layout-clues" data-for="step-2-use-board-layout-clues">Step 2: Use Board Layout Clues</a></li><li class="depth-1"><a href="#step-3-dump-the-flash" data-for="step-3-dump-the-flash">Step 3: Dump the Flash</a></li><li class="depth-1"><a href="#common-filesystem-layout-patterns" data-for="common-filesystem-layout-patterns">Common Filesystem Layout Patterns</a></li><li class="depth-1"><a href="#pcb-reverse-engineering-tricks" data-for="pcb-reverse-engineering-tricks">PCB Reverse-Engineering Tricks</a></li><li class="depth-1"><a href="#vulnerability-research-angle" data-for="vulnerability-research-angle">Vulnerability Research Angle</a></li><li class="depth-0"><a href="#vi-reverse-engineering-a-pcb" data-for="vi-reverse-engineering-a-pcb">VI. Reverse-Engineering a PCB</a></li><li class="depth-1"><a href="#1-locate-the-cpu--soc-system-on-chip" data-for="1-locate-the-cpu--soc-system-on-chip">1. Locate the CPU / SoC (System on Chip)</a></li><li class="depth-1"><a href="#2-locate-dram-memory" data-for="2-locate-dram-memory">2. Locate DRAM (Memory)</a></li><li class="depth-1"><a href="#3-locate-flash-firmware-storage" data-for="3-locate-flash-firmware-storage">3. Locate Flash (Firmware Storage)</a></li><li class="depth-1"><a href="#4-locate-debug-ports-uart" data-for="4-locate-debug-ports-uart">4. Locate Debug Ports (UART)</a></li><li class="depth-1"><a href="#5-other-functional-modules-for-triangulation" data-for="5-other-functional-modules-for-triangulation">5. Other Functional Modules for Triangulation</a></li><li class="depth-1"><a href="#reverse-engineering-cheat-sheet" data-for="reverse-engineering-cheat-sheet">Reverse-Engineering Cheat Sheet</a></li><li class="depth-0"><a href="#vii-debug-pin-reverse-identification" data-for="vii-debug-pin-reverse-identification">VII. Debug Pin Reverse Identification</a></li><li class="depth-1"><a href="#1-bootstrap-pins-boot-configuration-pins" data-for="1-bootstrap-pins-boot-configuration-pins">1. Bootstrap Pins (Boot Configuration Pins)</a></li><li class="depth-1"><a href="#2-common-debug-interfaces-at-a-glance" data-for="2-common-debug-interfaces-at-a-glance">2. Common Debug Interfaces at a Glance</a></li><li class="depth-0"><a href="#viii-finding-jumper-points-on-non-standard-interfaces" data-for="viii-finding-jumper-points-on-non-standard-interfaces">VIII. Finding Jumper Points on Non-Standard Interfaces</a></li><li class="depth-1"><a href="#1-find-bootstrap--strapping-pins" data-for="1-find-bootstrap--strapping-pins">1. Find Bootstrap / Strapping Pins</a></li><li class="depth-1"><a href="#2-probe-through-the-via-matrix" data-for="2-probe-through-the-via-matrix">2. Probe Through the Via Matrix</a></li><li class="depth-1"><a href="#3-find-ic--spi-sniffing-points" data-for="3-find-ic--spi-sniffing-points">3. Find I²C / SPI Sniffing Points</a></li><li class="depth-1"><a href="#4-identify-isolated-test-points-tp" data-for="4-identify-isolated-test-points-tp">4. Identify Isolated Test Points (TP)</a></li><li class="depth-1"><a href="#5-blind-circuit-tracing" data-for="5-blind-circuit-tracing">5. Blind Circuit Tracing</a></li><li class="depth-1"><a href="#the-golden-jumper-location" data-for="the-golden-jumper-location">The Golden Jumper Location</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-2" class="overflow"><li><a href="../tech/" class="internal">Tech Notes</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>

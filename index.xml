@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+    <channel>
+      <title>Chokebit Wiki</title>
+      <link>https://</link>
+      <description>Last 10 notes on Chokebit Wiki</description>
+      <generator>Quartz -- quartz.jzhao.xyz</generator>
+      <item>
+    <title>想法随笔</title>
+    <link>https://ideas/index.cn</link>
+    <guid>https://ideas/index.cn</guid>
+    <description><![CDATA[ 想法随笔 个人思考、碎片灵感、日常反思。 文章列表 AI 时代下 LLM 构建知识体系 . ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>Ideas</title>
+    <link>https://ideas/</link>
+    <guid>https://ideas/</guid>
+    <description><![CDATA[ Ideas Personal thoughts, fragments, daily reflections. Articles Building a Knowledge System with LLMs . ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>Chokebit Wiki</title>
+    <link>https://index.cn</link>
+    <guid>https://index.cn</guid>
+    <description><![CDATA[ 关于我 对世界充满好奇。 媒体 null 赞助 如果你觉得这里的内容有价值，欢迎支持。 使用侧栏语言切换按钮切换 English / 中文。. ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>Chokebit Wiki</title>
+    <link>https:///</link>
+    <guid>https:///</guid>
+    <description><![CDATA[ About Me Full of curiosity about the world. Play crazily while playing, and do your best while studying. ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>摘要记录</title>
+    <link>https://reading/index.cn</link>
+    <guid>https://reading/index.cn</guid>
+    <description><![CDATA[ 摘要记录 书籍、文章、视频的摘要与关键记录。 文章列表 . ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>Summary Notes</title>
+    <link>https://reading/</link>
+    <guid>https://reading/</guid>
+    <description><![CDATA[ Summary Notes Summaries and key takeaways from books, articles, videos. Articles . ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>技术笔记</title>
+    <link>https://tech/index.cn</link>
+    <guid>https://tech/index.cn</guid>
+    <description><![CDATA[ 技术笔记 编程、工具使用、技术实践。 文章列表 硬件逆向基础：从电阻到芯片 Markdown-Quartz 渲染一致性速查表 . ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>Tech Notes</title>
+    <link>https://tech/</link>
+    <guid>https://tech/</guid>
+    <description><![CDATA[ Tech Notes Programming, tools, technical practices. Articles Hardware Reverse Engineering Basics Markdown-Quartz Rendering Cheatsheet . ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>Markdown-Quartz 渲染一致性速查表</title>
+    <link>https://tech/markdown-quartz-rendering-cheatsheet.cn</link>
+    <guid>https://tech/markdown-quartz-rendering-cheatsheet.cn</guid>
+    <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 为什么 Obsidian 里好好的，Web 上就乱了：实时预览 vs 标准渲染。 换行三型法：空行、双空格+回车、单回车，各自的效果和适用场景。 图片语法：从 Obsidian 粘贴到生产就绪路径。 文件路径与 URL：slug 是什么，文件命名如何决定访问地址。 发布前验证：Obsidian 阅读模式 = Quartz 渲染结果。 一、Obsidian 和 Quartz 对 Markdown 的处理不同 Obsidian 的实时预览（Live Preview）为了写作体验更流畅，单回车就换行。但 Quartz 使用的 remark 渲染器遵循 ... ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item><item>
+    <title>Markdown-Quartz Rendering Consistency Cheatsheet</title>
+    <link>https://tech/markdown-quartz-rendering-cheatsheet</link>
+    <guid>https://tech/markdown-quartz-rendering-cheatsheet</guid>
+    <description><![CDATA[  Errors are inevitable — read critically. Contents Why it looks fine in Obsidian but breaks on the web: Live Preview vs. standard rendering. ]]></description>
+    <pubDate>Sat, 04 Jul 2026 06:35:11 GMT</pubDate>
+  </item>
+    </channel>
+  </rss>

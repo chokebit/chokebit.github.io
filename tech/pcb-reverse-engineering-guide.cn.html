@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>硬件逆向基础：从电阻到芯片，一块电路板的完整分析指南</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Chokebit Wiki"/><meta property="og:title" content="硬件逆向基础：从电阻到芯片，一块电路板的完整分析指南"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="硬件逆向基础：从电阻到芯片，一块电路板的完整分析指南"/><meta name="twitter:description" content="内容难免有误，请带着辩证视角阅读。 本文内容 上拉/下拉电阻：理解数字电路的底层逻辑基石，以及为什么 Flash 读取必须用下拉电阻。 芯片引脚识别：所有芯片通用的引脚 1 定位法与逆时针排列规律。 三大存储芯片（SDRAM / NOR / NAND）：从用途、封装、丝印到逆向价值的完整对比。 定位固件位置：通过电路板布局快速判断固件在哪颗芯片上。 PCB 逆向实操：不靠丝印，靠蛇形线找内存、靠 BGA 找 CPU、靠 SOP 找 Flash。 调试接口识别：UART / SWD / JTAG / Boot Pin 的引脚排列和判断依据。 非标准跳线点：过孔矩阵、I²C/SPI 嗅探、测试点..."/><meta property="og:description" content="内容难免有误，请带着辩证视角阅读。 本文内容 上拉/下拉电阻：理解数字电路的底层逻辑基石，以及为什么 Flash 读取必须用下拉电阻。 芯片引脚识别：所有芯片通用的引脚 1 定位法与逆时针排列规律。 三大存储芯片（SDRAM / NOR / NAND）：从用途、封装、丝印到逆向价值的完整对比。 定位固件位置：通过电路板布局快速判断固件在哪颗芯片上。 PCB 逆向实操：不靠丝印，靠蛇形线找内存、靠 BGA 找 CPU、靠 SOP 找 Flash。 调试接口识别：UART / SWD / JTAG / Boot Pin 的引脚排列和判断依据。 非标准跳线点：过孔矩阵、I²C/SPI 嗅探、测试点..."/><meta property="og:image:alt" content="内容难免有误，请带着辩证视角阅读。 本文内容 上拉/下拉电阻：理解数字电路的底层逻辑基石，以及为什么 Flash 读取必须用下拉电阻。 芯片引脚识别：所有芯片通用的引脚 1 定位法与逆时针排列规律。 三大存储芯片（SDRAM / NOR / NAND）：从用途、封装、丝印到逆向价值的完整对比。 定位固件位置：通过电路板布局快速判断固件在哪颗芯片上。 PCB 逆向实操：不靠丝印，靠蛇形线找内存、靠 BGA 找 CPU、靠 SOP 找 Flash。 调试接口识别：UART / SWD / JTAG / Boot Pin 的引脚排列和判断依据。 非标准跳线点：过孔矩阵、I²C/SPI 嗅探、测试点..."/><meta property="og:image" content="https://undefined/static/og-image.png"/><meta property="og:image:url" content="https://undefined/static/og-image.png"/><meta name="twitter:image" content="https://undefined/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="内容难免有误，请带着辩证视角阅读。 本文内容 上拉/下拉电阻：理解数字电路的底层逻辑基石，以及为什么 Flash 读取必须用下拉电阻。 芯片引脚识别：所有芯片通用的引脚 1 定位法与逆时针排列规律。 三大存储芯片（SDRAM / NOR / NAND）：从用途、封装、丝印到逆向价值的完整对比。 定位固件位置：通过电路板布局快速判断固件在哪颗芯片上。 PCB 逆向实操：不靠丝印，靠蛇形线找内存、靠 BGA 找 CPU、靠 SOP 找 Flash。 调试接口识别：UART / SWD / JTAG / Boot Pin 的引脚排列和判断依据。 非标准跳线点：过孔矩阵、I²C/SPI 嗅探、测试点..."/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://undefined/index.xml"/></head><body data-slug="tech/pcb-reverse-engineering-guide.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Chokebit Wiki</a></h2><div class="flex-component" style="flex-direction: row; flex-wrap: wrap; gap: 0.25rem;"><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href="tech/pcb-reverse-engineering-guide" aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div></div><div class="explorer desktop-only" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-21"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>All Posts</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-21" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Notes</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>硬件逆向基础：从电阻到芯片，一块电路板的完整分析指南</a></div></nav><h1 class="article-title">硬件逆向基础：从电阻到芯片，一块电路板的完整分析指南</h1><p show-comma="true" class="content-meta"><time datetime="2026-07-04T06:35:11.702Z">Jul 04, 2026</time><span>19 min read</span></p><ul class="tags"><li><a href="../tags/hardware" class="internal tag-link">hardware</a></li><li><a href="../tags/reverse-engineering" class="internal tag-link">reverse-engineering</a></li><li><a href="../tags/firmware" class="internal tag-link">firmware</a></li></ul></div></div><article class="popover-hint"><blockquote>
+<p>内容难免有误，请带着辩证视角阅读。</p>
+</blockquote>
+<h2 id="本文内容">本文内容<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#本文内容" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>上拉/下拉电阻</strong>：理解数字电路的底层逻辑基石，以及为什么 Flash 读取必须用下拉电阻。</li>
+<li><strong>芯片引脚识别</strong>：所有芯片通用的引脚 1 定位法与逆时针排列规律。</li>
+<li><strong>三大存储芯片（SDRAM / NOR / NAND）</strong>：从用途、封装、丝印到逆向价值的完整对比。</li>
+<li><strong>定位固件位置</strong>：通过电路板布局快速判断固件在哪颗芯片上。</li>
+<li><strong>PCB 逆向实操</strong>：不靠丝印，靠蛇形线找内存、靠 BGA 找 CPU、靠 SOP 找 Flash。</li>
+<li><strong>调试接口识别</strong>：UART / SWD / JTAG / Boot Pin 的引脚排列和判断依据。</li>
+<li><strong>非标准跳线点</strong>：过孔矩阵、I²C/SPI 嗅探、测试点、盲绘电路图。</li>
+</ul>
+<h2 id="一上拉电阻与下拉电阻">一、上拉电阻与下拉电阻<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一上拉电阻与下拉电阻" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>上拉电阻（Pull-Up Resistor）和下拉电阻（Pull-Down Resistor）是数字电路中两种常见的电阻配置，用于在信号线未被驱动时确保逻辑电平稳定。</p>
+<p>理解电压与逻辑的关系：<br/>
+逻辑 1 (High Level/高电平)：通常等同于电源电压（例如 3.3V 或 5V）。<br/>
+逻辑 0 (Low Level/低电平)：通常等同于地电压（GND，即 0V）。</p>
+<h3 id="1-上拉电阻">1. 上拉电阻<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-上拉电阻" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>定义</strong>：连接在电源（Vcc）与信号线之间。当信号线未被驱动时，将其拉到高电平（逻辑 1）。</li>
+<li><strong>作用</strong>：
+<ul>
+<li>输入端悬空时保持确定的高电平，防止浮动状态（Undefined State）。</li>
+<li>常用于按键输入、开关等场景。</li>
+</ul>
+</li>
+<li><strong>示例</strong>：
+<ul>
+<li>按键未按下 → 信号线经上拉电阻接 Vcc，因为没有其他路径，信号线处于 Vcc 电压 → 高电平（逻辑 1）。</li>
+<li>按键按下 → 信号线直接接地，由于导线的电阻远小于上拉电阻，电流直接流向地 → 低电平（逻辑 0）。</li>
+</ul>
+</li>
+</ul>
+<p><strong>Q：为什么需要上拉电阻？（解决”悬空”问题）</strong></p>
+<p><strong>A：</strong> 在数字芯片的输入引脚看来，如果它没有接到任何地方（悬空），它非常容易受到周围环境电磁干扰，导致电平在 0 和 1 之间乱跳（即”浮动”）。这种状态是逻辑灾难，因为芯片不知道自己到底读到了什么。上拉电阻的作用就是：在没有人”拉”它的时候，强制把它”拽”到高电平。</p>
+<h3 id="2-下拉电阻">2. 下拉电阻<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-下拉电阻" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>定义</strong>：连接在信号线与地（GND）之间。当信号线未被驱动时，将其拉到低电平（逻辑 0）。</li>
+<li><strong>作用</strong>：
+<ul>
+<li>输入端悬空时保持确定的低电平。</li>
+<li>电流在无外部信号时接近于零，创建稳定的输入状态；有外部信号时电流流动，影响输入电平。</li>
+</ul>
+</li>
+<li><strong>示例</strong>：
+<ul>
+<li>开关未按下 → 信号线经下拉电阻接地 → 低电平（逻辑 0）。</li>
+<li>开关按下 → 信号线经开关接 Vcc → 高电平（逻辑 1）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-场景选择">3. 场景选择<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-场景选择" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>协议空闲态</th><th>电阻类型</th><th>典型场景</th></tr></thead><tbody><tr><td>高电平</td><td>上拉电阻</td><td>UART RX、I²C（SCL/SDA）</td></tr><tr><td>低电平</td><td>下拉电阻</td><td>部分片选信号（Chip Select）</td></tr></tbody></table></div>
+<blockquote>
+<p><strong>协议空闲态</strong>：总线或接口在无数据传输时的默认电平状态。</p>
+</blockquote>
+<p>常见协议空闲态：</p>
+<ul>
+<li><strong>UART</strong>：空闲为高电平。线路保持高表示无数据，出现低电平（起始位）表示传输开始。</li>
+<li><strong>I²C</strong>：SCL 和 SDA 空闲均为高电平。SDA 在 SCL 高电平时下降沿 = 起始条件。</li>
+<li><strong>SPI</strong>：空闲态由时钟极性（CPOL, Clock Polarity）和片选信号决定，通常片选为高时接口空闲。</li>
+</ul>
+<h3 id="4-flash-读取为什么用下拉电阻稳定0状态">4. Flash 读取为什么用下拉电阻（稳定0状态）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-flash-读取为什么用下拉电阻稳定0状态" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>给 Flash 芯片上电后，控制器/编程器会读取引脚状态（地址线、数据线、模式选择脚），这些引脚必须在上电瞬间稳定在规定的逻辑电平。</p>
+<ul>
+<li>
+<p><strong>下拉电阻过大的问题</strong>：电阻过大 → 电流过小 → 漏电流/耦合干扰/芯片内部弱上拉可能导致电平漂浮 → Flash 无法正确识别控制信号 → 读取失败。</p>
+</li>
+<li>
+<p><strong>类比（水流模型）</strong>：</p>
+<ul>
+<li>电压源 = 水箱水位</li>
+<li>电阻 = 水管粗细</li>
+<li>电流 = 水流量</li>
+<li>下拉电阻太大 = 水管太细，水流不足以把水位拉低。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>结论</strong>：Flash 使用下拉电阻是为了上电瞬间确保引脚电压稳定在逻辑低，避免悬空或干扰导致错误状态，保证芯片进入正确工作模式。</p>
+</blockquote>
+<h3 id="5-总结对比下拉电阻-vs-上拉电阻">5. 总结对比：下拉电阻 vs 上拉电阻<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-总结对比下拉电阻-vs-上拉电阻" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th><strong>特性</strong></th><th><strong>下拉电阻 (Pull-down)</strong></th><th><strong>上拉电阻 (Pull-up)</strong></th></tr></thead><tbody><tr><td><strong>默认状态</strong></td><td>逻辑 0 (GND)</td><td>逻辑 1 (Vcc)</td></tr><tr><td><strong>主要目标</strong></td><td>确保系统处于“静止/关断”状态</td><td>确保系统处于“准备/使能”状态</td></tr><tr><td><strong>安全性</strong></td><td>防止误操作，数据更安全</td><td>容易在不经意间激活芯片</td></tr><tr><td><strong>常见应用</strong></td><td>模式选择、重置脚、写保护脚</td><td>I2C 总线、中断信号、握手信号</td></tr></tbody></table></div>
+<hr/>
+<h2 id="二识别芯片引脚">二、识别芯片引脚<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#二识别芯片引脚" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="引脚-1-的定位标志">引脚 1 的定位标志<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#引脚-1-的定位标志" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>空心圆点</li>
+<li>箭头标记</li>
+<li>直接标出数字 “1”</li>
+</ul>
+<h3 id="其他引脚排列规律">其他引脚排列规律<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#其他引脚排列规律" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>从引脚 1 开始，<strong>逆时针</strong>方向依次排列（所有芯片均遵循此规律）。</p>
+<hr/>
+<h2 id="三nand-flash数据处理注意">三、NAND Flash数据处理注意<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#三nand-flash数据处理注意" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="核心概念">核心概念<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#核心概念" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>数据区域（Data Area）</strong>：存储实际内容。编程器读出的内容 = 数据 + 校验信息。</li>
+<li><strong>OOB（Out of Band，带外数据区）</strong>：额外数据区域，用于存储 ECC（Error Correction Code，错误纠正码）。</li>
+<li><strong>实际空间分配</strong>：需查看芯片手册，常见为 <code>0x800（数据）+ 0x40（校验）</code>。</li>
+<li><strong>运行时行为</strong>：程序加载到内存时只加载数据内容，校验数据不会被读入。</li>
+</ul>
+<h3 id="nor-flash-vs-nand-flash">NOR Flash vs NAND Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nor-flash-vs-nand-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>类型</th><th>用途</th><th>易失性</th><th>典型内容</th></tr></thead><tbody><tr><td>SDRAM</td><td>运行内存</td><td>是</td><td>启动后加载的代码/数据</td></tr><tr><td>NOR Flash</td><td>启动 + 固件（有时含完整根文件系统）</td><td>否</td><td>Bootloader（引导程序）、Kernel（内核）、rootfs（根文件系统）</td></tr><tr><td>NAND Flash</td><td>存储</td><td>否</td><td>rootfs、配置文件、日志</td></tr></tbody></table></div>
+<p>参考链接：</p>
+<ul>
+<li><a href="https://www.zhiwanyuzhou.com/index.php/2024/08/28/nand%e9%97%aa%e5%ad%98%e4%b9%8boob/" class="external">NAND Flash 之 OOB 详解<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://www.zhiwanyuzhou.com/index.php/2022/06/03/mrctf2022-iot%e9%a2%98%e7%9b%ae%e4%b9%8bnand%e6%9c%89%e6%95%88%e6%95%b0%e6%8d%ae%e5%88%86%e6%9e%90%ef%bc%881%ef%bc%89/" class="external">MRCTF2022 IoT 题目之 NAND 有效数据分析<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://blog.csdn.net/weixin_45209963/article/details/124502211" class="external">CSDN：NAND Flash 分析<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://www.ctfiot.com/38677.html" class="external">CTF IoT 分析案例<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://mp.weixin.qq.com/s/s_PDfNvzPvPi7KGwVyHZ-w" class="external">微信文章：NAND 分析<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul>
+<h3 id="识别有效数据方法">识别有效数据方法<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#识别有效数据方法" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p>“由于 BootLoader（引导加载程序）的文件结构没有统一格式，需要向文件后方区域分析，寻找有规律的数据块（如全 00 区域、连续字符串区域、特殊文件结构等）。”</p>
+</blockquote>
+<p>这些规律区域可帮助区分有效数据与无效数据，观察字节规律，便于还原文件字节排序。</p>
+<hr/>
+<h2 id="四识别-sdram--nor-flash--nand-flash">四、识别 SDRAM / NOR Flash / NAND Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#四识别-sdram--nor-flash--nand-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="核心区别速查">核心区别速查<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#核心区别速查" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>类型</th><th>用途</th><th>易失性</th><th>典型内容</th></tr></thead><tbody><tr><td><strong>SDRAM</strong></td><td>运行内存</td><td>✅ 是</td><td>启动时加载的代码/数据</td></tr><tr><td><strong>NOR Flash</strong></td><td>启动 + 固件（有时含完整根文件系统）</td><td>❌ 否</td><td>Bootloader、Kernel、rootfs</td></tr><tr><td><strong>NAND Flash</strong></td><td>存储</td><td>❌ 否</td><td>rootfs、配置文件、日志</td></tr></tbody></table></div>
+<h3 id="sdram同步动态随机存取存储器">SDRAM（同步动态随机存取存储器）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#sdram同步动态随机存取存储器" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>常见丝印标记</strong>：<code>DDR</code>、<code>SDRAM</code>、<code>MT</code>、<code>H5</code>、<code>K4</code></li>
+</ul>
+<h3 id="nor-flash">NOR Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nor-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>支持 <strong>XIP（Execute-In-Place，片内执行）</strong>，代码可直接在 Flash 上运行。</li>
+<li><strong>特征</strong>：
+<ul>
+<li>容量较小（通常 8–64 MB）</li>
+<li>SPI 或并行（Parallel）接口</li>
+<li>8 脚 SOIC（SPI NOR）或 TSOP 封装</li>
+</ul>
+</li>
+<li><strong>常见丝印标记</strong>：<code>W25Q</code>、<code>MX25</code>、<code>S25</code>、<code>EN25</code></li>
+<li><strong>逆向价值</strong>：最易 dump 的芯片，偏移量干净，几乎无磨损均衡（Wear-Leveling）干扰。</li>
+</ul>
+<h3 id="nand-flash">NAND Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nand-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>基于块（Block）存储，需要 ECC 纠错。</li>
+<li><strong>特征</strong>：
+<ul>
+<li>容量较大（128 MB 以上）</li>
+<li>TSOP-48 或 BGA 封装</li>
+<li>大量地址/数据线</li>
+</ul>
+</li>
+<li><strong>常见丝印标记</strong>：<code>MT29F</code>、<code>K9F</code>、<code>TC58</code></li>
+<li><strong>复杂因素</strong>：坏块（Bad Block）、ECC、磨损均衡，原始 dump 无控制器逻辑时常表现为”损坏”状态。</li>
+</ul>
+<hr/>
+<h2 id="五如何定位固件--文件系统位置">五、如何定位固件 / 文件系统位置<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#五如何定位固件--文件系统位置" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="step-1识别存储芯片">Step 1：识别存储芯片<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#step-1识别存储芯片" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>读取芯片丝印 → 搜索型号</li>
+<li>检查封装类型</li>
+</ul>
+<h3 id="step-2利用电路板布局线索">Step 2：利用电路板布局线索<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#step-2利用电路板布局线索" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>离 CPU 最近的 Flash → 通常是启动 NOR</li>
+<li>容量最大的 Flash → 通常是 NAND（文件系统）</li>
+<li>SDRAM 特征：大量等长走线、附近有终端匹配电阻</li>
+</ul>
+<h3 id="step-3dump-flash">Step 3：Dump Flash<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#step-3dump-flash" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>SPI NOR → 使用 <code>flashrom</code> 工具</li>
+<li>NAND → 使用编程器或拆焊 + 读取器</li>
+</ul>
+<h3 id="文件系统布局常见模式">文件系统布局常见模式<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#文件系统布局常见模式" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>纯 NOR 设备</strong>：</p>
+<pre><code>[ bootloader ][ kernel ][ rootfs ]
+</code></pre>
+<p><strong>NOR + NAND 设备</strong>：</p>
+<pre><code>NOR:  bootloader + kernel
+NAND: rootfs + data
+</code></pre>
+<blockquote>
+<p>掌握以上布局模式，通常可直接判断应该优先 dump 哪块芯片。</p>
+</blockquote>
+<h3 id="pcb-逆向技巧">PCB 逆向技巧<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#pcb-逆向技巧" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>跟踪启动引脚（Boot Pins）</strong>：SPI 走线 → NOR；宽并行总线 → NAND；DDR 走线 → SDRAM</li>
+<li><strong>UART 启动日志</strong>：常直接打印 <code>Loading kernel from SPI flash...</code>、<code>Mounting rootfs from NAND...</code>，即时给出答案。</li>
+</ul>
+<h3 id="漏洞研究方向">漏洞研究方向<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#漏洞研究方向" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>目标</th><th>对应存储</th></tr></thead><tbody><tr><td>Bootloader 漏洞</td><td>NOR Flash</td></tr><tr><td>Web/服务漏洞</td><td>NAND rootfs</td></tr><tr><td>运行时 RCE（远程代码执行）</td><td>仅 SDRAM</td></tr></tbody></table></div>
+<blockquote>
+<p><strong>攻击面映射（Attack Surface Mapping）从存储类型开始。</strong></p>
+</blockquote>
+<hr/>
+<h2 id="六逆向分析-pcb-电路板">六、逆向分析 PCB 电路板<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#六逆向分析-pcb-电路板" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>在不查看芯片丝印的情况下进行 PCB 逆向分析，依赖布局逻辑、走线特征、外围器件特征和信号完整性设计原则。</p>
+<p><img src=".././assets/pcb-board-reverse-engineering-example.webp" alt/></p>
+<h3 id="1-定位-cpu--soc主控芯片system-on-chip">1. 定位 CPU / SoC（主控芯片，System on Chip）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-定位-cpu--soc主控芯片system-on-chip" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>核心地位</strong>：引脚最多、封装最大、走线最密集的 BGA 芯片（球栅阵列封装）。</li>
+<li><strong>总线枢纽</strong>：所有信号的汇聚点，大量走线从此出发通往内存、闪存、网口等。</li>
+<li><strong>供电特征</strong>：周围环绕多组电感（方形黑色元件）和大量小型去耦电容（Decoupling Capacitor），主控需要多路低电压、大电流供电。</li>
+</ul>
+<h3 id="2-定位-dram内存dynamic-random-access-memory">2. 定位 DRAM（内存，Dynamic Random Access Memory）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-定位-dram内存dynamic-random-access-memory" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>等长走线（蛇形线）</strong>：判断内存最准确的特征。为保证高速数据同步，内存与 CPU 之间的走线必须长度一致，表现为弯曲并排的蛇形线。</li>
+<li><strong>紧邻 CPU</strong>：DDR 信号频率极高，为减少干扰，内存芯片紧贴 CPU。</li>
+<li><strong>封装</strong>：通常为长方形 BGA。</li>
+</ul>
+<p><img src=".././assets/pcb-dram-length-matched-traces.webp" alt/></p>
+<h3 id="3-定位-flash闪存--固件存储">3. 定位 Flash（闪存 / 固件存储）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-定位-flash闪存--固件存储" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>走线相对稀疏</strong>：SPI Flash 通常 8–16 引脚，走线比内存简单得多。</li>
+<li><strong>常见封装</strong>：SOP-8 或宽体 SOP-16；大容量 NAND Flash 为长方形多引脚 TSOP。</li>
+<li><strong>位置</strong>：靠近 CPU，但对距离要求不如内存严格。</li>
+</ul>
+<h3 id="4-定位调试引脚debug-ports--uart">4. 定位调试引脚（Debug Ports / UART）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-定位调试引脚debug-ports--uart" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>排针/焊盘特征</strong>：通常 3–4 个连续空闲焊盘或已焊接排针。</li>
+<li><strong>信号逻辑</strong>：一个接大面积铺铜（GND），一个接 3.3V 电源，另外两个（TX/RX）直连 CPU。</li>
+<li><strong>丝印标记</strong>：可能预留 <code>VCC, GND, TX, RX</code> 文字，或完全无标记但在 CPU 附近整齐排列。</li>
+</ul>
+<h3 id="5-其他功能模块辅助判断">5. 其他功能模块辅助判断<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-其他功能模块辅助判断" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>模块</th><th>识别特征</th><th>逆向逻辑</th></tr></thead><tbody><tr><td>网络接口（PHY / Switch，物理层芯片/交换机芯片）</td><td>靠近 RJ45 网口，连接黑色长方形网络变压器</td><td>变压器另一端连接的芯片 = 交换机芯片或 CPU</td></tr><tr><td>射频（Wi-Fi / RF）</td><td>位于屏蔽罩内，连接黑色或灰色天线馈线</td><td>顺天线找末端芯片 = 无线芯片（集成 SoC 则直接连主控）</td></tr><tr><td>电源管理（PMU，Power Management Unit）</td><td>靠近 DC 电源插座，周围有大型电感和电解电容</td><td>负责电压转换，为 CPU 和内存供电</td></tr></tbody></table></div>
+<h3 id="逆向思路总结">逆向思路总结<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#逆向思路总结" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li><strong>看走线</strong>：蛇形线 → 内存，粗线 → 电源，密集线 → CPU。</li>
+<li><strong>看外设</strong>：顺网口 → PHY，顺天线 → RF，顺电源口 → 供电。</li>
+<li><strong>看封装</strong>：大方块 → 主控，长方块 → 内存，小方块 → Flash。</li>
+</ol>
+<hr/>
+<h2 id="七调试引脚逆向识别">七、调试引脚逆向识别<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#七调试引脚逆向识别" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="1-bootstrap-引脚启动配置引脚">1. Bootstrap 引脚（启动配置引脚）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-bootstrap-引脚启动配置引脚" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>不用于持续通信，但决定芯片从何处启动（Flash 启动 / USB 烧录模式）。</p>
+<ul>
+<li><strong>判断依据</strong>：
+<ul>
+<li>CPU 附近一簇排列整齐的小电阻（0402 或 0201 封装），一端接 CPU 信号线，另一端接高电平或地。</li>
+<li>三个并排焊盘：中间为信号，两边分别为高电平和地，通过焊接 0Ω 电阻改变启动模式。</li>
+</ul>
+</li>
+<li><strong>逆向逻辑</strong>：需强制进入烧录模式时，找到这些电阻并短接。</li>
+</ul>
+<p><img src=".././assets/pcb-bootstrap-resistors.webp" alt/></p>
+<h3 id="2-常见调试接口速查">2. 常见调试接口速查<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-常见调试接口速查" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>接口</th><th>引脚数</th><th>典型排列</th><th>判断依据</th></tr></thead><tbody><tr><td><strong>UART</strong>（通用异步收发传输器）</td><td>3–4</td><td>1×4 线性</td><td>TX/RX 电压波动，电平通常为 3.3V</td></tr><tr><td><strong>SWD</strong>（串行线调试，ARM 专用）</td><td>2–4</td><td>1×4 或焊盘</td><td>仅 ARM 内核，CLK 引脚有恒定频率特征</td></tr><tr><td><strong>JTAG</strong>（联合测试行动组标准接口）</td><td>5–20</td><td>2×N 阵列或连续焊盘</td><td>引脚间有匹配电阻，信号直通 CPU 核心</td></tr><tr><td><strong>Boot Pin</strong>（启动配置引脚）</td><td>1–4</td><td>电阻群</td><td>位于 CPU 旁，通过电阻连接 VCC 或 GND</td></tr></tbody></table></div>
+<hr/>
+<h2 id="八非标准化接口的跳线点查找">八、非标准化接口的跳线点查找<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#八非标准化接口的跳线点查找" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>如果排除了 UART、SWD、JTAG 等标准调试接口，需要从非标准化调试或底层硬件配置入手。</p>
+<h3 id="1-寻找启动配置引脚bootstrap--strapping-pins">1. 寻找启动配置引脚（Bootstrap / Strapping Pins）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-寻找启动配置引脚bootstrap--strapping-pins" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>寻找 CPU 附近成排的 0Ω 电阻或空焊盘电阻位（一端接信号，另一端接 3.3V 或 GND）。</li>
+<li>改变其中一个引脚的电平（如高→低），可能使系统进入救援模式（Recovery Mode），这本身就是一种调试手段。</li>
+</ul>
+<h3 id="2-利用过孔矩阵via-matrix进行信号探测">2. 利用过孔矩阵（Via Matrix）进行信号探测<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-利用过孔矩阵via-matrix进行信号探测" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>BGA 芯片周围的过孔是天然测试点。</li>
+<li><strong>操作</strong>：用万用表通断档（Continuity）——表笔一头按在 Flash 芯片引脚（如 CLK 时钟线），另一头在 CPU 附近过孔阵列中扫过，找出直通核心总线的过孔。</li>
+<li><strong>刮开绿油（Solder Mask）</strong>：对未露出焊盘的过孔，用手术刀轻刮表面绿色阻焊漆，露出铜层后可焊接飞线（Jump Wire）进行逻辑分析。</li>
+</ul>
+<h3 id="3-寻找-ic--spi-嗅探点">3. 寻找 I²C / SPI 嗅探点<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-寻找-ic--spi-嗅探点" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>定位对象</strong>：板子上 8 脚或 16 脚小芯片（如 EEPROM 或传感器）。</li>
+<li><strong>I²C</strong>：寻找有一对上拉电阻（通常 4.7kΩ）连接到 3.3V 的线路。</li>
+<li><strong>SPI</strong>：寻找连接到 Winbond Flash 芯片的 1、2、5、6 脚。</li>
+<li>这些总线上常承载关键配置信息或加密密钥，挂载逻辑分析仪可实现旁路调试。</li>
+</ul>
+<h3 id="4-识别孤立测试点test-point-tp">4. 识别孤立测试点（Test Point, TP）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-识别孤立测试点test-point-tp" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>板上散布的金色小圆点，通常带有 <code>TP</code> 编号：</p>
+<ul>
+<li><strong>静态 TP</strong>：测量电压（1.1V 核心电压、1.8V 内存电压、3.3V I/O 电压）。</li>
+<li><strong>动态 TP</strong>：关键时钟信号（CLK）或复位信号（RESET）。</li>
+<li><strong>判断</strong>：用示波器测量，恒定 25MHz/40MHz 正弦波 = 晶振时钟测试点；上电瞬间跳变后保持高电平 = Reset 引脚。</li>
+</ul>
+<h3 id="5-盲绘电路图">5. 盲绘电路图<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-盲绘电路图" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li>确定地平面（GND）：大面积覆铜或电解电容负极。</li>
+<li>电源树溯源：从 DC 电源口 → 顺电感（标 <code>1R2</code> / <code>4R7</code> 的方块）→ 电感后过孔 = 主电源导轨。</li>
+<li>互连映射：
+<ul>
+<li>CPU → 内存：等长蛇形走线组。</li>
+<li>CPU → 网口：顺网络变压器引脚反推。</li>
+<li>CPU → 存储：顺 Flash 芯片 8 脚反推。</li>
+</ul>
+</li>
+</ol>
+<h3 id="总结最值得跳线的位置">总结：最值得跳线的位置<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#总结最值得跳线的位置" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><strong>CPU 与 Flash 芯片之间的 6 根 SPI 总线走线。</strong></p>
+</blockquote>
+<p>接上飞线后，可在系统运行时读取所有底层指令流，甚至挂载外部 Flash 替换原厂固件。</p></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-9" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#本文内容" data-for="本文内容">本文内容</a></li><li class="depth-0"><a href="#一上拉电阻与下拉电阻" data-for="一上拉电阻与下拉电阻">一、上拉电阻与下拉电阻</a></li><li class="depth-1"><a href="#1-上拉电阻" data-for="1-上拉电阻">1. 上拉电阻</a></li><li class="depth-1"><a href="#2-下拉电阻" data-for="2-下拉电阻">2. 下拉电阻</a></li><li class="depth-1"><a href="#3-场景选择" data-for="3-场景选择">3. 场景选择</a></li><li class="depth-1"><a href="#4-flash-读取为什么用下拉电阻稳定0状态" data-for="4-flash-读取为什么用下拉电阻稳定0状态">4. Flash 读取为什么用下拉电阻（稳定0状态）</a></li><li class="depth-1"><a href="#5-总结对比下拉电阻-vs-上拉电阻" data-for="5-总结对比下拉电阻-vs-上拉电阻">5. 总结对比：下拉电阻 vs 上拉电阻</a></li><li class="depth-0"><a href="#二识别芯片引脚" data-for="二识别芯片引脚">二、识别芯片引脚</a></li><li class="depth-1"><a href="#引脚-1-的定位标志" data-for="引脚-1-的定位标志">引脚 1 的定位标志</a></li><li class="depth-1"><a href="#其他引脚排列规律" data-for="其他引脚排列规律">其他引脚排列规律</a></li><li class="depth-0"><a href="#三nand-flash数据处理注意" data-for="三nand-flash数据处理注意">三、NAND Flash数据处理注意</a></li><li class="depth-1"><a href="#核心概念" data-for="核心概念">核心概念</a></li><li class="depth-1"><a href="#nor-flash-vs-nand-flash" data-for="nor-flash-vs-nand-flash">NOR Flash vs NAND Flash</a></li><li class="depth-1"><a href="#识别有效数据方法" data-for="识别有效数据方法">识别有效数据方法</a></li><li class="depth-0"><a href="#四识别-sdram--nor-flash--nand-flash" data-for="四识别-sdram--nor-flash--nand-flash">四、识别 SDRAM / NOR Flash / NAND Flash</a></li><li class="depth-1"><a href="#核心区别速查" data-for="核心区别速查">核心区别速查</a></li><li class="depth-1"><a href="#sdram同步动态随机存取存储器" data-for="sdram同步动态随机存取存储器">SDRAM（同步动态随机存取存储器）</a></li><li class="depth-1"><a href="#nor-flash" data-for="nor-flash">NOR Flash</a></li><li class="depth-1"><a href="#nand-flash" data-for="nand-flash">NAND Flash</a></li><li class="depth-0"><a href="#五如何定位固件--文件系统位置" data-for="五如何定位固件--文件系统位置">五、如何定位固件 / 文件系统位置</a></li><li class="depth-1"><a href="#step-1识别存储芯片" data-for="step-1识别存储芯片">Step 1：识别存储芯片</a></li><li class="depth-1"><a href="#step-2利用电路板布局线索" data-for="step-2利用电路板布局线索">Step 2：利用电路板布局线索</a></li><li class="depth-1"><a href="#step-3dump-flash" data-for="step-3dump-flash">Step 3：Dump Flash</a></li><li class="depth-1"><a href="#文件系统布局常见模式" data-for="文件系统布局常见模式">文件系统布局常见模式</a></li><li class="depth-1"><a href="#pcb-逆向技巧" data-for="pcb-逆向技巧">PCB 逆向技巧</a></li><li class="depth-1"><a href="#漏洞研究方向" data-for="漏洞研究方向">漏洞研究方向</a></li><li class="depth-0"><a href="#六逆向分析-pcb-电路板" data-for="六逆向分析-pcb-电路板">六、逆向分析 PCB 电路板</a></li><li class="depth-1"><a href="#1-定位-cpu--soc主控芯片system-on-chip" data-for="1-定位-cpu--soc主控芯片system-on-chip">1. 定位 CPU / SoC（主控芯片，System on Chip）</a></li><li class="depth-1"><a href="#2-定位-dram内存dynamic-random-access-memory" data-for="2-定位-dram内存dynamic-random-access-memory">2. 定位 DRAM（内存，Dynamic Random Access Memory）</a></li><li class="depth-1"><a href="#3-定位-flash闪存--固件存储" data-for="3-定位-flash闪存--固件存储">3. 定位 Flash（闪存 / 固件存储）</a></li><li class="depth-1"><a href="#4-定位调试引脚debug-ports--uart" data-for="4-定位调试引脚debug-ports--uart">4. 定位调试引脚（Debug Ports / UART）</a></li><li class="depth-1"><a href="#5-其他功能模块辅助判断" data-for="5-其他功能模块辅助判断">5. 其他功能模块辅助判断</a></li><li class="depth-1"><a href="#逆向思路总结" data-for="逆向思路总结">逆向思路总结</a></li><li class="depth-0"><a href="#七调试引脚逆向识别" data-for="七调试引脚逆向识别">七、调试引脚逆向识别</a></li><li class="depth-1"><a href="#1-bootstrap-引脚启动配置引脚" data-for="1-bootstrap-引脚启动配置引脚">1. Bootstrap 引脚（启动配置引脚）</a></li><li class="depth-1"><a href="#2-常见调试接口速查" data-for="2-常见调试接口速查">2. 常见调试接口速查</a></li><li class="depth-0"><a href="#八非标准化接口的跳线点查找" data-for="八非标准化接口的跳线点查找">八、非标准化接口的跳线点查找</a></li><li class="depth-1"><a href="#1-寻找启动配置引脚bootstrap--strapping-pins" data-for="1-寻找启动配置引脚bootstrap--strapping-pins">1. 寻找启动配置引脚（Bootstrap / Strapping Pins）</a></li><li class="depth-1"><a href="#2-利用过孔矩阵via-matrix进行信号探测" data-for="2-利用过孔矩阵via-matrix进行信号探测">2. 利用过孔矩阵（Via Matrix）进行信号探测</a></li><li class="depth-1"><a href="#3-寻找-ic--spi-嗅探点" data-for="3-寻找-ic--spi-嗅探点">3. 寻找 I²C / SPI 嗅探点</a></li><li class="depth-1"><a href="#4-识别孤立测试点test-point-tp" data-for="4-识别孤立测试点test-point-tp">4. 识别孤立测试点（Test Point, TP）</a></li><li class="depth-1"><a href="#5-盲绘电路图" data-for="5-盲绘电路图">5. 盲绘电路图</a></li><li class="depth-1"><a href="#总结最值得跳线的位置" data-for="总结最值得跳线的位置">总结：最值得跳线的位置</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-2" class="overflow"><li><a href="../tech/index.cn" class="internal">技术笔记</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>
