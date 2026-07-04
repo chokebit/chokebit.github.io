@@ -1,0 +1,72 @@
+.language-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: 4px;
+
+  .lang-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gray);
+    border-radius: 3px;
+    transition: color 0.15s, background 0.15s;
+
+    &:hover {
+      color: var(--dark);
+    }
+
+    &.active {
+      color: var(--dark);
+      background: var(--highlight);
+    }
+
+    &[data-href=""] {
+      opacity: 0.4;
+      cursor: default;
+
+      &:hover {
+        color: var(--gray);
+      }
+    }
+  }
+
+  .lang-sep {
+    color: var(--gray);
+    font-size: 0.8rem;
+    opacity: 0.4;
+    margin: 0 1px;
+  }
+}
+
+// EN mode: hide .cn file nodes in Explorer
+[data-user-lang="en"] .explorer li:has(> a[data-for*=".cn"]) {
+  display: none;
+}
+// CN mode: hide non-.cn file nodes, but keep .cn ones visible
+[data-user-lang="cn"] .explorer li:has(> a[data-for]:not([data-for*=".cn"])) {
+  display: none;
+}
+// CN mode: hide index.cn file nodes (folder renamed to CN, so child is redundant)
+[data-user-lang="cn"] .explorer li:has(> a[data-for$="index.cn"]) {
+  display: none;
+}
+// EN mode: hide .cn backlinks
+[data-user-lang="en"] .backlinks li:has(> a[href*=".cn"]) {
+  display: none;
+}
+// CN mode: hide non-.cn backlinks
+[data-user-lang="cn"] .backlinks li:has(> a[href]:not([href*=".cn"])) {
+  display: none;
+}
+// Folder page content: hide .cn links in EN mode
+[data-user-lang="en"] .section-li:has(a[href*=".cn"]) {
+  display: none;
+}
+// Folder page content: hide non-.cn links in CN mode
+[data-user-lang="cn"] .section-li:has(a[href]:not([href*=".cn"])) {
+  display: none;
+}

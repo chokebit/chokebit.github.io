@@ -1,0 +1,59 @@
+@use "./base.scss";
+
+// Center content max-width
+.center {
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+// Left sidebar: turntrout-style compact vertical stack
+.sidebar.left {
+  padding-top: 1.5rem;
+  gap: 0.6rem;
+
+  .page-title {
+    margin-bottom: 0;
+    font-size: 1.25rem;
+  }
+
+  .flex-component {
+    margin-bottom: 0;
+  }
+
+  .explorer {
+    margin-top: 0.25rem;
+
+    .title-button > h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    // File/folder items: breathing room
+    li {
+      margin-bottom: 0.15rem;
+    }
+
+    // Separator between items (not after the last one)
+    a[data-for] {
+      display: block;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      line-height: 1.4;
+
+      &:hover {
+        background: var(--highlight);
+      }
+
+      &.active {
+        background: var(--highlight);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Right sidebar: compact
+.sidebar.right {
+  padding-top: 2rem;
+}

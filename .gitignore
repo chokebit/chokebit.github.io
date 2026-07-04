@@ -1,20 +1,23 @@
 # === 私密区域：绝对不上传 ===
 /01-raw/
 /02-drafts/
+/04-social/
 
 # === 系统文件 ===
 .DS_Store
 Thumbs.db
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/cache
+/.obsidian/
 
 # === Quartz 构建产物 ===
 /public/
 /node_modules/
-/.quartz-cache/
+.quartz-cache/
 
 # === 敏感信息 ===
 .env
 .env.*
 *.token
+USERGUIDE.md
+SYSTEM.md
+CHANGELOG.md
+setup-quartz.sh

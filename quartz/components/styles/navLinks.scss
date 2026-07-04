@@ -1,0 +1,26 @@
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0.5rem 0;
+
+  .nav-link {
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--darkgray);
+    text-decoration: none;
+    transition: background 0.1s, color 0.1s;
+
+    &:hover {
+      background: var(--highlight);
+      color: var(--dark);
+    }
+
+    &[aria-current="page"] {
+      background: var(--highlight);
+      color: var(--dark);
+      font-weight: 600;
+    }
+  }
+}
