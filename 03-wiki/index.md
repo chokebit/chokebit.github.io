@@ -8,7 +8,6 @@ translations:
 ## About Me
 
 X
-Play crazily while playing, and do your best while studying.
 
 ## Media
 
