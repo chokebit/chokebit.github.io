@@ -6,65 +6,65 @@
       <description>Last 10 notes on Chokebit Wiki</description>
       <generator>Quartz -- quartz.jzhao.xyz</generator>
       <item>
-    <title>技术笔记</title>
-    <link>https://tech/index.cn</link>
-    <guid>https://tech/index.cn</guid>
-    <description><![CDATA[ 技术笔记 编程、工具使用、技术实践。 文章列表 硬件逆向基础：从电阻到芯片 Markdown-Quartz 渲染一致性速查表 . ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
+    <title>AI 时代下 LLM 构建知识体系</title>
+    <link>https://ideas/building-knowledge-with-llms.cn</link>
+    <guid>https://ideas/building-knowledge-with-llms.cn</guid>
+    <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 传统笔记为什么失效：记了不看、碎片化、垃圾堆积的根源。 AI 时代的学习记录新可能：从被动囤积到主动重构，AI 放大整理能力。 LLM 具体做什么：筛选、合并、删除、链接——四项核心能力。 我的工作流：分批投料 → AI 提案 → 人工审核 → 执行 → 人工复查 → 发布。 踩过的坑：不能一次全丢、目录先于内容、中英双语远超预期。 分享即学习，利他即利己：本博客的设计初心。 一、传统笔记为什么失效 每个人大概都有这样的经历：浏览器剪藏了一堆文章、Markdown 笔记存了几百篇、截图和 PDF 塞满文件夹。然后再也没有打开过。 问题不在工具，在... ]]></description>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
   </item><item>
-    <title>Tech Notes</title>
-    <link>https://tech/</link>
-    <guid>https://tech/</guid>
-    <description><![CDATA[ Tech Notes Programming, tools, technical practices. Articles Hardware Reverse Engineering Basics Markdown-Quartz Rendering Cheatsheet . ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
-  </item><item>
-    <title>Markdown-Quartz 渲染一致性速查表</title>
-    <link>https://tech/markdown-quartz-rendering-cheatsheet.cn</link>
-    <guid>https://tech/markdown-quartz-rendering-cheatsheet.cn</guid>
-    <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 为什么 Obsidian 里好好的，Web 上就乱了：实时预览 vs 标准渲染。 换行三型法：空行、双空格+回车、单回车，各自的效果和适用场景。 图片语法：从 Obsidian 粘贴到生产就绪路径。 文件路径与 URL：slug 是什么，文件命名如何决定访问地址。 发布前验证：Obsidian 阅读模式 = Quartz 渲染结果。 一、Obsidian 和 Quartz 对 Markdown 的处理不同 Obsidian 的实时预览（Live Preview）为了写作体验更流畅，单回车就换行。但 Quartz 使用的 remark 渲染器遵循 ... ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
-  </item><item>
-    <title>Markdown-Quartz Rendering Consistency Cheatsheet</title>
-    <link>https://tech/markdown-quartz-rendering-cheatsheet</link>
-    <guid>https://tech/markdown-quartz-rendering-cheatsheet</guid>
-    <description><![CDATA[  Errors are inevitable — read critically. Contents Why it looks fine in Obsidian but breaks on the web: Live Preview vs. standard rendering. ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
-  </item><item>
-    <title>硬件逆向基础：从电阻到芯片，一块电路板的完整分析指南</title>
-    <link>https://tech/pcb-reverse-engineering-guide.cn</link>
-    <guid>https://tech/pcb-reverse-engineering-guide.cn</guid>
-    <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 上拉/下拉电阻：理解数字电路的底层逻辑基石，以及为什么 Flash 读取必须用下拉电阻。 芯片引脚识别：所有芯片通用的引脚 1 定位法与逆时针排列规律。 三大存储芯片（SDRAM / NOR / NAND）：从用途、封装、丝印到逆向价值的完整对比。 定位固件位置：通过电路板布局快速判断固件在哪颗芯片上。 PCB 逆向实操：不靠丝印，靠蛇形线找内存、靠 BGA 找 CPU、靠 SOP 找 Flash。 调试接口识别：UART / SWD / JTAG / Boot Pin 的引脚排列和判断依据。 非标准跳线点：过孔矩阵、I²C/SPI 嗅探、测试点... ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
-  </item><item>
-    <title>Hardware Reverse Engineering Basics — A Complete PCB Analysis Guide</title>
-    <link>https://tech/pcb-reverse-engineering-guide</link>
-    <guid>https://tech/pcb-reverse-engineering-guide</guid>
+    <title>Building a Knowledge System with LLMs in the AI Era</title>
+    <link>https://ideas/building-knowledge-with-llms</link>
+    <guid>https://ideas/building-knowledge-with-llms</guid>
     <description><![CDATA[  Errors are inevitable — read critically. ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
   </item><item>
     <title>想法随笔</title>
     <link>https://ideas/index.cn</link>
     <guid>https://ideas/index.cn</guid>
     <description><![CDATA[ 想法随笔 个人思考、碎片灵感、日常反思。 文章列表 AI 时代下 LLM 构建知识体系 . ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
   </item><item>
     <title>Ideas</title>
     <link>https://ideas/</link>
     <guid>https://ideas/</guid>
     <description><![CDATA[ Ideas Personal thoughts, fragments, daily reflections. Articles Building a Knowledge System with LLMs . ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
   </item><item>
     <title>Chokebit Wiki</title>
     <link>https://index.cn</link>
     <guid>https://index.cn</guid>
-    <description><![CDATA[ 关于我 X 玩的时候尽情玩，学的时候全力以赴。 媒体 演讲、访谈、视频等媒体内容。 赞助 如果你觉得这里的内容有价值，欢迎支持。 使用侧栏语言切换按钮切换 English / 中文。. ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
+    <description><![CDATA[ 关于我 X 媒体 null 赞助 如果你觉得这里的内容有价值，欢迎支持。 使用侧栏语言切换按钮切换 English / 中文。. ]]></description>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
   </item><item>
     <title>Chokebit Wiki</title>
     <link>https:///</link>
     <guid>https:///</guid>
-    <description><![CDATA[ About Me X Play crazily while playing, and do your best while studying. Media Talks, interviews, videos, and other media appearances. ]]></description>
-    <pubDate>Tue, 04 Aug 2026 00:48:37 GMT</pubDate>
+    <description><![CDATA[ About Me X Media Talks, interviews, videos, and other media appearances. Donate If you find value here, consider supporting my work. ]]></description>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
+  </item><item>
+    <title>摘要记录</title>
+    <link>https://reading/index.cn</link>
+    <guid>https://reading/index.cn</guid>
+    <description><![CDATA[ 摘要记录 书籍、文章、视频的摘要与关键记录。 文章列表 . ]]></description>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
+  </item><item>
+    <title>Summary Notes</title>
+    <link>https://reading/</link>
+    <guid>https://reading/</guid>
+    <description><![CDATA[ Summary Notes Summaries and key takeaways from books, articles, videos. Articles . ]]></description>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
+  </item><item>
+    <title>技术笔记</title>
+    <link>https://tech/index.cn</link>
+    <guid>https://tech/index.cn</guid>
+    <description><![CDATA[ 技术笔记 编程、工具使用、技术实践。 文章列表 硬件逆向基础：从电阻到芯片 Markdown-Quartz 渲染一致性速查表 . ]]></description>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
+  </item><item>
+    <title>Tech Notes</title>
+    <link>https://tech/</link>
+    <guid>https://tech/</guid>
+    <description><![CDATA[ Tech Notes Programming, tools, technical practices. Articles Hardware Reverse Engineering Basics Markdown-Quartz Rendering Cheatsheet . ]]></description>
+    <pubDate>Tue, 04 Aug 2026 00:51:55 GMT</pubDate>
   </item>
     </channel>
   </rss>
