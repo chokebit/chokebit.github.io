@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><title>Network Troubleshooting Handbook</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Chokebit Wiki"/><meta property="og:title" content="Network Troubleshooting Handbook"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Network Troubleshooting Handbook"/><meta name="twitter:description" content="Errors are inevitable — read critically."/><meta property="og:description" content="Errors are inevitable — read critically."/><meta property="og:image:alt" content="Errors are inevitable — read critically."/><meta property="og:image" content="https://undefined/static/og-image.png"/><meta property="og:image:url" content="https://undefined/static/og-image.png"/><meta name="twitter:image" content="https://undefined/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="Errors are inevitable — read critically."/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://undefined/index.xml"/></head><body data-slug="tech/network-troubleshooting-handbook"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Chokebit Wiki</a></h2><div class="flex-component" style="flex-direction: row; flex-wrap: wrap; gap: 0.25rem;"><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="language-toggle"><button class="lang-btn active" data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn " data-lang="cn" data-href="tech/network-troubleshooting-handbook.cn" aria-label="中文">中文</button></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div></div><div class="explorer desktop-only" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-27"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>All Posts</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-27" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Notes</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>Network Troubleshooting Handbook</a></div></nav><h1 class="article-title">Network Troubleshooting Handbook</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-04T08:29:56.661Z">Aug 04, 2026</time><span>10 min read</span></p><ul class="tags"><li><a href="../tags/network" class="internal tag-link">network</a></li><li><a href="../tags/security" class="internal tag-link">security</a></li><li><a href="../tags/workflow" class="internal tag-link">workflow</a></li></ul></div></div><article class="popover-hint"><blockquote>
+<p>Errors are inevitable — read critically.</p>
+</blockquote>
+<h2 id="contents">Contents<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#contents" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>Core Principle</strong>: Network problems = packets not flowing as expected</li>
+<li><strong>Golden Troubleshooting Flow</strong>: Bottom-up, layer by layer</li>
+<li><strong>Eleven Phases</strong>: Interface → IP → Route → ARP → Connectivity → Path → Port → Capture</li>
+<li><strong>The Complete Life of a ping</strong>: What happens behind a single ping</li>
+<li><strong>Four Network Communication Paths</strong>: Local, same subnet, cross-subnet, NAT</li>
+<li><strong>NAT / iptables / conntrack Deep Dive</strong>: Their relationship and debugging</li>
+<li><strong>Dual NIC Management</strong>: Multi-route tables, DHCP, nmcli</li>
+<li><strong>Tool Quick Reference</strong>: Minimal toolset for Linux + Windows</li>
+</ul>
+<hr/>
+<h2 id="i-core-principles">I. Core Principles<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#i-core-principles" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="the-nature-of-network-problems">The Nature of Network Problems<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#the-nature-of-network-problems" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Packets are not flowing along the expected path.
+</code></pre>
+<h3 id="basic-troubleshooting-method">Basic Troubleshooting Method<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#basic-troubleshooting-method" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Observe → Hypothesize → Verify
+</code></pre>
+<h3 id="engineering-rule">Engineering Rule<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#engineering-rule" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Troubleshoot from the bottom up.
+</code></pre>
+<p>Order:</p>
+<pre><code>Physical → Link → IP → TCP/UDP → Application
+</code></pre>
+<h3 id="osi-model-key-principle">OSI Model Key Principle<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#osi-model-key-principle" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Upper layers work → lower layers are definitely fine.
+Lower layer failure → upper layers will be abnormal.
+</code></pre>
+<hr/>
+<h2 id="ii-network-layers-engineering-perspective">II. Network Layers (Engineering Perspective)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ii-network-layers-engineering-perspective" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>OSI seven layers simplified to five in practice:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Layer</th><th>Role</th><th>Examples</th></tr></thead><tbody><tr><td>Application</td><td>User programs</td><td>HTTP, DNS, SSH</td></tr><tr><td>Transport</td><td>Port communication</td><td>TCP, UDP</td></tr><tr><td>Network</td><td>IP addressing</td><td>IPv4, IPv6</td></tr><tr><td>Link</td><td>MAC communication</td><td>Ethernet</td></tr><tr><td>Physical</td><td>Electrical signals</td><td>NIC</td></tr></tbody></table></div>
+<h3 id="engineering-communication-model">Engineering Communication Model<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#engineering-communication-model" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Network communication = Address + Route + Forwarding + State + Policy
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Layer</th><th>Key Question</th><th>Example</th></tr></thead><tbody><tr><td>Address</td><td>Who am I</td><td>IP / MAC</td></tr><tr><td>Route</td><td>Where am I going</td><td>route</td></tr><tr><td>Forwarding</td><td>Who is the next hop</td><td>ARP</td></tr><tr><td>State</td><td>Is it allowed</td><td>conntrack</td></tr><tr><td>Policy</td><td>Is it blocked</td><td>firewall</td></tr></tbody></table></div>
+<p>So network troubleshooting generally follows:</p>
+<pre><code>IP → ARP → Route → Forward → Firewall → Application
+</code></pre>
+<hr/>
+<h2 id="iii-the-golden-troubleshooting-flow">III. The Golden Troubleshooting Flow<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#iii-the-golden-troubleshooting-flow" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<pre><code>1. Network Interface (NIC status)
+2. IP Address (identity)
+3. Route (egress)
+4. ARP (neighbors)
+5. Connectivity (ping)
+6. Path Detection (traceroute)
+7. Port Status (services)
+8. Packet Capture (final resort)
+</code></pre>
+<hr/>
+<h2 id="iv-phase-1-network-interface">IV. Phase 1: Network Interface<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#iv-phase-1-network-interface" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Check NIC status.</p>
+<h3 id="linux">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> link</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP></span></span></code></pre></figure>
+<p>Both <code>UP</code> and <code>LOWER_UP</code> mean the interface is enabled and physically connected.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> link</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> set</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> up</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # Enable interface</span></span></code></pre></figure>
+<h3 id="windows">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ipconfig</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /all</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># or</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Get-NetAdapter</span></span></code></pre></figure>
+<hr/>
+<h2 id="v-phase-2-ip-address">V. Phase 2: IP Address<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#v-phase-2-ip-address" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>IP address defines host identity.</p>
+<h3 id="linux-1">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> addr</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># inet 192.168.1.10/24</span></span></code></pre></figure>
+<h3 id="windows-1">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ipconfig</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># IPv4 Address . . . : 192.168.1.10</span></span></code></pre></figure>
+<hr/>
+<h2 id="vi-phase-3-route">VI. Phase 3: Route<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vi-phase-3-route" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Routes determine packet egress. Reference: RFC 1812 (IP Routing).</p>
+<h3 id="linux-2">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># default via 192.168.1.1 dev eth0</span></span></code></pre></figure>
+<p>Test the route for a specific IP:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 8.8.8.8 via 192.168.31.1 dev ens33 src 192.168.31.101</span></span></code></pre></figure>
+<h3 id="windows-2">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> print</span></span></code></pre></figure>
+<p>Add a route:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 10.0.0.0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mask</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 255.255.255.0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.1.1</span></span></code></pre></figure>
+<h3 id="route-table-fields-explained">Route Table Fields Explained<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#route-table-fields-explained" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody><tr><td>Destination</td><td>Target network. <code>0.0.0.0</code> = unknown / default</td></tr><tr><td>Gateway</td><td>Next hop. <code>0.0.0.0</code> = directly connected</td></tr><tr><td>Genmask</td><td>Subnet mask</td></tr><tr><td>Flags</td><td>U=Up, G=Gateway, H=Host, D=Dynamic</td></tr><tr><td>Metric</td><td>Priority — lower is preferred</td></tr><tr><td>Iface</td><td>Egress interface</td></tr></tbody></table></div>
+<p>Summary: Access an IP → route table uses <code>IP &amp; Genmask</code> to calculate subnet → Destination → Iface → Gateway → target server.</p>
+<hr/>
+<h2 id="vii-phase-4-arp">VII. Phase 4: ARP<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vii-phase-4-arp" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>ARP handles <code>IP → MAC</code>. Reference: RFC 826.</p>
+<h3 id="linux-3">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> neigh</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 192.168.31.1 dev ens33 lladdr 4c:c6:4c:bf:ca:6e REACHABLE</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">arp</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Address            HWtype  HWaddress           Flags Mask  Iface</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 192.168.31.1       ether   4c:c6:4c:bf:ca:6e   C           ens33</span></span></code></pre></figure>
+<p>Clear ARP:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> neigh</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> flush</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> all</span></span></code></pre></figure>
+<h3 id="windows-3">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">arp</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -a</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">arp</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -d</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> *</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # Clear</span></span></code></pre></figure>
+<h3 id="arp-table-vs-route-table">ARP Table vs Route Table<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#arp-table-vs-route-table" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Route table decides where the packet goes.
+ARP table decides who gets it.
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Table</th><th>Function</th><th>Example</th></tr></thead><tbody><tr><td>Route</td><td>IP → next hop</td><td><code>8.8.8.8 → 192.168.1.1</code></td></tr><tr><td>ARP</td><td>IP → MAC</td><td><code>192.168.1.1 → aa:bb:cc:dd</code></td></tr></tbody></table></div>
+<hr/>
+<h2 id="viii-phase-5-network-connectivity">VIII. Phase 5: Network Connectivity<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#viii-phase-5-network-connectivity" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="ping-ip-layer-check">ping (IP Layer Check)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ping-ip-layer-check" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Reference: RFC 792 (ICMP).</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Linux</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Windows</span></span></code></pre></figure>
+<h3 id="the-complete-life-of-a-ping">The Complete Life of a ping<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#the-complete-life-of-a-ping" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Host A <code>192.168.1.10</code> pings host B <code>192.168.2.10</code>, gateway <code>192.168.1.1</code>.</p>
+<p><strong>Step 1 — DNS Resolution</strong> (if using a domain name):</p>
+<pre><code>Application → getaddrinfo() → libc resolver → /etc/resolv.conf → DNS server → returns IP
+</code></pre>
+<p><strong>Step 2 — Route Decision</strong>:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.2.10</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 192.168.2.10 via 192.168.1.1 dev eth0</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># → next hop = 192.168.1.1</span></span></code></pre></figure>
+<p><strong>Step 3 — ARP Resolution</strong>:</p>
+<pre><code>System broadcasts:
+  ARP Request: Who has 192.168.1.1? Tell 192.168.1.10
+
+Gateway replies:
+  192.168.1.1 is at aa:bb:cc:dd:ee
+
+Cached:
+  ip neigh → 192.168.1.1 ... REACHABLE
+</code></pre>
+<p><strong>Step 4 — Send Ethernet Frame</strong>:</p>
+<pre><code>Ethernet Frame:
+  dst MAC = gateway
+  src MAC = host
+   └─ IP packet
+       └─ ICMP
+</code></pre>
+<p><strong>Step 5 — Gateway Forwarding</strong>:</p>
+<pre><code>Gateway checks route table: 192.168.2.0/24 dev vlan20
+Gateway ARPs for B: who has 192.168.2.10
+</code></pre>
+<p><strong>Step 6 — Re-encapsulation</strong>:</p>
+<p>Gateway modifies MAC, <strong>does not modify IP</strong>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Field</th><th>Changed?</th></tr></thead><tbody><tr><td>src MAC</td><td>Yes (replaced with gateway egress MAC)</td></tr><tr><td>dst MAC</td><td>Yes (replaced with target MAC)</td></tr><tr><td>src IP</td><td>No</td></tr><tr><td>dst IP</td><td>No</td></tr></tbody></table></div>
+<p><strong>Step 7 — Target Host Reply</strong>:</p>
+<pre><code>ICMP echo reply: B → gateway → A
+</code></pre>
+<h3 id="why-check-the-path-when-ping-fails">Why Check the Path When ping Fails?<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#why-check-the-path-when-ping-fails" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>IP reachable ≠ Application reachable
+</code></pre>
+<p>If ping fails, at least one condition exists:</p>
+<pre><code>1. Route does not exist
+2. Intermediate device dropping packets
+3. Firewall blocking
+4. Target does not exist
+</code></pre>
+<hr/>
+<h2 id="ix-phase-6-path-detection">IX. Phase 6: Path Detection<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ix-phase-6-path-detection" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>View the network path.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">traceroute</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # Linux</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tracert</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Windows</span></span></code></pre></figure>
+<h3 id="four-network-communication-paths">Four Network Communication Paths<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#four-network-communication-paths" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>1. Local communication</strong>:</p>
+<pre><code>127.0.0.1
+
+Application → Socket → Loopback Interface → Application
+(No NIC, ARP, or routing involved)
+</code></pre>
+<p><strong>2. Same-subnet communication</strong>:</p>
+<pre><code>A 192.168.1.10 → B 192.168.1.20
+
+A → ARP for B's MAC → Send Ethernet Frame directly → B
+(No routing, only ARP)
+</code></pre>
+<p><strong>3. Cross-subnet communication</strong>:</p>
+<pre><code>A 192.168.1.10 → B 192.168.2.10
+
+A → check route → next hop = gateway → ARP for gateway MAC → send to gateway → gateway forwards → B
+
+Core rule: IP stays the same, MAC changes every hop.
+</code></pre>
+<p><strong>4. NAT communication</strong>:</p>
+<pre><code>192.168.1.10 → NAT Router → Internet
+
+SNAT: 192.168.1.10:4444 → 1.2.3.4:50000
+Return: 1.2.3.4:50000 → 192.168.1.10:4444
+
+Relies on conntrack.
+</code></pre>
+<hr/>
+<h2 id="x-phase-7-port-status">X. Phase 7: Port Status<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#x-phase-7-port-status" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="why-check-ports-after-confirming-the-path">Why Check Ports After Confirming the Path?<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#why-check-ports-after-confirming-the-path" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>IP reachable ≠ Application reachable
+</code></pre>
+<p>Services run on TCP/UDP. Example: Server IP reachable but port 80 is closed → ping works, HTTP fails.</p>
+<h3 id="linux-4">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ss</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -lntp</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # Listening ports</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ss</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -ant</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">     # All connections</span></span></code></pre></figure>
+<h3 id="windows-4">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">netstat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -ano</span></span></code></pre></figure>
+<hr/>
+<h2 id="xi-packet-capture-final-resort">XI. Packet Capture (Final Resort)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#xi-packet-capture-final-resort" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Packet capture is the <strong>most important</strong> network troubleshooting tool. Path and port checks are “logical checks,” but intermediate device issues (firewall, NAT, load balancer, ACL, IPS) cannot be seen with system commands — you must capture.</p>
+<h3 id="linux--tcpdump">Linux — tcpdump<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux--tcpdump" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">              # All traffic</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> host</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Specific IP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> port</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 80</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">              # HTTP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> arp</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                  # ARP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -w</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dump.pcap</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"> # Save to file</span></span></code></pre></figure>
+<h3 id="windows--pktmon">Windows — pktmon<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows--pktmon" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">pktmon</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> start</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --capture</span></span></code></pre></figure>
+<h3 id="wireshark-cross-platform">Wireshark (Cross-Platform)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#wireshark-cross-platform" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Supports Windows / Linux / macOS. Docs: <a href="https://www.wireshark.org/docs/" class="external">https://www.wireshark.org/docs/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></p>
+<hr/>
+<h2 id="xii-nat--iptables--conntrack-deep-dive">XII. NAT / iptables / conntrack Deep Dive<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#xii-nat--iptables--conntrack-deep-dive" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="the-relationship">The Relationship<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#the-relationship" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Netfilter (Linux firewall framework)
+ ├─ conntrack   (connection state tracking)
+ ├─ iptables    (rule control system)
+ └─ NAT         (address translation module)
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Component</th><th>What It Is</th></tr></thead><tbody><tr><td>conntrack</td><td>Connection state tracking system</td></tr><tr><td>iptables</td><td>Rule control system (tool to operate Netfilter)</td></tr><tr><td>NAT</td><td>Address translation module (<strong>100% depends on conntrack</strong>)</td></tr></tbody></table></div>
+<h3 id="linux-netfilter-architecture">Linux Netfilter Architecture<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-netfilter-architecture" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>                Userspace
+                ──────────
+                 iptables / nftables
+                      │
+                Kernel Space
+                ────────────
+                   Netfilter
+                      │
+      ┌───────────────┼───────────────┐
+      │               │               │
+  conntrack         NAT            filter
+</code></pre>
+<h3 id="netfilter-five-hooks">Netfilter Five Hooks<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#netfilter-five-hooks" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>            incoming
+               │
+           PREROUTING
+               │
+      ┌────────┴─────────┐
+      │                  │
+    routing            local
+      │                  │
+   FORWARD             INPUT
+      │                  │
+      └──────┬───────────┘
+             │
+          OUTPUT
+             │
+         POSTROUTING
+             │
+           outgoing
+</code></pre>
+<h3 id="complete-packet-flow-diagram">Complete Packet Flow Diagram<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#complete-packet-flow-diagram" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>NIC receive
+  │
+NIC Driver
+  │
+Kernel protocol stack entry
+  │
+Netfilter PREROUTING
+  ├─ raw → mangle → nat (DNAT)
+  │
+conntrack
+  │
+Routing decision
+  ├─ INPUT  → mangle → filter → local process
+  └─ FORWARD → mangle → filter → POSTROUTING
+                                    │
+                                  mangle → nat (SNAT) → NIC send
+</code></pre>
+<h3 id="where-nat-happens">Where NAT Happens<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#where-nat-happens" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Hook</th><th>NAT Type</th></tr></thead><tbody><tr><td>PREROUTING</td><td>DNAT (destination address translation)</td></tr><tr><td>OUTPUT</td><td>Local DNAT</td></tr><tr><td>POSTROUTING</td><td>SNAT (source address translation)</td></tr></tbody></table></div>
+<h3 id="dnat-destination-nat">DNAT (Destination NAT)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#dnat-destination-nat" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Common scenario: public IP → internal server.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -A</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> PREROUTING</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -d</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1.1.1.1</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -j</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> DNAT</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --to</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.1.10</span></span></code></pre></figure>
+<p>Flow:</p>
+<pre><code>Client → accesses 1.1.1.1 → Router → DNAT → 192.168.1.10
+</code></pre>
+<h3 id="snat-source-nat">SNAT (Source NAT)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#snat-source-nat" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Typical: internal network accessing the internet. <code>192.168.1.10 → 8.8.8.8</code> becomes <code>1.1.1.1 → 8.8.8.8</code> through the router.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -A</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> POSTROUTING</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -s</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 192.168.1.0/24</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -j</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> MASQUERADE</span></span></code></pre></figure>
+<h3 id="conntrack-core-role">conntrack Core Role<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#conntrack-core-role" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Each connection records</strong>:</p>
+<pre><code>src IP, dst IP, src port, dst port, protocol, state
+</code></pre>
+<p>View:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">conntrack</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">cat</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /proc/net/nf_conntrack</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># tcp  6  431999 ESTABLISHED src=192.168.1.10 dst=8.8.8.8 sport=50000 dport=53</span></span></code></pre></figure>
+<h3 id="why-nat-depends-on-conntrack">Why NAT Depends on conntrack<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#why-nat-depends-on-conntrack" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>After SNAT, return packet <code>8.8.8.8 → 1.1.1.1</code> arrives. The router must know “who should this return to?” conntrack records <code>1.1.1.1:60000 ↔ 192.168.1.10:50000</code> and automatically performs reverse NAT.</p>
+<h3 id="linux-troubleshooting-trio">Linux Troubleshooting Trio<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-troubleshooting-trio" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -v</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # View NAT rules</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">conntrack</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                # View connection tracking</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> host</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # Capture (compare before/after NAT)</span></span></code></pre></figure>
+<h3 id="typical-nat-fault-debugging">Typical NAT Fault Debugging<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#typical-nat-fault-debugging" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Internal network cannot access the internet:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 1: Check IP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> addr</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 2: Check routes</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 3: Check NAT</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Is MASQUERADE present?</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 4: Check conntrack</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">conntrack</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Are there entries?</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 5: Capture</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Is SNAT happening?</span></span></code></pre></figure>
+<h3 id="four-common-misconceptions">Four Common Misconceptions<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#four-common-misconceptions" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li>❌ “iptables does NAT” → ✅ Netfilter NAT module does NAT; iptables is just the configuration tool</li>
+<li>❌ “NAT doesn’t need conntrack” → ✅ NAT 100% depends on conntrack</li>
+<li>❌ “NAT translates every packet” → ✅ Only the first packet of a connection; subsequent packets use conntrack directly</li>
+<li>❌ “SNAT happens at PREROUTING” → ✅ SNAT → POSTROUTING; DNAT → PREROUTING</li>
+</ol>
+<h3 id="windows-equivalents">Windows Equivalents<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-equivalents" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Linux</th><th>Windows</th></tr></thead><tbody><tr><td>iptables</td><td>Windows Firewall</td></tr><tr><td>conntrack</td><td>WFP (Windows Filtering Platform)</td></tr><tr><td>NAT</td><td>ICS / RRAS</td></tr></tbody></table></div>
+<p>Windows NAT:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">netsh</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> interface</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> portproxy</span></span></code></pre></figure>
+<hr/>
+<h2 id="xiii-dual-nic-management">XIII. Dual NIC Management<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#xiii-dual-nic-management" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="scenario-and-key-configuration">Scenario and Key Configuration<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#scenario-and-key-configuration" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>One NIC for internet (eth1), one for testing (eth0). <strong>There can only be one default route.</strong></p>
+<p>Prevent a NIC from acquiring a default route:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modify</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ipv4.never-default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> yes</span></span></code></pre></figure>
+<h3 id="dhcp-management">DHCP Management<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#dhcp-management" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># View lease</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Wired connection 1&quot;</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> DHCP4</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Manual operations</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dhclient</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # Request</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dhclient</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -r</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Release</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dhclient</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -v</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Verbose</span></span></code></pre></figure>
+<h3 id="nmcli-quick-reference">nmcli Quick Reference<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nmcli-quick-reference" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># View</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> status</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Wired connection 1&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Operate</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> up</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> down</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Wired connection 1&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> disconnect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Modify</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modify</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ipv4.never-default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> yes</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modify</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection.autoconnect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> yes</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> down</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;...&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> &amp;&amp; </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> up</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;...&quot;</span></span></code></pre></figure>
+<h3 id="network-outage-troubleshooting-order">Network Outage Troubleshooting Order<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#network-outage-troubleshooting-order" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1. Physical: is the link up?</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> link</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> state</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # UP + LOWER_UP</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2. IP: did we get an address?</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> addr</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> inet</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 3. Route: is the default route present?</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> default</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 4. DNS: can we resolve?</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">cat</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /etc/resolv.conf</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 5. Final test:</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # Ping IP first (eliminate DNS issues)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> google.com</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Then ping by domain name</span></span></code></pre></figure>
+<h3 id="multi-route-table-configuration">Multi-Route Table Configuration<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#multi-route-table-configuration" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Add route tables</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> via</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.20.1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ens33</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> table</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 100</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> via</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.1.1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> br-lan</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> table</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 200</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Add rules</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rule</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> from</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 192.168.20.0/24</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lookup</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 100</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rule</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> from</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 192.168.1.0/24</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lookup</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 200</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rule</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pref</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 32766</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lookup</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> main</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Test</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -I</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ens33</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> google.com</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -I</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> br-lan</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> google.com</span></span></code></pre></figure>
+<hr/>
+<h2 id="xiv-minimal-network-troubleshooting-toolkit">XIV. Minimal Network Troubleshooting Toolkit<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#xiv-minimal-network-troubleshooting-toolkit" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="linux-5">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>ip          — Interfaces, addresses, routes
+ss          — Ports, connections
+tcpdump     — Packet capture
+iptables    — Firewall/NAT rules
+conntrack   — Connection tracking
+</code></pre>
+<h3 id="windows-5">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>ipconfig    — IP configuration
+route       — Route table
+netstat     — Ports, connections
+tracert     — Path detection
+pktmon      — Packet capture
+</code></pre>
+<h3 id="cross-platform">Cross-Platform<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#cross-platform" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Wireshark   — Graphical packet analysis
+</code></pre>
+<hr/>
+<h2 id="final-conclusion">Final Conclusion<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#final-conclusion" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<pre><code>There are no mysterious network problems.
+There are only unobserved packets.
+
+Packet capture is the ultimate truth.
+tcpdump + Wireshark are your most important tools.
+</code></pre></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-12" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#contents" data-for="contents">Contents</a></li><li class="depth-0"><a href="#i-core-principles" data-for="i-core-principles">I. Core Principles</a></li><li class="depth-1"><a href="#the-nature-of-network-problems" data-for="the-nature-of-network-problems">The Nature of Network Problems</a></li><li class="depth-1"><a href="#basic-troubleshooting-method" data-for="basic-troubleshooting-method">Basic Troubleshooting Method</a></li><li class="depth-1"><a href="#engineering-rule" data-for="engineering-rule">Engineering Rule</a></li><li class="depth-1"><a href="#osi-model-key-principle" data-for="osi-model-key-principle">OSI Model Key Principle</a></li><li class="depth-0"><a href="#ii-network-layers-engineering-perspective" data-for="ii-network-layers-engineering-perspective">II. Network Layers (Engineering Perspective)</a></li><li class="depth-1"><a href="#engineering-communication-model" data-for="engineering-communication-model">Engineering Communication Model</a></li><li class="depth-0"><a href="#iii-the-golden-troubleshooting-flow" data-for="iii-the-golden-troubleshooting-flow">III. The Golden Troubleshooting Flow</a></li><li class="depth-0"><a href="#iv-phase-1-network-interface" data-for="iv-phase-1-network-interface">IV. Phase 1: Network Interface</a></li><li class="depth-1"><a href="#linux" data-for="linux">Linux</a></li><li class="depth-1"><a href="#windows" data-for="windows">Windows</a></li><li class="depth-0"><a href="#v-phase-2-ip-address" data-for="v-phase-2-ip-address">V. Phase 2: IP Address</a></li><li class="depth-1"><a href="#linux-1" data-for="linux-1">Linux</a></li><li class="depth-1"><a href="#windows-1" data-for="windows-1">Windows</a></li><li class="depth-0"><a href="#vi-phase-3-route" data-for="vi-phase-3-route">VI. Phase 3: Route</a></li><li class="depth-1"><a href="#linux-2" data-for="linux-2">Linux</a></li><li class="depth-1"><a href="#windows-2" data-for="windows-2">Windows</a></li><li class="depth-1"><a href="#route-table-fields-explained" data-for="route-table-fields-explained">Route Table Fields Explained</a></li><li class="depth-0"><a href="#vii-phase-4-arp" data-for="vii-phase-4-arp">VII. Phase 4: ARP</a></li><li class="depth-1"><a href="#linux-3" data-for="linux-3">Linux</a></li><li class="depth-1"><a href="#windows-3" data-for="windows-3">Windows</a></li><li class="depth-1"><a href="#arp-table-vs-route-table" data-for="arp-table-vs-route-table">ARP Table vs Route Table</a></li><li class="depth-0"><a href="#viii-phase-5-network-connectivity" data-for="viii-phase-5-network-connectivity">VIII. Phase 5: Network Connectivity</a></li><li class="depth-1"><a href="#ping-ip-layer-check" data-for="ping-ip-layer-check">ping (IP Layer Check)</a></li><li class="depth-1"><a href="#the-complete-life-of-a-ping" data-for="the-complete-life-of-a-ping">The Complete Life of a ping</a></li><li class="depth-1"><a href="#why-check-the-path-when-ping-fails" data-for="why-check-the-path-when-ping-fails">Why Check the Path When ping Fails?</a></li><li class="depth-0"><a href="#ix-phase-6-path-detection" data-for="ix-phase-6-path-detection">IX. Phase 6: Path Detection</a></li><li class="depth-1"><a href="#four-network-communication-paths" data-for="four-network-communication-paths">Four Network Communication Paths</a></li><li class="depth-0"><a href="#x-phase-7-port-status" data-for="x-phase-7-port-status">X. Phase 7: Port Status</a></li><li class="depth-1"><a href="#why-check-ports-after-confirming-the-path" data-for="why-check-ports-after-confirming-the-path">Why Check Ports After Confirming the Path?</a></li><li class="depth-1"><a href="#linux-4" data-for="linux-4">Linux</a></li><li class="depth-1"><a href="#windows-4" data-for="windows-4">Windows</a></li><li class="depth-0"><a href="#xi-packet-capture-final-resort" data-for="xi-packet-capture-final-resort">XI. Packet Capture (Final Resort)</a></li><li class="depth-1"><a href="#linux--tcpdump" data-for="linux--tcpdump">Linux — tcpdump</a></li><li class="depth-1"><a href="#windows--pktmon" data-for="windows--pktmon">Windows — pktmon</a></li><li class="depth-1"><a href="#wireshark-cross-platform" data-for="wireshark-cross-platform">Wireshark (Cross-Platform)</a></li><li class="depth-0"><a href="#xii-nat--iptables--conntrack-deep-dive" data-for="xii-nat--iptables--conntrack-deep-dive">XII. NAT / iptables / conntrack Deep Dive</a></li><li class="depth-1"><a href="#the-relationship" data-for="the-relationship">The Relationship</a></li><li class="depth-1"><a href="#linux-netfilter-architecture" data-for="linux-netfilter-architecture">Linux Netfilter Architecture</a></li><li class="depth-1"><a href="#netfilter-five-hooks" data-for="netfilter-five-hooks">Netfilter Five Hooks</a></li><li class="depth-1"><a href="#complete-packet-flow-diagram" data-for="complete-packet-flow-diagram">Complete Packet Flow Diagram</a></li><li class="depth-1"><a href="#where-nat-happens" data-for="where-nat-happens">Where NAT Happens</a></li><li class="depth-1"><a href="#dnat-destination-nat" data-for="dnat-destination-nat">DNAT (Destination NAT)</a></li><li class="depth-1"><a href="#snat-source-nat" data-for="snat-source-nat">SNAT (Source NAT)</a></li><li class="depth-1"><a href="#conntrack-core-role" data-for="conntrack-core-role">conntrack Core Role</a></li><li class="depth-1"><a href="#why-nat-depends-on-conntrack" data-for="why-nat-depends-on-conntrack">Why NAT Depends on conntrack</a></li><li class="depth-1"><a href="#linux-troubleshooting-trio" data-for="linux-troubleshooting-trio">Linux Troubleshooting Trio</a></li><li class="depth-1"><a href="#typical-nat-fault-debugging" data-for="typical-nat-fault-debugging">Typical NAT Fault Debugging</a></li><li class="depth-1"><a href="#four-common-misconceptions" data-for="four-common-misconceptions">Four Common Misconceptions</a></li><li class="depth-1"><a href="#windows-equivalents" data-for="windows-equivalents">Windows Equivalents</a></li><li class="depth-0"><a href="#xiii-dual-nic-management" data-for="xiii-dual-nic-management">XIII. Dual NIC Management</a></li><li class="depth-1"><a href="#scenario-and-key-configuration" data-for="scenario-and-key-configuration">Scenario and Key Configuration</a></li><li class="depth-1"><a href="#dhcp-management" data-for="dhcp-management">DHCP Management</a></li><li class="depth-1"><a href="#nmcli-quick-reference" data-for="nmcli-quick-reference">nmcli Quick Reference</a></li><li class="depth-1"><a href="#network-outage-troubleshooting-order" data-for="network-outage-troubleshooting-order">Network Outage Troubleshooting Order</a></li><li class="depth-1"><a href="#multi-route-table-configuration" data-for="multi-route-table-configuration">Multi-Route Table Configuration</a></li><li class="depth-0"><a href="#xiv-minimal-network-troubleshooting-toolkit" data-for="xiv-minimal-network-troubleshooting-toolkit">XIV. Minimal Network Troubleshooting Toolkit</a></li><li class="depth-1"><a href="#linux-5" data-for="linux-5">Linux</a></li><li class="depth-1"><a href="#windows-5" data-for="windows-5">Windows</a></li><li class="depth-1"><a href="#cross-platform" data-for="cross-platform">Cross-Platform</a></li><li class="depth-0"><a href="#final-conclusion" data-for="final-conclusion">Final Conclusion</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-2" class="overflow"><li><a href="../tech/" class="internal">Tech Notes</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>

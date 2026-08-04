@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>网络排查实战手册</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Chokebit Wiki"/><meta property="og:title" content="网络排查实战手册"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="网络排查实战手册"/><meta name="twitter:description" content="内容难免有误，请带着辩证视角阅读。 本文内容 核心思想：网络问题本质 = 数据包没有按预期路径流动 黄金排查流程：从底层往上层，逐层排除 十一个排查阶段：接口 → IP → 路由 → ARP → 连通性 → 路由检测 → 端口 → 抓包 ping 的完整生命周期：一次 ping 背后发生了什么 网络通信四种路径：本机、同网段、跨网段、NAT NAT / iptables / conntrack 深度解析：三者关系与排障方法 双网卡管理：多路由表、DHCP、nmcli 工具速查：Linux + Windows 最小工具集 一、核心思想 网络问题的本质 数据包没有按照预期路径流动 排查基本方法 ..."/><meta property="og:description" content="内容难免有误，请带着辩证视角阅读。 本文内容 核心思想：网络问题本质 = 数据包没有按预期路径流动 黄金排查流程：从底层往上层，逐层排除 十一个排查阶段：接口 → IP → 路由 → ARP → 连通性 → 路由检测 → 端口 → 抓包 ping 的完整生命周期：一次 ping 背后发生了什么 网络通信四种路径：本机、同网段、跨网段、NAT NAT / iptables / conntrack 深度解析：三者关系与排障方法 双网卡管理：多路由表、DHCP、nmcli 工具速查：Linux + Windows 最小工具集 一、核心思想 网络问题的本质 数据包没有按照预期路径流动 排查基本方法 ..."/><meta property="og:image:alt" content="内容难免有误，请带着辩证视角阅读。 本文内容 核心思想：网络问题本质 = 数据包没有按预期路径流动 黄金排查流程：从底层往上层，逐层排除 十一个排查阶段：接口 → IP → 路由 → ARP → 连通性 → 路由检测 → 端口 → 抓包 ping 的完整生命周期：一次 ping 背后发生了什么 网络通信四种路径：本机、同网段、跨网段、NAT NAT / iptables / conntrack 深度解析：三者关系与排障方法 双网卡管理：多路由表、DHCP、nmcli 工具速查：Linux + Windows 最小工具集 一、核心思想 网络问题的本质 数据包没有按照预期路径流动 排查基本方法 ..."/><meta property="og:image" content="https://undefined/static/og-image.png"/><meta property="og:image:url" content="https://undefined/static/og-image.png"/><meta name="twitter:image" content="https://undefined/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="内容难免有误，请带着辩证视角阅读。 本文内容 核心思想：网络问题本质 = 数据包没有按预期路径流动 黄金排查流程：从底层往上层，逐层排除 十一个排查阶段：接口 → IP → 路由 → ARP → 连通性 → 路由检测 → 端口 → 抓包 ping 的完整生命周期：一次 ping 背后发生了什么 网络通信四种路径：本机、同网段、跨网段、NAT NAT / iptables / conntrack 深度解析：三者关系与排障方法 双网卡管理：多路由表、DHCP、nmcli 工具速查：Linux + Windows 最小工具集 一、核心思想 网络问题的本质 数据包没有按照预期路径流动 排查基本方法 ..."/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://undefined/index.xml"/></head><body data-slug="tech/network-troubleshooting-handbook.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Chokebit Wiki</a></h2><div class="flex-component" style="flex-direction: row; flex-wrap: wrap; gap: 0.25rem;"><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href="tech/network-troubleshooting-handbook" aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div></div><div class="explorer desktop-only" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-26"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>All Posts</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-26" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Notes</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>网络排查实战手册</a></div></nav><h1 class="article-title">网络排查实战手册</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-04T08:29:56.661Z">Aug 04, 2026</time><span>13 min read</span></p><ul class="tags"><li><a href="../tags/network" class="internal tag-link">network</a></li><li><a href="../tags/security" class="internal tag-link">security</a></li><li><a href="../tags/workflow" class="internal tag-link">workflow</a></li></ul></div></div><article class="popover-hint"><blockquote>
+<p>内容难免有误，请带着辩证视角阅读。</p>
+</blockquote>
+<h2 id="本文内容">本文内容<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#本文内容" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>核心思想</strong>：网络问题本质 = 数据包没有按预期路径流动</li>
+<li><strong>黄金排查流程</strong>：从底层往上层，逐层排除</li>
+<li><strong>十一个排查阶段</strong>：接口 → IP → 路由 → ARP → 连通性 → 路由检测 → 端口 → 抓包</li>
+<li><strong>ping 的完整生命周期</strong>：一次 ping 背后发生了什么</li>
+<li><strong>网络通信四种路径</strong>：本机、同网段、跨网段、NAT</li>
+<li><strong>NAT / iptables / conntrack 深度解析</strong>：三者关系与排障方法</li>
+<li><strong>双网卡管理</strong>：多路由表、DHCP、nmcli</li>
+<li><strong>工具速查</strong>：Linux + Windows 最小工具集</li>
+</ul>
+<hr/>
+<h2 id="一核心思想">一、核心思想<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一核心思想" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="网络问题的本质">网络问题的本质<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#网络问题的本质" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>数据包没有按照预期路径流动
+</code></pre>
+<h3 id="排查基本方法">排查基本方法<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#排查基本方法" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>观察 → 假设 → 验证
+</code></pre>
+<h3 id="工程经验原则">工程经验原则<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#工程经验原则" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>从底层往上排查
+</code></pre>
+<p>顺序：</p>
+<pre><code>物理层 → 链路层 → IP 层 → TCP/UDP 层 → 应用层
+</code></pre>
+<h3 id="ios-网络模型关键原则">IOS 网络模型关键原则<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ios-网络模型关键原则" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>上层正常，下层绝对没问题
+下层故障 → 上层一定异常
+</code></pre>
+<hr/>
+<h2 id="二网络协议层工程视角">二、网络协议层（工程视角）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#二网络协议层工程视角" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>OSI 七层在工程中简化为五层：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>层</th><th>作用</th><th>示例</th></tr></thead><tbody><tr><td>应用层</td><td>用户程序</td><td>HTTP, DNS, SSH</td></tr><tr><td>传输层</td><td>端口通信</td><td>TCP, UDP</td></tr><tr><td>网络层</td><td>IP 寻址</td><td>IPv4, IPv6</td></tr><tr><td>链路层</td><td>MAC 通信</td><td>Ethernet</td></tr><tr><td>物理层</td><td>电信号</td><td>网卡</td></tr></tbody></table></div>
+<h3 id="工程级通信模型">工程级通信模型<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#工程级通信模型" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>网络通信 = 地址 + 路由 + 转发 + 状态 + 策略
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>层</th><th>关键问题</th><th>例子</th></tr></thead><tbody><tr><td>地址</td><td>我是谁</td><td>IP / MAC</td></tr><tr><td>路由</td><td>我要去哪</td><td>route</td></tr><tr><td>转发</td><td>下一跳是谁</td><td>ARP</td></tr><tr><td>状态</td><td>是否允许</td><td>conntrack</td></tr><tr><td>策略</td><td>是否被拦截</td><td>firewall</td></tr></tbody></table></div>
+<p>所以排查网络问题一般顺序：</p>
+<pre><code>IP → ARP → Route → Forward → Firewall → Application
+</code></pre>
+<hr/>
+<h2 id="三网络排查黄金流程">三、网络排查黄金流程<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#三网络排查黄金流程" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<pre><code>1. 网络接口（网卡状态）
+2. IP 地址（身份）
+3. 路由（出口）
+4. ARP（邻居）
+5. 网络连通性（ping）
+6. 路由检测（traceroute）
+7. 端口状态（服务）
+8. 抓包（最终手段）
+</code></pre>
+<hr/>
+<h2 id="四第一阶段网络接口">四、第一阶段：网络接口<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#四第一阶段网络接口" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>检查网卡状态。</p>
+<h3 id="linux">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> link</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP></span></span></code></pre></figure>
+<p><code>UP</code> + <code>LOWER_UP</code> 表示网卡启用且物理链路连接正常。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> link</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> set</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> up</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # 启用接口</span></span></code></pre></figure>
+<h3 id="windows">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ipconfig</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /all</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 或</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Get-NetAdapter</span></span></code></pre></figure>
+<hr/>
+<h2 id="五第二阶段ip-地址">五、第二阶段：IP 地址<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#五第二阶段ip-地址" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>IP 地址决定主机身份。</p>
+<h3 id="linux-1">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> addr</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># inet 192.168.1.10/24</span></span></code></pre></figure>
+<h3 id="windows-1">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ipconfig</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># IPv4 Address . . . : 192.168.1.10</span></span></code></pre></figure>
+<hr/>
+<h2 id="六第三阶段路由">六、第三阶段：路由<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#六第三阶段路由" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>路由决定数据包出口。参考：RFC 1812 (IP Routing)。</p>
+<h3 id="linux-2">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># default via 192.168.1.1 dev eth0</span></span></code></pre></figure>
+<p>测试特定 IP 的路由：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 8.8.8.8 via 192.168.31.1 dev ens33 src 192.168.31.101</span></span></code></pre></figure>
+<h3 id="windows-2">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> print</span></span></code></pre></figure>
+<p>添加路由：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 10.0.0.0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mask</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 255.255.255.0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.1.1</span></span></code></pre></figure>
+<h3 id="路由表字段解释">路由表字段解释<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#路由表字段解释" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>字段</th><th>含义</th></tr></thead><tbody><tr><td>Destination</td><td>目标网络，<code>0.0.0.0</code> 表示未知/默认</td></tr><tr><td>Gateway</td><td>下一跳网关，<code>0.0.0.0</code> 表示直连</td></tr><tr><td>Genmask</td><td>子网掩码</td></tr><tr><td>Flags</td><td>U=Up, G=Gateway, H=Host, D=Dynamic</td></tr><tr><td>Metric</td><td>优先级，越小越优先</td></tr><tr><td>Iface</td><td>出口接口</td></tr></tbody></table></div>
+<p>总结：访问一个 IP → 路由表 <code>IP &amp; Genmask</code> 计算子网 → Destination → Iface → Gateway → 目的服务器。</p>
+<hr/>
+<h2 id="七第四阶段arp">七、第四阶段：ARP<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#七第四阶段arp" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>ARP 负责 <code>IP → MAC</code>。参考：RFC 826。</p>
+<h3 id="linux-3">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> neigh</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 192.168.31.1 dev ens33 lladdr 4c:c6:4c:bf:ca:6e REACHABLE</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">arp</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Address            HWtype  HWaddress           Flags Mask  Iface</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 192.168.31.1       ether   4c:c6:4c:bf:ca:6e   C           ens33</span></span></code></pre></figure>
+<p>清除 ARP：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> neigh</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> flush</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> all</span></span></code></pre></figure>
+<h3 id="windows-3">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">arp</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -a</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">arp</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -d</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> *</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # 清除</span></span></code></pre></figure>
+<h3 id="arp-表-vs-路由表">ARP 表 vs 路由表<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#arp-表-vs-路由表" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>路由表决定包去哪
+ARP 表决定包给谁
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>表</th><th>功能</th><th>示例</th></tr></thead><tbody><tr><td>路由表</td><td>IP → 下一跳</td><td><code>8.8.8.8 → 192.168.1.1</code></td></tr><tr><td>ARP 表</td><td>IP → MAC</td><td><code>192.168.1.1 → aa:bb:cc:dd</code></td></tr></tbody></table></div>
+<hr/>
+<h2 id="八第五阶段网络连通性">八、第五阶段：网络连通性<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#八第五阶段网络连通性" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="pingip-层检查">ping（IP 层检查）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#pingip-层检查" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>参考：RFC 792 (ICMP)。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Linux</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Windows</span></span></code></pre></figure>
+<h3 id="ping-的完整生命周期">ping 的完整生命周期<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ping-的完整生命周期" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>假设 A <code>192.168.1.10</code> ping B <code>192.168.2.10</code>，网关 <code>192.168.1.1</code>。</p>
+<p><strong>Step 1 — DNS 解析</strong>（如果是域名）：</p>
+<pre><code>应用 → getaddrinfo() → libc resolver → /etc/resolv.conf → DNS server → 返回 IP
+</code></pre>
+<p><strong>Step 2 — 路由判断</strong>：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.2.10</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 192.168.2.10 via 192.168.1.1 dev eth0</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># → 下一跳 = 192.168.1.1</span></span></code></pre></figure>
+<p><strong>Step 3 — ARP 解析</strong>：</p>
+<pre><code>系统发广播：
+  ARP Request: Who has 192.168.1.1? Tell 192.168.1.10
+
+网关回应：
+  192.168.1.1 is at aa:bb:cc:dd:ee
+
+缓存：
+  ip neigh → 192.168.1.1 ... REACHABLE
+</code></pre>
+<p><strong>Step 4 — 发送以太网帧</strong>：</p>
+<pre><code>Ethernet Frame:
+  dst MAC = 网关
+  src MAC = 本机
+   └─ IP packet
+       └─ ICMP
+</code></pre>
+<p><strong>Step 5 — 网关转发</strong>：</p>
+<pre><code>网关查路由表: 192.168.2.0/24 dev vlan20
+网关 ARP 查询 B: who has 192.168.2.10
+</code></pre>
+<p><strong>Step 6 — 重封装</strong>：</p>
+<p>网关修改 MAC，<strong>不改 IP</strong>：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>字段</th><th>变化</th></tr></thead><tbody><tr><td>src MAC</td><td>变（替换为网关出口 MAC）</td></tr><tr><td>dst MAC</td><td>变（替换为目标 MAC）</td></tr><tr><td>src IP</td><td>不变</td></tr><tr><td>dst IP</td><td>不变</td></tr></tbody></table></div>
+<p><strong>Step 7 — 目标主机回应</strong>：</p>
+<pre><code>ICMP echo reply: B → 网关 → A
+</code></pre>
+<h3 id="为什么-ping-不通就检查路径">为什么 ping 不通就检查路径？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#为什么-ping-不通就检查路径" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>IP 层可达 ≠ 应用服务可达
+</code></pre>
+<p>如果 ping 不通，存在至少一种情况：</p>
+<pre><code>1. 路由不存在
+2. 中间设备丢包
+3. 防火墙阻止
+4. 目标不存在
+</code></pre>
+<hr/>
+<h2 id="九第六阶段路由检测">九、第六阶段：路由检测<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#九第六阶段路由检测" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>查看网络路径。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">traceroute</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # Linux</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tracert</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Windows</span></span></code></pre></figure>
+<h3 id="网络通信四种路径">网络通信四种路径<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#网络通信四种路径" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>1. 本机通信</strong>：</p>
+<pre><code>127.0.0.1
+
+Application → Socket → Loopback Interface → Application
+（不经过网卡、ARP、路由）
+</code></pre>
+<p><strong>2. 同网段通信</strong>：</p>
+<pre><code>A 192.168.1.10 → B 192.168.1.20
+
+A → ARP 查询 B 的 MAC → 直接发送 Ethernet Frame → B
+（没有路由，只有 ARP）
+</code></pre>
+<p><strong>3. 跨网段通信</strong>：</p>
+<pre><code>A 192.168.1.10 → B 192.168.2.10
+
+A → 查路由 → 下一跳=网关 → ARP 获取网关 MAC → 发给网关 → 网关转发 → B
+
+核心规则：IP 不变，MAC 每跳变
+</code></pre>
+<p><strong>4. NAT 通信</strong>：</p>
+<pre><code>192.168.1.10 → NAT Router → Internet
+
+SNAT: 192.168.1.10:4444 → 1.2.3.4:50000
+返回: 1.2.3.4:50000 → 192.168.1.10:4444
+
+依赖 conntrack
+</code></pre>
+<hr/>
+<h2 id="十第七阶段端口状态">十、第七阶段：端口状态<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#十第七阶段端口状态" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="为什么路径通了还要检查端口">为什么路径通了还要检查端口？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#为什么路径通了还要检查端口" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>IP 层可达 ≠ 应用服务可达
+</code></pre>
+<p>服务运行在 TCP/UDP 上。例如：服务器 IP 可达，但 80 端口没开 → ping 正常，HTTP 访问失败。</p>
+<h3 id="linux-4">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ss</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -lntp</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # 查看监听端口</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ss</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -ant</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">     # 查看所有连接</span></span></code></pre></figure>
+<h3 id="windows-4">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">netstat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -ano</span></span></code></pre></figure>
+<hr/>
+<h2 id="十一抓包最终手段">十一、抓包（最终手段）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#十一抓包最终手段" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>抓包是网络排查<strong>最重要的工具</strong>。路径和端口是”逻辑检查”，但中间设备问题（firewall、NAT、负载均衡、ACL、IPS）系统命令无法直接看到，必须抓包。</p>
+<h3 id="linux--tcpdump">Linux — tcpdump<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux--tcpdump" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">              # 抓所有流量</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> host</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # 抓特定 IP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> port</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 80</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">              # 抓 HTTP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> arp</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                  # 抓 ARP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -w</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dump.pcap</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"> # 保存到文件</span></span></code></pre></figure>
+<h3 id="windows--pktmon">Windows — pktmon<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows--pktmon" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">pktmon</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> start</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --capture</span></span></code></pre></figure>
+<h3 id="wireshark跨平台推荐">Wireshark（跨平台推荐）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#wireshark跨平台推荐" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>支持 Windows / Linux / macOS。官方文档：<a href="https://www.wireshark.org/docs/" class="external">https://www.wireshark.org/docs/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></p>
+<hr/>
+<h2 id="十二nat--iptables--conntrack-深度解析">十二、NAT / iptables / conntrack 深度解析<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#十二nat--iptables--conntrack-深度解析" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="三者关系">三者关系<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#三者关系" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Netfilter（Linux 防火墙框架）
+ ├─ conntrack   (连接状态跟踪)
+ ├─ iptables    (规则控制系统)
+ └─ NAT         (地址转换模块)
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>组件</th><th>本质</th></tr></thead><tbody><tr><td>conntrack</td><td>连接状态跟踪系统</td></tr><tr><td>iptables</td><td>规则控制系统（操作 Netfilter 的工具）</td></tr><tr><td>NAT</td><td>地址转换模块（<strong>必须依赖 conntrack 才能工作</strong>）</td></tr></tbody></table></div>
+<h3 id="linux-netfilter-架构">Linux Netfilter 架构<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-netfilter-架构" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>                Userspace
+                ──────────
+                 iptables / nftables
+                      │
+                Kernel Space
+                ────────────
+                   Netfilter
+                      │
+      ┌───────────────┼───────────────┐
+      │               │               │
+  conntrack         NAT            filter
+</code></pre>
+<h3 id="netfilter-五个-hook">Netfilter 五个 Hook<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#netfilter-五个-hook" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>            incoming
+               │
+           PREROUTING
+               │
+      ┌────────┴─────────┐
+      │                  │
+    routing            local
+      │                  │
+   FORWARD             INPUT
+      │                  │
+      └──────┬───────────┘
+             │
+          OUTPUT
+             │
+         POSTROUTING
+             │
+           outgoing
+</code></pre>
+<h3 id="完整数据包流程图">完整数据包流程图<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#完整数据包流程图" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>网卡接收
+  │
+NIC Driver
+  │
+内核协议栈入口
+  │
+Netfilter PREROUTING
+  ├─ raw → mangle → nat (DNAT)
+  │
+conntrack
+  │
+路由决策
+  ├─ INPUT  → mangle → filter → 本地进程
+  └─ FORWARD → mangle → filter → POSTROUTING
+                                    │
+                                  mangle → nat (SNAT) → 网卡发送
+</code></pre>
+<h3 id="nat-发生位置">NAT 发生位置<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nat-发生位置" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Hook</th><th>NAT 类型</th></tr></thead><tbody><tr><td>PREROUTING</td><td>DNAT（目标地址转换）</td></tr><tr><td>OUTPUT</td><td>本机 DNAT</td></tr><tr><td>POSTROUTING</td><td>SNAT（源地址转换）</td></tr></tbody></table></div>
+<h3 id="dnat目标地址转换">DNAT（目标地址转换）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#dnat目标地址转换" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>常见场景：公网 IP → 内网服务器。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -A</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> PREROUTING</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -d</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1.1.1.1</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -j</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> DNAT</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --to</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.1.10</span></span></code></pre></figure>
+<p>流程：</p>
+<pre><code>Client → 访问 1.1.1.1 → Router → DNAT → 192.168.1.10
+</code></pre>
+<h3 id="snat源地址转换">SNAT（源地址转换）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#snat源地址转换" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>典型：内网访问互联网。<code>192.168.1.10 → 8.8.8.8</code> 经 Router 变为 <code>1.1.1.1 → 8.8.8.8</code>。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -A</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> POSTROUTING</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -s</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 192.168.1.0/24</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -j</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> MASQUERADE</span></span></code></pre></figure>
+<h3 id="conntrack-核心作用">conntrack 核心作用<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#conntrack-核心作用" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>每个连接记录</strong>：</p>
+<pre><code>源 IP、目标 IP、源端口、目标端口、协议、状态
+</code></pre>
+<p>查看：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">conntrack</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">cat</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /proc/net/nf_conntrack</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># tcp  6  431999 ESTABLISHED src=192.168.1.10 dst=8.8.8.8 sport=50000 dport=53</span></span></code></pre></figure>
+<h3 id="nat-为什么必须依赖-conntrack">NAT 为什么必须依赖 conntrack<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nat-为什么必须依赖-conntrack" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>SNAT 后返回包 <code>8.8.8.8 → 1.1.1.1</code>，路由器必须知道”这个包应该还给谁”。conntrack 记录了 <code>1.1.1.1:60000 ↔ 192.168.1.10:50000</code>，自动反向 NAT。</p>
+<h3 id="linux-排查三件套">Linux 排查三件套<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-排查三件套" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -v</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # 查看 NAT 规则</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">conntrack</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                # 查看连接跟踪</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> host</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # 抓包（NAT 前后对比）</span></span></code></pre></figure>
+<h3 id="典型-nat-故障排查">典型 NAT 故障排查<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#典型-nat-故障排查" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>内网不能访问互联网：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 1: 检查 IP</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> addr</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 2: 检查路由</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 3: 检查 NAT</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 是否有 MASQUERADE?</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 4: 检查 conntrack</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">conntrack</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 是否有记录?</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Step 5: 抓包</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tcpdump</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 看是否 SNAT</span></span></code></pre></figure>
+<h3 id="四大误区">四大误区<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#四大误区" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li>❌ “iptables 做 NAT” → ✅ Netfilter NAT 模块做 NAT，iptables 只是配置工具</li>
+<li>❌ “NAT 不需要 conntrack” → ✅ NAT 100% 依赖 conntrack</li>
+<li>❌ “NAT 每个包都转换” → ✅ 只在连接第一个包时决定，后续直接用 conntrack</li>
+<li>❌ “SNAT 在 PREROUTING” → ✅ SNAT → POSTROUTING，DNAT → PREROUTING</li>
+</ol>
+<h3 id="windows-对应机制">Windows 对应机制<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-对应机制" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Linux</th><th>Windows</th></tr></thead><tbody><tr><td>iptables</td><td>Windows Firewall</td></tr><tr><td>conntrack</td><td>WFP (Windows Filtering Platform)</td></tr><tr><td>NAT</td><td>ICS / RRAS</td></tr></tbody></table></div>
+<p>Windows NAT：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">netsh</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> interface</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> portproxy</span></span></code></pre></figure>
+<hr/>
+<h2 id="十三双网卡管理">十三、双网卡管理<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#十三双网卡管理" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="场景与关键配置">场景与关键配置<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#场景与关键配置" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>一张上外网（eth1），一张做测试（eth0）。<strong>默认路由只能有一个</strong>。</p>
+<p>控制某张网卡不拿默认路由：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modify</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ipv4.never-default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> yes</span></span></code></pre></figure>
+<h3 id="dhcp-管理">DHCP 管理<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#dhcp-管理" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 查看租约</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Wired connection 1&quot;</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> DHCP4</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 手工操作</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dhclient</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # 申请</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dhclient</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -r</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # 释放</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dhclient</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -v</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # 详细过程</span></span></code></pre></figure>
+<h3 id="nmcli-常用命令">nmcli 常用命令<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nmcli-常用命令" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 查看</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> status</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Wired connection 1&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 操作</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> up</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> down</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Wired connection 1&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> disconnect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 修改</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modify</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ipv4.never-default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> yes</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modify</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection.autoconnect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> yes</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> down</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;...&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> &amp;&amp; </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nmcli</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> connection</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> up</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;...&quot;</span></span></code></pre></figure>
+<h3 id="断网排查顺序">断网排查顺序<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#断网排查顺序" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1. 物理层：链路通不通？</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> link</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> state</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # UP + LOWER_UP</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2. IP 层：有没有拿到 IP？</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> addr</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth1</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> inet</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 3. 路由层：默认路由在不在？</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> show</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> default</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 4. DNS：能不能解析？</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">cat</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /etc/resolv.conf</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 5. 终极测试：</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8.8.8.8</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # 先 ping IP（排除 DNS 问题）</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> google.com</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # 再 ping 域名</span></span></code></pre></figure>
+<h3 id="多路由表配置">多路由表配置<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#多路由表配置" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 添加路由表</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> via</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.20.1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ens33</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> table</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 100</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> route</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> default</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> via</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 192.168.1.1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> dev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> br-lan</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> table</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 200</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 添加规则</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rule</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> from</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 192.168.20.0/24</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lookup</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 100</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rule</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> from</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 192.168.1.0/24</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lookup</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 200</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rule</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pref</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 32766</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lookup</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> main</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 测试</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -I</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ens33</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> google.com</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ping</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -I</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> br-lan</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> google.com</span></span></code></pre></figure>
+<hr/>
+<h2 id="十四网络排查最小工具集">十四、网络排查最小工具集<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#十四网络排查最小工具集" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="linux-5">Linux<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#linux-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>ip          — 接口、地址、路由
+ss          — 端口、连接
+tcpdump     — 抓包
+iptables    — 防火墙/NAT 规则
+conntrack   — 连接跟踪
+</code></pre>
+<h3 id="windows-5">Windows<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#windows-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>ipconfig    — IP 配置
+route       — 路由表
+netstat     — 端口、连接
+tracert     — 路径检测
+pktmon      — 抓包
+</code></pre>
+<h3 id="跨平台">跨平台<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#跨平台" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Wireshark   — 图形化抓包分析
+</code></pre>
+<hr/>
+<h2 id="最终核心结论">最终核心结论<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#最终核心结论" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<pre><code>没有神秘的网络问题
+只有没有被观察到的数据包
+
+抓包是最终真相
+tcpdump + Wireshark 是最重要的工具
+</code></pre></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-11" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#本文内容" data-for="本文内容">本文内容</a></li><li class="depth-0"><a href="#一核心思想" data-for="一核心思想">一、核心思想</a></li><li class="depth-1"><a href="#网络问题的本质" data-for="网络问题的本质">网络问题的本质</a></li><li class="depth-1"><a href="#排查基本方法" data-for="排查基本方法">排查基本方法</a></li><li class="depth-1"><a href="#工程经验原则" data-for="工程经验原则">工程经验原则</a></li><li class="depth-1"><a href="#ios-网络模型关键原则" data-for="ios-网络模型关键原则">IOS 网络模型关键原则</a></li><li class="depth-0"><a href="#二网络协议层工程视角" data-for="二网络协议层工程视角">二、网络协议层（工程视角）</a></li><li class="depth-1"><a href="#工程级通信模型" data-for="工程级通信模型">工程级通信模型</a></li><li class="depth-0"><a href="#三网络排查黄金流程" data-for="三网络排查黄金流程">三、网络排查黄金流程</a></li><li class="depth-0"><a href="#四第一阶段网络接口" data-for="四第一阶段网络接口">四、第一阶段：网络接口</a></li><li class="depth-1"><a href="#linux" data-for="linux">Linux</a></li><li class="depth-1"><a href="#windows" data-for="windows">Windows</a></li><li class="depth-0"><a href="#五第二阶段ip-地址" data-for="五第二阶段ip-地址">五、第二阶段：IP 地址</a></li><li class="depth-1"><a href="#linux-1" data-for="linux-1">Linux</a></li><li class="depth-1"><a href="#windows-1" data-for="windows-1">Windows</a></li><li class="depth-0"><a href="#六第三阶段路由" data-for="六第三阶段路由">六、第三阶段：路由</a></li><li class="depth-1"><a href="#linux-2" data-for="linux-2">Linux</a></li><li class="depth-1"><a href="#windows-2" data-for="windows-2">Windows</a></li><li class="depth-1"><a href="#路由表字段解释" data-for="路由表字段解释">路由表字段解释</a></li><li class="depth-0"><a href="#七第四阶段arp" data-for="七第四阶段arp">七、第四阶段：ARP</a></li><li class="depth-1"><a href="#linux-3" data-for="linux-3">Linux</a></li><li class="depth-1"><a href="#windows-3" data-for="windows-3">Windows</a></li><li class="depth-1"><a href="#arp-表-vs-路由表" data-for="arp-表-vs-路由表">ARP 表 vs 路由表</a></li><li class="depth-0"><a href="#八第五阶段网络连通性" data-for="八第五阶段网络连通性">八、第五阶段：网络连通性</a></li><li class="depth-1"><a href="#pingip-层检查" data-for="pingip-层检查">ping（IP 层检查）</a></li><li class="depth-1"><a href="#ping-的完整生命周期" data-for="ping-的完整生命周期">ping 的完整生命周期</a></li><li class="depth-1"><a href="#为什么-ping-不通就检查路径" data-for="为什么-ping-不通就检查路径">为什么 ping 不通就检查路径？</a></li><li class="depth-0"><a href="#九第六阶段路由检测" data-for="九第六阶段路由检测">九、第六阶段：路由检测</a></li><li class="depth-1"><a href="#网络通信四种路径" data-for="网络通信四种路径">网络通信四种路径</a></li><li class="depth-0"><a href="#十第七阶段端口状态" data-for="十第七阶段端口状态">十、第七阶段：端口状态</a></li><li class="depth-1"><a href="#为什么路径通了还要检查端口" data-for="为什么路径通了还要检查端口">为什么路径通了还要检查端口？</a></li><li class="depth-1"><a href="#linux-4" data-for="linux-4">Linux</a></li><li class="depth-1"><a href="#windows-4" data-for="windows-4">Windows</a></li><li class="depth-0"><a href="#十一抓包最终手段" data-for="十一抓包最终手段">十一、抓包（最终手段）</a></li><li class="depth-1"><a href="#linux--tcpdump" data-for="linux--tcpdump">Linux — tcpdump</a></li><li class="depth-1"><a href="#windows--pktmon" data-for="windows--pktmon">Windows — pktmon</a></li><li class="depth-1"><a href="#wireshark跨平台推荐" data-for="wireshark跨平台推荐">Wireshark（跨平台推荐）</a></li><li class="depth-0"><a href="#十二nat--iptables--conntrack-深度解析" data-for="十二nat--iptables--conntrack-深度解析">十二、NAT / iptables / conntrack 深度解析</a></li><li class="depth-1"><a href="#三者关系" data-for="三者关系">三者关系</a></li><li class="depth-1"><a href="#linux-netfilter-架构" data-for="linux-netfilter-架构">Linux Netfilter 架构</a></li><li class="depth-1"><a href="#netfilter-五个-hook" data-for="netfilter-五个-hook">Netfilter 五个 Hook</a></li><li class="depth-1"><a href="#完整数据包流程图" data-for="完整数据包流程图">完整数据包流程图</a></li><li class="depth-1"><a href="#nat-发生位置" data-for="nat-发生位置">NAT 发生位置</a></li><li class="depth-1"><a href="#dnat目标地址转换" data-for="dnat目标地址转换">DNAT（目标地址转换）</a></li><li class="depth-1"><a href="#snat源地址转换" data-for="snat源地址转换">SNAT（源地址转换）</a></li><li class="depth-1"><a href="#conntrack-核心作用" data-for="conntrack-核心作用">conntrack 核心作用</a></li><li class="depth-1"><a href="#nat-为什么必须依赖-conntrack" data-for="nat-为什么必须依赖-conntrack">NAT 为什么必须依赖 conntrack</a></li><li class="depth-1"><a href="#linux-排查三件套" data-for="linux-排查三件套">Linux 排查三件套</a></li><li class="depth-1"><a href="#典型-nat-故障排查" data-for="典型-nat-故障排查">典型 NAT 故障排查</a></li><li class="depth-1"><a href="#四大误区" data-for="四大误区">四大误区</a></li><li class="depth-1"><a href="#windows-对应机制" data-for="windows-对应机制">Windows 对应机制</a></li><li class="depth-0"><a href="#十三双网卡管理" data-for="十三双网卡管理">十三、双网卡管理</a></li><li class="depth-1"><a href="#场景与关键配置" data-for="场景与关键配置">场景与关键配置</a></li><li class="depth-1"><a href="#dhcp-管理" data-for="dhcp-管理">DHCP 管理</a></li><li class="depth-1"><a href="#nmcli-常用命令" data-for="nmcli-常用命令">nmcli 常用命令</a></li><li class="depth-1"><a href="#断网排查顺序" data-for="断网排查顺序">断网排查顺序</a></li><li class="depth-1"><a href="#多路由表配置" data-for="多路由表配置">多路由表配置</a></li><li class="depth-0"><a href="#十四网络排查最小工具集" data-for="十四网络排查最小工具集">十四、网络排查最小工具集</a></li><li class="depth-1"><a href="#linux-5" data-for="linux-5">Linux</a></li><li class="depth-1"><a href="#windows-5" data-for="windows-5">Windows</a></li><li class="depth-1"><a href="#跨平台" data-for="跨平台">跨平台</a></li><li class="depth-0"><a href="#最终核心结论" data-for="最终核心结论">最终核心结论</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-2" class="overflow"><li><a href="../tech/index.cn" class="internal">技术笔记</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>
