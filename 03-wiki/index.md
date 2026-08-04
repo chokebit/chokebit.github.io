@@ -7,7 +7,7 @@ translations:
 
 ## About Me
 
-Full of curiosity about the world.  
+X
 Play crazily while playing, and do your best while studying.
 
 ## Media
