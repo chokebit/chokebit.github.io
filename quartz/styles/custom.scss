@@ -1,4 +1,5 @@
 @use "./base.scss";
+@use "./brand.scss";
 
 // Center content max-width
 .center {
@@ -63,7 +64,7 @@ body[data-slug^="products/"] {
   --product-accent: #4f7600;
   --product-accent-soft: rgba(79, 118, 0, 0.09);
 
-  .page-header {
+  .page-header > .popover-hint {
     display: none;
   }
 

@@ -1,16 +1,55 @@
 .nav-links {
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  margin: 0.5rem 0;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-width: 0;
+
+  .brand-link {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--dark);
+    text-decoration: none;
+  }
+
+  .brand-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--light);
+    background: var(--secondary);
+    border-radius: 0.4rem;
+    font-family: var(--codeFont);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .brand-name {
+    font-family: var(--codeFont);
+    font-size: 0.84rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .nav-link-list {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.15rem;
+  }
 
   .nav-link {
-    padding: 0.3rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
+    padding: 0.4rem 0.55rem;
+    border-radius: 0.35rem;
+    font-size: 0.82rem;
     color: var(--darkgray);
     text-decoration: none;
-    transition: background 0.1s, color 0.1s;
+    white-space: nowrap;
+    transition: background 140ms ease, color 140ms ease;
 
     &:hover {
       background: var(--highlight);
@@ -21,6 +60,28 @@
       background: var(--highlight);
       color: var(--dark);
       font-weight: 600;
+    }
+  }
+
+  @media all and (max-width: 800px) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+
+    .nav-link-list {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+  }
+
+  @media all and (max-width: 480px) {
+    .brand-name {
+      display: none;
+    }
+
+    .nav-link {
+      padding: 0.35rem 0.42rem;
+      font-size: 0.76rem;
     }
   }
 }

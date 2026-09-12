@@ -1,0 +1,508 @@
+// Chokebit personal brand layer
+.page-header > header {
+  gap: 0.65rem;
+  margin: 1.25rem 0 0;
+  padding-bottom: 0.95rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gray) 28%, transparent);
+
+  > .language-toggle,
+  > .darkmode,
+  > .search {
+    flex: 0 0 auto;
+  }
+
+  > .search {
+    width: 2.15rem;
+  }
+
+  > .search > .search-button {
+    justify-content: center;
+    width: 2.15rem;
+    padding: 0;
+    border-radius: 0.4rem;
+  }
+
+  > .search > .search-button > p {
+    display: none;
+  }
+
+  > .search > .search-button svg {
+    margin: 0;
+  }
+}
+
+body[data-slug="index"],
+body[data-slug="index.cn"] {
+  .page-header > .popover-hint,
+  .sidebar.left,
+  .sidebar.right,
+  .center > hr {
+    display: none;
+  }
+
+  .center {
+    max-width: 1040px;
+  }
+
+  @media all and (min-width: 1200px) {
+    #quartz-body {
+      grid-template-columns: 0 minmax(0, 1040px) 0;
+      column-gap: 0;
+    }
+  }
+}
+
+.brand-home {
+  --brand-line: color-mix(in srgb, var(--gray) 30%, transparent);
+  --brand-accent-soft: color-mix(in srgb, var(--secondary) 10%, transparent);
+  padding-top: 4.5rem;
+
+  a {
+    font-weight: inherit;
+  }
+
+  .bh-kicker,
+  .bh-section-head > span,
+  .bh-now-label,
+  .bh-product-status,
+  .bh-product-number,
+  .bh-product-tags,
+  .bh-track-number,
+  .bh-note-meta,
+  .bh-about-label {
+    font-family: var(--codeFont);
+    font-size: 0.76rem;
+    letter-spacing: 0.055em;
+  }
+
+  .bh-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 33rem;
+    padding: 2.4rem 0 4.8rem;
+  }
+
+  .bh-hero::before {
+    content: "";
+    position: absolute;
+    top: -4rem;
+    right: -4rem;
+    width: 28rem;
+    height: 28rem;
+    opacity: 0.55;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--brand-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--brand-line) 1px, transparent 1px),
+      radial-gradient(circle at center, var(--brand-accent-soft), transparent 68%);
+    background-size: 2.5rem 2.5rem, 2.5rem 2.5rem, auto;
+    mask-image: radial-gradient(circle, black 20%, transparent 72%);
+  }
+
+  .bh-hero::after {
+    content: "C_";
+    position: absolute;
+    top: 3rem;
+    right: 4rem;
+    color: var(--secondary);
+    font-family: var(--codeFont);
+    font-size: clamp(5rem, 14vw, 9.5rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.08em;
+    opacity: 0.16;
+  }
+
+  .bh-kicker {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: var(--secondary);
+  }
+
+  .bh-hero h1 {
+    position: relative;
+    z-index: 1;
+    max-width: 50rem;
+    margin: 1.15rem 0 1.35rem;
+    font-size: clamp(3.1rem, 7vw, 6.3rem);
+    line-height: 0.95;
+    letter-spacing: -0.068em;
+    font-weight: 600;
+  }
+
+  .bh-hero h1 span {
+    color: var(--secondary);
+  }
+
+  .bh-lead {
+    position: relative;
+    z-index: 1;
+    max-width: 42rem;
+    margin: 0;
+    color: var(--darkgray);
+    font-size: 1.12rem;
+    line-height: 1.75;
+  }
+
+  .bh-actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .bh-actions a,
+  .bh-about-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.55rem;
+    padding: 0.55rem 0.85rem;
+    color: var(--dark);
+    border: 1px solid var(--brand-line);
+    border-radius: 0.45rem;
+    text-decoration: none;
+    transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+  }
+
+  .bh-actions a:first-child {
+    color: var(--light);
+    background: var(--secondary);
+    border-color: var(--secondary);
+  }
+
+  .bh-actions a:hover,
+  .bh-about-links a:hover {
+    transform: translateY(-2px);
+    border-color: var(--secondary);
+  }
+
+  .bh-now {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    margin-bottom: 5rem;
+    background: var(--brand-accent-soft);
+    border: 1px solid color-mix(in srgb, var(--secondary) 32%, transparent);
+    border-radius: 0.55rem;
+  }
+
+  .bh-now-label {
+    color: var(--secondary);
+  }
+
+  .bh-now p {
+    margin: 0;
+    color: var(--darkgray);
+  }
+
+  .bh-now a {
+    color: var(--secondary);
+    text-decoration: none;
+  }
+
+  .bh-section {
+    margin: 0 0 5.5rem;
+  }
+
+  .bh-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .bh-section-head h2 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .bh-section-head > span {
+    color: var(--gray);
+  }
+
+  .bh-product {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(15rem, 0.7fr);
+    color: var(--dark);
+    background: color-mix(in srgb, var(--light) 94%, var(--lightgray));
+    border: 1px solid var(--brand-line);
+    border-radius: 0.9rem;
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .bh-product:hover {
+    transform: translateY(-3px);
+    border-color: var(--secondary);
+    box-shadow: 0 1.2rem 3rem var(--brand-accent-soft);
+  }
+
+  .bh-product-main {
+    padding: 1.6rem;
+  }
+
+  .bh-product-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--secondary);
+  }
+
+  .bh-product-status i {
+    width: 0.45rem;
+    height: 0.45rem;
+    background: currentColor;
+    border-radius: 50%;
+    box-shadow: 0 0 0.75rem currentColor;
+  }
+
+  .bh-product-number {
+    margin: 3rem 0 0.45rem;
+    color: var(--gray);
+  }
+
+  .bh-product h3 {
+    margin: 0 0 0.85rem;
+    font-size: clamp(2rem, 5vw, 3.7rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .bh-product-main > p:last-of-type {
+    max-width: 35rem;
+    margin-bottom: 1.5rem;
+    color: var(--darkgray);
+    line-height: 1.65;
+  }
+
+  .bh-product-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .bh-product-tags span {
+    padding: 0.26rem 0.48rem;
+    color: var(--darkgray);
+    background: var(--lightgray);
+    border-radius: 0.25rem;
+  }
+
+  .bh-product-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 20rem;
+    padding: 1.6rem;
+    background:
+      linear-gradient(var(--brand-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--brand-line) 1px, transparent 1px),
+      var(--brand-accent-soft);
+    background-size: 2rem 2rem;
+    border-left: 1px solid var(--brand-line);
+  }
+
+  .bh-product-side span:first-child {
+    align-self: flex-end;
+    color: var(--secondary);
+    font-size: 2rem;
+  }
+
+  .bh-product-side span:last-child {
+    font-family: var(--codeFont);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  .bh-tracks {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .bh-track {
+    min-height: 14rem;
+    padding: 1.3rem;
+    color: var(--dark);
+    border: 1px solid var(--brand-line);
+    border-radius: 0.7rem;
+    text-decoration: none;
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+
+  .bh-track:hover {
+    border-color: var(--secondary);
+    background: var(--brand-accent-soft);
+  }
+
+  .bh-track-number {
+    color: var(--secondary);
+  }
+
+  .bh-track h3 {
+    margin: 3.2rem 0 0.6rem;
+    font-size: 1.18rem;
+  }
+
+  .bh-track p {
+    margin: 0;
+    color: var(--gray);
+    line-height: 1.55;
+  }
+
+  .bh-notes {
+    border-top: 1px solid var(--brand-line);
+  }
+
+  .bh-note {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.1rem 0;
+    color: var(--dark);
+    border-bottom: 1px solid var(--brand-line);
+    text-decoration: none;
+  }
+
+  .bh-note-meta {
+    color: var(--gray);
+  }
+
+  .bh-note strong {
+    font-weight: 600;
+  }
+
+  .bh-note > span:last-child {
+    color: var(--secondary);
+  }
+
+  .bh-about {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 3rem;
+    padding: 4rem 0 1rem;
+    border-top: 1px solid var(--brand-line);
+    scroll-margin-top: 2rem;
+  }
+
+  .bh-about-label {
+    color: var(--secondary);
+  }
+
+  .bh-about h2 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+  }
+
+  .bh-about-copy > p {
+    max-width: 40rem;
+    color: var(--darkgray);
+    line-height: 1.75;
+  }
+
+  .bh-about-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.5rem;
+  }
+}
+
+@media all and (max-width: 760px) {
+  .page-header > header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .page-header > header > .nav-links {
+    flex-basis: 100%;
+  }
+
+  .brand-home {
+    padding-top: 2.5rem;
+
+    .bh-hero {
+      min-height: 0;
+      padding: 1rem 0 3.5rem;
+    }
+
+    .bh-hero::after {
+      top: 1rem;
+      right: 0;
+    }
+
+    .bh-hero h1 {
+      font-size: 3.25rem;
+    }
+
+    .bh-now,
+    .bh-product,
+    .bh-about {
+      grid-template-columns: 1fr;
+    }
+
+    .bh-now {
+      align-items: start;
+    }
+
+    .bh-product-side {
+      min-height: 9rem;
+      border-top: 1px solid var(--brand-line);
+      border-left: 0;
+    }
+
+    .bh-tracks {
+      grid-template-columns: 1fr;
+    }
+
+    .bh-track {
+      min-height: 0;
+    }
+
+    .bh-track h3 {
+      margin-top: 1.5rem;
+    }
+
+    .bh-note {
+      grid-template-columns: 1fr auto;
+    }
+
+    .bh-note-meta {
+      grid-column: 1 / -1;
+    }
+
+    .bh-about {
+      gap: 1rem;
+    }
+  }
+}
+
+@media all and (max-width: 420px) {
+  .brand-home .bh-hero h1 {
+    font-size: 2.75rem;
+  }
+
+  .brand-home .bh-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-home .bh-actions a,
+  .brand-home .bh-about-links a,
+  .brand-home .bh-product,
+  .brand-home .bh-track {
+    transition: none;
+  }
+}
