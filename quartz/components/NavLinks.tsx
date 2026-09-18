@@ -29,7 +29,7 @@ const NavLinks: QuartzComponent = ({ fileData }: QuartzComponentProps) => {
       matchChildren: true,
     },
     {
-      label: lang === "cn" ? "安全实验室" : "Security Lab",
+      label: lang === "cn" ? "AI 业务安全" : "AI Security",
       slug: (lang === "cn" ? "tech/index.cn" : "tech/index") as FullSlug,
       section: "tech/",
       matchChildren: true,

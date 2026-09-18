@@ -1,67 +1,45 @@
 ---
 title: Chokebit
 lang: en
-description: Chokebit is an independent maker building AI-native products in public, with security research and systems thinking as a technical foundation.
+description: Chokebit is an independent maker focused on AI-native products and security for AI-powered businesses, documenting the path from idea to launch in public.
 translations:
   cn: index.cn
 cssclasses:
   - brand-home
 ---
 
-<section class="bh-hero">
-  <p class="bh-kicker">// INDEPENDENT MAKER · BUILD IN PUBLIC</p>
-  <h1>Build small. Ship fast.<br><span>Study systems.</span></h1>
-  <p class="bh-lead">I'm Chokebit, an independent maker. I document the full path of AI-native products—from idea and development to launch and failure—while studying security, reverse engineering, and complex systems on the side.</p>
-  <div class="bh-actions">
-    <a href="./products/index">See what I'm building&nbsp; ↗</a>
-    <a href="./products/chokebit-wiki">Read the latest Build Log&nbsp; →</a>
+<section class="mh-intro">
+  <p class="mh-kicker">INDEPENDENT MAKER / AI NATIVE / AI BUSINESS SECURITY</p>
+  <h1>Hi, I'm <span>Chokebit</span>.</h1>
+  <p class="mh-positioning">An independent maker focused on AI-native products and security for AI-powered businesses.</p>
+  <p class="mh-summary">I build small products and document the honest path from idea and development to launch and failure. I also work on the data flows, permission boundaries, supply-chain risks, and security governance that emerge when AI enters real businesses.</p>
+  <p class="mh-principle">Build products. Understand the business. Protect the boundaries of AI systems.</p>
+  <div class="mh-actions">
+    <a href="./products/index">View products →</a>
+    <a href="./products/chokebit-wiki">Latest Build Log →</a>
   </div>
 </section>
 
-<div class="bh-now">
-  <span class="bh-now-label">NOW_</span>
-  <p>Turning Chokebit Wiki from a technical knowledge base into a public workshop for an independent maker.</p>
-  <a href="./products/chokebit-wiki">Follow progress →</a>
-</div>
-
-<section class="bh-section">
-  <div class="bh-section-head"><h2>Now building</h2><span>01 / ACTIVE PRODUCT</span></div>
-  <a class="bh-product" href="./products/chokebit-wiki">
-    <div class="bh-product-main">
-      <span class="bh-product-status"><i></i> ACTIVE · PUBLIC BETA</span>
-      <p class="bh-product-number">PROJECT / 001</p>
-      <h3>Chokebit Wiki</h3>
-      <p>Turning years of fragmented notes into a public, bilingual, interconnected knowledge system—and documenting how it becomes a real personal brand product.</p>
-      <div class="bh-product-tags"><span>QUARTZ</span><span>OBSIDIAN</span><span>LLM WORKFLOW</span></div>
-    </div>
-    <div class="bh-product-side"><span>↗</span><span>STARTED 2026.05<br>CURRENT STAGE<br>CONTENT FIT</span></div>
-  </a>
+<section class="mh-now">
+  <span class="mh-label"><i></i> NOW</span>
+  <div>
+    <h2>Building Chokebit Wiki</h2>
+    <p>Turning a technical knowledge base into the public workshop of an independent maker.</p>
+  </div>
+  <a href="./products/chokebit-wiki">Follow progress ↗</a>
 </section>
 
-<section class="bh-section">
-  <div class="bh-section-head"><h2>What I build here</h2><span>03 / TRACKS</span></div>
-  <div class="bh-tracks">
-    <a class="bh-track" href="./products/index"><span class="bh-track-number">01 / PRODUCTS</span><h3>Products in public</h3><p>Ideas, MVPs, technical decisions, launches, feedback, failures, and postmortems.</p></a>
-    <a class="bh-track" href="./ai-native/index"><span class="bh-track-number">02 / AI NATIVE</span><h3>AI-native practice</h3><p>AI agents, RAG, MCP, and the real problems behind shipping AI products.</p></a>
-    <a class="bh-track" href="./tech/index"><span class="bh-track-number">03 / SECURITY LAB</span><h3>Security Lab</h3><p>Weekend research into networks, firmware, reverse engineering, and system security.</p></a>
+<section class="mh-section">
+  <div class="mh-section-title"><h2>Recent notes</h2><span>SELECTED NOTES</span></div>
+  <div class="mh-list">
+    <a href="./products/chokebit-wiki"><span>2026.09 · BUILD</span><strong>Chokebit Wiki: from knowledge base to independent-maker identity</strong><b>→</b></a>
+    <a href="./tech/data-flow-analysis.cn"><span>2026.08 · AI SECURITY</span><strong>Data flow analysis, from traditional systems to AI business security（中文）</strong><b>→</b></a>
+    <a href="./ideas/building-knowledge-with-llms"><span>2026.05 · IDEA</span><strong>Building a knowledge system with LLMs</strong><b>→</b></a>
   </div>
 </section>
 
-<section class="bh-section">
-  <div class="bh-section-head"><h2>Recent field notes</h2><span>FIELD NOTES</span></div>
-  <div class="bh-notes">
-    <a class="bh-note" href="./products/chokebit-wiki"><span class="bh-note-meta">2026.09 · BUILD</span><strong>Chokebit Wiki: from knowledge base to independent-maker identity</strong><span>→</span></a>
-    <a class="bh-note" href="./tech/data-flow-analysis.cn"><span class="bh-note-meta">2026.08 · METHOD</span><strong>Data flow analysis, from traditional systems to AI security（中文）</strong><span>→</span></a>
-    <a class="bh-note" href="./ideas/building-knowledge-with-llms"><span class="bh-note-meta">2026.05 · IDEA</span><strong>Building a knowledge system with LLMs</strong><span>→</span></a>
-  </div>
-</section>
-
-<section id="about" class="bh-about">
-  <span class="bh-about-label">ABOUT_</span>
-  <div class="bh-about-copy">
-    <h2>Build independently. Think in public.</h2>
-    <p>My long-term goal is to become an independent maker who ships real products—not only someone who records technology. This site keeps the decisions behind the work visible: why something started, why it changed direction, what worked, and what eventually failed.</p>
-    <p>Security research remains my technical foundation. It trained me to trace how data moves, where permissions break down, and why complex systems fail. That perspective carries into every product I build.</p>
-    <div class="bh-about-links"><a href="https://github.com/chokebit">GitHub ↗</a><a href="./index.xml">RSS ↗</a></div>
-  </div>
+<section id="about" class="mh-about">
+  <span class="mh-label">ABOUT</span>
+  <p>This site keeps more than finished answers. It preserves the decisions behind a product: why it started, why it changed direction, what worked, and what ultimately failed.</p>
+  <div><a href="https://github.com/chokebit">GitHub ↗</a><a href="./index.xml">RSS ↗</a></div>
 </section>
