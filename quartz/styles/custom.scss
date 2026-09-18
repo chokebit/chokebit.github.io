@@ -64,7 +64,7 @@ body[data-slug^="products/"] {
   --product-accent: #4f7600;
   --product-accent-soft: rgba(79, 118, 0, 0.09);
 
-  .page-header > .popover-hint {
+  .page-header > .popover-hint > :not(.view-counter) {
     display: none;
   }
 

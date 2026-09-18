@@ -1,5 +1,10 @@
 import { SharedLayout, PageLayout } from "./quartz/cfg"
 import * as Component from "./quartz/components"
+import { QuartzComponentProps } from "./quartz/components/types"
+
+const viewCounter = Component.ViewCounter()
+const isHomePage = ({ fileData }: QuartzComponentProps) =>
+  fileData.slug === "index" || fileData.slug === "index.cn"
 
 // 所有页面共享
 export const sharedPageComponents: SharedLayout = {
@@ -10,7 +15,12 @@ export const sharedPageComponents: SharedLayout = {
     Component.Darkmode(),
     Component.Search(),
   ],
-  afterBody: [],
+  afterBody: [
+    Component.ConditionalRender({
+      component: viewCounter,
+      condition: isHomePage,
+    }),
+  ],
   footer: Component.Footer({
     links: {
       GitHub: "https://github.com/chokebit",
@@ -30,6 +40,10 @@ export const defaultContentPageLayout: PageLayout = {
     Component.ArticleTitle(),
     Component.ContentMeta(),
     Component.TagList(),
+    Component.ConditionalRender({
+      component: viewCounter,
+      condition: (props) => !isHomePage(props),
+    }),
   ],
   left: leftSidebar,
   right: [
@@ -44,6 +58,10 @@ export const defaultListPageLayout: PageLayout = {
     Component.Breadcrumbs(),
     Component.ArticleTitle(),
     Component.ContentMeta(),
+    Component.ConditionalRender({
+      component: viewCounter,
+      condition: (props) => !isHomePage(props),
+    }),
   ],
   left: leftSidebar,
   right: [],

@@ -6,7 +6,10 @@ const config: QuartzConfig = {
     pageTitle: "CHOKEBIT",
     enableSPA: true,
     enablePopovers: true,
-    analytics: null,
+    analytics: {
+      provider: "goatcounter",
+      websiteId: "chokebit",
+    },
     locale: "en-US",
     // baseUrl 留空，部署时填写如 "chokebit.github.io"
     ignorePatterns: ["private", "templates", ".gitkeep"],

@@ -25,8 +25,10 @@ import Flex from "./Flex"
 import ConditionalRender from "./ConditionalRender"
 import LanguageToggle from "./LanguageToggle"
 import NavLinks from "./NavLinks"
+import ViewCounter from "./ViewCounter"
 
 export {
+  ViewCounter,
   NavLinks,
   LanguageToggle,
   ArticleTitle,
