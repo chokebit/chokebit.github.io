@@ -39,17 +39,20 @@ export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
     Component.ConditionalRender({
       component: Component.Breadcrumbs(),
-      condition: (props) => !isFolderIndex(props),
+      condition: (props) => !isHomePage(props) && !isFolderIndex(props),
     }),
     Component.ConditionalRender({
       component: Component.ArticleTitle(),
-      condition: (props) => !isFolderIndex(props),
+      condition: (props) => !isHomePage(props) && !isFolderIndex(props),
     }),
     Component.ConditionalRender({
       component: Component.ContentMeta(),
-      condition: (props) => !isFolderIndex(props),
+      condition: (props) => !isHomePage(props) && !isFolderIndex(props),
     }),
-    Component.TagList(),
+    Component.ConditionalRender({
+      component: Component.TagList(),
+      condition: (props) => !isHomePage(props) && !isFolderIndex(props),
+    }),
     Component.ConditionalRender({
       component: viewCounter,
       condition: (props) => !isHomePage(props) && !isFolderIndex(props),
@@ -57,8 +60,14 @@ export const defaultContentPageLayout: PageLayout = {
   ],
   left: [],
   right: [
-    Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
+    Component.ConditionalRender({
+      component: Component.DesktopOnly(Component.TableOfContents()),
+      condition: (props) => !isHomePage(props),
+    }),
+    Component.ConditionalRender({
+      component: Component.Backlinks(),
+      condition: (props) => !isHomePage(props),
+    }),
   ],
 }
 
