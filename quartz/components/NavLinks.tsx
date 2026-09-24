@@ -12,15 +12,7 @@ const NavLinks: QuartzComponent = ({ fileData }: QuartzComponentProps) => {
       label: lang === "cn" ? "产品" : "Products",
       slug: (lang === "cn" ? "products/index.cn" : "products/index") as FullSlug,
       section: "products/",
-      matchChildren: false,
-    },
-    {
-      label: "Build Log",
-      slug: (lang === "cn"
-        ? "products/chokebit-wiki.cn"
-        : "products/chokebit-wiki") as FullSlug,
-      section: "products/chokebit-wiki",
-      matchChildren: false,
+      matchChildren: true,
     },
     {
       label: "AI Native",

@@ -5,8 +5,10 @@ import { QuartzComponentProps } from "./quartz/components/types"
 const viewCounter = Component.ViewCounter()
 const isHomePage = ({ fileData }: QuartzComponentProps) =>
   fileData.slug === "index" || fileData.slug === "index.cn"
-const isTechIndex = ({ fileData }: QuartzComponentProps) =>
-  fileData.slug === "tech/index" || fileData.slug === "tech/index.cn"
+const isFolderIndex = ({ fileData }: QuartzComponentProps) => {
+  const slug = fileData.slug
+  return !!slug && !slug.startsWith("tags/") && (slug.endsWith("/index") || slug.endsWith("/index.cn"))
+}
 
 // 所有页面共享
 export const sharedPageComponents: SharedLayout = {
@@ -32,33 +34,28 @@ export const sharedPageComponents: SharedLayout = {
   }),
 }
 
-// 左侧栏：品牌 + 控件 + Explorer
-const leftSidebar = [
-  Component.DesktopOnly(Component.Explorer()),
-]
-
 // 内容页面布局
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
     Component.ConditionalRender({
       component: Component.Breadcrumbs(),
-      condition: (props) => !isTechIndex(props),
+      condition: (props) => !isFolderIndex(props),
     }),
     Component.ConditionalRender({
       component: Component.ArticleTitle(),
-      condition: (props) => !isTechIndex(props),
+      condition: (props) => !isFolderIndex(props),
     }),
     Component.ConditionalRender({
       component: Component.ContentMeta(),
-      condition: (props) => !isTechIndex(props),
+      condition: (props) => !isFolderIndex(props),
     }),
     Component.TagList(),
     Component.ConditionalRender({
       component: viewCounter,
-      condition: (props) => !isHomePage(props) && !isTechIndex(props),
+      condition: (props) => !isHomePage(props) && !isFolderIndex(props),
     }),
   ],
-  left: leftSidebar,
+  left: [],
   right: [
     Component.DesktopOnly(Component.TableOfContents()),
     Component.Backlinks(),
@@ -68,14 +65,23 @@ export const defaultContentPageLayout: PageLayout = {
 // 列表页面布局（文件夹页、标签页）
 export const defaultListPageLayout: PageLayout = {
   beforeBody: [
-    Component.Breadcrumbs(),
-    Component.ArticleTitle(),
-    Component.ContentMeta(),
+    Component.ConditionalRender({
+      component: Component.Breadcrumbs(),
+      condition: (props) => !isFolderIndex(props),
+    }),
+    Component.ConditionalRender({
+      component: Component.ArticleTitle(),
+      condition: (props) => !isFolderIndex(props),
+    }),
+    Component.ConditionalRender({
+      component: Component.ContentMeta(),
+      condition: (props) => !isFolderIndex(props),
+    }),
     Component.ConditionalRender({
       component: viewCounter,
-      condition: (props) => !isHomePage(props),
+      condition: (props) => !isHomePage(props) && !isFolderIndex(props),
     }),
   ],
-  left: leftSidebar,
+  left: [],
   right: [],
 }

@@ -4,6 +4,7 @@ lang: cn
 translations:
   en: ideas/building-knowledge-with-llms
 tags:
+  - ideas
   - llm
   - knowledge-management
   - workflow

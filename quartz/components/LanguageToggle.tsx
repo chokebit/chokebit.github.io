@@ -47,27 +47,6 @@ const filterFolderPages = (lang) => {
   }
 }
 
-const localizeExplorer = (lang) => {
-  for (const folderLi of document.querySelectorAll(".explorer .folder-container")) {
-    const li = folderLi.parentElement
-    const innerUl = li?.querySelector(":scope > .folder-outer > ul")
-    if (!innerUl) continue
-    // Find .cn index child
-    const cnLink = innerUl.querySelector("a[data-for$='index.cn']")
-    const folderLink = folderLi.querySelector(".folder-title")
-    if (!folderLink) continue
-    const defaultTitle = folderLink.getAttribute("data-default-title") || folderLink.textContent
-    folderLink.setAttribute("data-default-title", defaultTitle)
-    if (lang === "cn" && cnLink) {
-      folderLink.textContent = cnLink.textContent
-      folderLink.setAttribute("data-for", cnLink.getAttribute("data-for") || "")
-      folderLink.setAttribute("href", cnLink.getAttribute("href") || "")
-    } else {
-      folderLink.textContent = defaultTitle
-    }
-  }
-}
-
 const saved = localStorage.getItem("user-lang")
 const browserLang = navigator.language.startsWith("zh") ? "cn" : "en"
 applyLang(saved ?? browserLang)
@@ -88,15 +67,7 @@ filterFolderPages(saved ?? browserLang)
 document.addEventListener("nav", () => {
   const current = localStorage.getItem("user-lang") ?? "en"
   applyLang(current)
-  // Poll until Explorer rendered, then localize
-  let attempts = 0
-  const poll = setInterval(() => {
-    if (document.querySelector(".explorer .folder-container") || ++attempts > 20) {
-      clearInterval(poll)
-      localizeExplorer(current)
-      filterFolderPages(current)
-    }
-  }, 100)
+  filterFolderPages(current)
   for (const btn of document.querySelectorAll(".lang-btn")) {
     const handler = () => {
       const href = btn.getAttribute("data-href")
