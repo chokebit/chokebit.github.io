@@ -12,7 +12,7 @@ cssclasses:
   <p class="mh-kicker">INDEPENDENT MAKER / AI NATIVE / AI BUSINESS SECURITY</p>
   <div class="mh-profile">
     <div class="mh-profile-copy">
-      <h1>Hi, I'm <span>Chokebit</span>.</h1>
+      <h1>Hi, I'm <span>chokebit3xp</span>.</h1>
       <p class="mh-positioning">An independent maker focused on AI-native products and security for AI-powered businesses.</p>
       <p class="mh-summary">I build small products and document the honest path from idea and development to launch and failure. I also work on the data flows, permission boundaries, supply-chain risks, and security governance that emerge when AI enters real businesses.</p>
       <p class="mh-principle">Build products. Understand the business. Protect the boundaries of AI systems.</p>
