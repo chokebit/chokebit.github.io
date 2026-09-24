@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>从 Linear Sync Engine 学技术，也学如何把技术研究做成产品</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="从 Linear Sync Engine 学技术，也学如何把技术研究做成产品"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="从 Linear Sync Engine 学技术，也学如何把技术研究做成产品"/><meta name="twitter:description" content="一句话结论：Linear Sync Engine 值得学习的不只有本地优先、事务队列和增量同步。围绕它产生的「完整研究 → 十分钟摘要 → 互动实验」也展示了一条很好的技术内容产品化路径。 0."/><meta property="og:description" content="一句话结论：Linear Sync Engine 值得学习的不只有本地优先、事务队列和增量同步。围绕它产生的「完整研究 → 十分钟摘要 → 互动实验」也展示了一条很好的技术内容产品化路径。 0."/><meta property="og:image:alt" content="一句话结论：Linear Sync Engine 值得学习的不只有本地优先、事务队列和增量同步。围绕它产生的「完整研究 → 十分钟摘要 → 互动实验」也展示了一条很好的技术内容产品化路径。 0."/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/ai-native/linear-sync-engine-technology-and-content-product.cn"/><meta property="twitter:url" content="https://chokebit.github.io/ai-native/linear-sync-engine-technology-and-content-product.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="一句话结论：Linear Sync Engine 值得学习的不只有本地优先、事务队列和增量同步。围绕它产生的「完整研究 → 十分钟摘要 → 互动实验」也展示了一条很好的技术内容产品化路径。 0."/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="ai-native/linear-sync-engine-technology-and-content-product.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../products/index.cn" class="nav-link">产品</a><a href="../ai-native/index.cn" class="nav-link" aria-current="page">AI Native</a><a href="../tech/index.cn" class="nav-link">技术档案</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../ai-native/">AI Native</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>从 Linear Sync Engine 学技术，也学如何把技术研究做成产品</a></div></nav><h1 class="article-title">从 Linear Sync Engine 学技术，也学如何把技术研究做成产品</h1><p show-comma="true" class="content-meta"><time datetime="2026-09-24T15:07:14.940Z">Sep 24, 2026</time><span>15 min read</span></p><ul class="tags"><li><a href="../tags/ai-native" class="internal tag-link">ai-native</a></li><li><a href="../tags/local-first" class="internal tag-link">local-first</a></li><li><a href="../tags/sync-engine" class="internal tag-link">sync-engine</a></li><li><a href="../tags/product" class="internal tag-link">product</a></li><li><a href="../tags/content-product" class="internal tag-link">content-product</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><blockquote>
+<p>一句话结论：Linear Sync Engine 值得学习的不只有本地优先、事务队列和增量同步。围绕它产生的「完整研究 → 十分钟摘要 → 互动实验」也展示了一条很好的技术内容产品化路径。</p>
+</blockquote>
+<h2 id="0-来源与阅读边界">0. 来源与阅读边界<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#0-来源与阅读边界" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>本文基于以下公开资料整理：</p>
+<ul>
+<li><a href="https://github.com/wzhudev/reverse-linear-sync-engine" class="external">Reverse Engineering Linear’s Sync Engine: A Detailed Study<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>：wzhudev 对 Linear 前端同步引擎的逆向研究、源码注释和架构分析。</li>
+<li><a href="https://github.com/wzhudev/reverse-linear-sync-engine/blob/main/SUMMARY.md" class="external">SUMMARY：Linear Sync Engine 概要<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>：研究作者提供的简明版本。</li>
+<li><a href="https://s.baoyu.io/files/linear-sync-lab-bilingual.html" class="external">Sync Lab：把同步引擎拆开看<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>：基于上述研究制作的双语互动实验。</li>
+</ul>
+<p>需要先说明：这是一份基于前端代码的逆向研究，不是 Linear 官方发布的完整技术规格。服务端内部实现、线上最新版本及部分边界行为无法仅凭客户端代码完全确认。</p>
+<hr/>
+<h2 id="1-linear-为什么会让人感觉很快">1. Linear 为什么会让人感觉很快<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-linear-为什么会让人感觉很快" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>在普通 Web 应用中，一次修改经常是这样的：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>用户点击</span></span>
+<span data-line><span>  → 发送请求</span></span>
+<span data-line><span>  → 等待服务器处理</span></span>
+<span data-line><span>  → 收到响应</span></span>
+<span data-line><span>  → 更新界面</span></span></code></pre></figure>
+<p>网络稍慢，用户就会感到明显停顿。</p>
+<p>Linear 采用的思路更接近 Local-first：先让本地状态和界面发生变化，再在后台完成持久化与同步。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>用户修改 Issue</span></span>
+<span data-line><span>  → 内存中的 Model 立即更新</span></span>
+<span data-line><span>  → MobX 驱动界面刷新</span></span>
+<span data-line><span>  → 生成 Transaction</span></span>
+<span data-line><span>  → Transaction 写入 IndexedDB</span></span>
+<span data-line><span>  → 加入发送队列</span></span>
+<span data-line><span>  → 服务器执行并分配 syncId</span></span>
+<span data-line><span>  → 通过 Delta Packet 广播结果</span></span>
+<span data-line><span>  → 客户端更新本地数据库和内存</span></span></code></pre></figure>
+<p>用户感受到的速度来自本地即时反馈，并不意味着网络真的变快了。</p>
+<hr/>
+<h2 id="2-同步引擎的关键组成">2. 同步引擎的关键组成<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-同步引擎的关键组成" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="21-model-与-modelregistry">2.1 Model 与 ModelRegistry<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#21-model-与-modelregistry" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>Issue</code>、<code>Team</code>、<code>Comment</code> 等业务实体被表示为 Model。每种 Model 的属性、关联、序列化方式、索引方式和加载策略，都记录在 <code>ModelRegistry</code> 中。</p>
+<p>可以把它理解为一套运行在浏览器里的 ORM 与元数据系统：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>ModelRegistry</span></span>
+<span data-line><span>  ├── Model 类型</span></span>
+<span data-line><span>  ├── Property 定义</span></span>
+<span data-line><span>  ├── Reference 关系</span></span>
+<span data-line><span>  ├── Serializer</span></span>
+<span data-line><span>  ├── Index 配置</span></span>
+<span data-line><span>  └── Load Strategy</span></span></code></pre></figure>
+<p>系统还会根据这些元数据生成 Schema Hash，用于判断本地 IndexedDB 是否需要迁移。</p>
+<h3 id="22-object-pool">2.2 Object Pool<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#22-object-pool" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>加载到内存的对象按 UUID 放入统一对象池。其他 Model 引用某个 Issue 时，尽量取得同一个对象实例，而不是制造多份彼此不一致的副本。</p>
+<p>这让响应式界面、对象关联和增量更新更容易保持一致。</p>
+<h3 id="23-indexeddb-与启动恢复">2.3 IndexedDB 与启动恢复<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#23-indexeddb-与启动恢复" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>客户端并非每次启动都重新下载全部数据。数据会保存在 IndexedDB 中，应用可以先从本地恢复，再连接服务器获取增量变化。</p>
+<p>这种设计带来三个直接好处：</p>
+<ul>
+<li>启动速度更快；</li>
+<li>弱网或临时离线时仍能读取本地数据；</li>
+<li>未完成的操作可以在浏览器关闭后继续恢复。</li>
+</ul>
+<h3 id="24-lazy-hydration">2.4 Lazy Hydration<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#24-lazy-hydration" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>数据存在本地，并不等于必须立即全部进入内存。Linear 会根据加载策略，只加载当前需要的对象；某个属性或关联真正被访问时，再从 IndexedDB 或服务器补齐。</p>
+<p>这解决了两个不同的问题：</p>
+<ul>
+<li><strong>持久化层</strong>：数据是否已经保存到本地；</li>
+<li><strong>内存层</strong>：数据是否已经成为可使用的对象。</li>
+</ul>
+<p>把两层分开，才能在大量数据下同时兼顾启动速度与内存占用。</p>
+<hr/>
+<h2 id="3-transaction同步系统的核心抽象">3. Transaction：同步系统的核心抽象<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-transaction同步系统的核心抽象" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>当用户修改一个字段并保存时，系统不会只发送一个普通的 <code>PATCH</code> 请求，而是把变化封装成 Transaction。</p>
+<p>Transaction 会记录修改内容和必要的旧状态，因此可以支持：</p>
+<ul>
+<li>乐观更新；</li>
+<li>失败回滚；</li>
+<li>离线缓存与重发；</li>
+<li>Undo / Redo；</li>
+<li>等待服务端最终确认。</li>
+</ul>
+<p>典型过程如下：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>issue.title = &quot;New title&quot;</span></span>
+<span data-line><span>  → 内存立即显示新标题</span></span>
+<span data-line><span>  → issue.save()</span></span>
+<span data-line><span>  → 创建 UpdateTransaction</span></span>
+<span data-line><span>  → 写入 IndexedDB 中的事务表</span></span>
+<span data-line><span>  → 进入 TransactionQueue</span></span>
+<span data-line><span>  → 批量发送到服务器</span></span></code></pre></figure>
+<p>如果此时断网，事务仍保存在本地；恢复连接后，队列可以继续发送。</p>
+<p>这里也存在一个重要工程边界：重试不自动等于“恰好执行一次”。涉及支付、发信、创建外部资源等非幂等操作时，仍然需要事务 ID、幂等键和服务端去重。</p>
+<hr/>
+<h2 id="4-syncid-与-delta-packet">4. syncId 与 Delta Packet<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-syncid-与-delta-packet" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Linear 的同步并不是让多个客户端自由合并全部状态，而是由中心服务器确定变化顺序。</p>
+<p>服务器为已确认的变化分配单调递增的 <code>syncId</code>。它类似同步日志的版本号：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>syncId 1041 → 修改 Issue A</span></span>
+<span data-line><span>syncId 1042 → 新增 Comment B</span></span>
+<span data-line><span>syncId 1043 → 移动 Issue C</span></span></code></pre></figure>
+<p>客户端保存自己的 <code>lastSyncId</code>，因此能够判断：</p>
+<ul>
+<li>当前已经同步到哪个位置；</li>
+<li>收到的变化是否乱序；</li>
+<li>中间是否缺少数据包；</li>
+<li>本地事务是否已经得到服务器确认。</li>
+</ul>
+<p>服务器执行事务后，会把实际变化封装成 Delta Packet，再通过连接广播给相关客户端。</p>
+<p>Delta 不一定与客户端提交的 Transaction 完全相同。服务器可能同时更新时间戳、生成历史记录，或者触发其他副作用。因此客户端最终仍以服务端广播的结果为准。</p>
+<p>这套机制更接近“中心服务器确定全序”的同步模型，不能简单等同于去中心化 CRDT，也不能直接推导出它适合通用富文本协作。</p>
+<hr/>
+<h2 id="5-权限不是隐藏按钮而是控制数据分发">5. 权限不是隐藏按钮，而是控制数据分发<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-权限不是隐藏按钮而是控制数据分发" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>同步系统中的权限问题不只是“用户能否打开某个页面”。真正的问题是：不该看的数据是否已经到达了客户端。</p>
+<p>Linear 研究中出现的 SyncGroup，把权限范围纳入同步协议：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>用户身份 / 团队 / 角色</span></span>
+<span data-line><span>  → 决定订阅哪些 SyncGroup</span></span>
+<span data-line><span>  → 服务器只分发对应范围的数据</span></span>
+<span data-line><span>  → 客户端只保存有权获得的 Model</span></span></code></pre></figure>
+<p>当用户获得新权限时，客户端可以加载新增范围；当权限被撤销时，停止订阅并清理相关本地模型。</p>
+<p>这比“先下载所有数据，再用前端隐藏”安全得多。但它仍有现实边界：如果设备已经离线，服务器无法神奇地远程抹除其旧副本。敏感数据还需要过期策略、加密、设备管理和审计共同保护。</p>
+<hr/>
+<h2 id="6-这套技术如何用于-ai-native-产品">6. 这套技术如何用于 AI Native 产品<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#6-这套技术如何用于-ai-native-产品" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Linear Sync Engine 不只适合任务管理软件。它的很多设计可以迁移到 AI Agent、知识库和工作流产品。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Linear 中的机制</th><th>AI Native 产品中的对应设计</th></tr></thead><tbody><tr><td>Model</td><td>Conversation、Task、AgentRun、ToolCall、Artifact</td></tr><tr><td>Transaction</td><td>用户指令、状态修改、Agent 行为请求</td></tr><tr><td>IndexedDB</td><td>本地会话、草稿、执行队列和结果缓存</td></tr><tr><td>TransactionQueue</td><td>待执行或待上传的 Agent 操作</td></tr><tr><td>syncId</td><td>服务端事件序号、审计日志位置</td></tr><tr><td>Delta Packet</td><td>流式状态变化、工具结果和任务进度</td></tr><tr><td>SyncGroup</td><td>租户、项目、角色和数据权限边界</td></tr><tr><td>Undo / Redo</td><td>撤销尚可逆的 Agent 操作</td></tr></tbody></table></div>
+<p>一个可靠的 Agent 操作链可以设计成：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>用户要求 Agent 执行任务</span></span>
+<span data-line><span>  → 客户端创建 Pending Action</span></span>
+<span data-line><span>  → 本地持久化</span></span>
+<span data-line><span>  → 服务端检查权限与幂等键</span></span>
+<span data-line><span>  → Agent 调用工具</span></span>
+<span data-line><span>  → 写入不可篡改的事件记录</span></span>
+<span data-line><span>  → 客户端接收增量状态</span></span>
+<span data-line><span>  → 成功确认，或失败回滚</span></span></code></pre></figure>
+<p>尤其重要的是：AI 生成了一个操作，不代表系统必须立刻执行。Transaction 层可以承载权限检查、人工确认、审计、重试和回滚，把模型推理与有后果的动作隔离开。</p>
+<hr/>
+<h2 id="7-从技术研究到内容产品">7. 从技术研究到内容产品<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#7-从技术研究到内容产品" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>这项研究的另一层价值，是它没有停留在一篇很长的技术文章。</p>
+<p>它逐步形成了三层内容：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>完整逆向研究</span></span>
+<span data-line><span>  → 给需要验证细节的工程师</span></span>
+<span data-line> </span>
+<span data-line><span>十分钟 SUMMARY</span></span>
+<span data-line><span>  → 给想快速建立整体认知的读者</span></span>
+<span data-line> </span>
+<span data-line><span>12 个互动实验</span></span>
+<span data-line><span>  → 给需要通过操作理解抽象机制的学习者</span></span></code></pre></figure>
+<p>这就是内容产品化：同一份知识，不是机械地改写成长文、短文和视频，而是针对不同理解深度，设计不同的使用方式。</p>
+<h3 id="71-完整研究是可信度底座">7.1 完整研究是可信度底座<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#71-完整研究是可信度底座" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>仓库保留源码注释、概念映射、架构图和推理过程。读者可以检查结论从哪里来，也可以通过 Issue 或 Pull Request 纠错。</p>
+<h3 id="72-summary-负责降低入口门槛">7.2 SUMMARY 负责降低入口门槛<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#72-summary-负责降低入口门槛" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>不是所有人都会直接读完长篇逆向分析。简明摘要先说明 Model、Transaction、Delta 和同步流程，让读者建立地图，再决定是否深入。</p>
+<h3 id="73-互动实验把不可见过程变得可见">7.3 互动实验把不可见过程变得可见<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#73-互动实验把不可见过程变得可见" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>同步顺序、乐观更新、离线队列和权限分发都发生在系统内部。互动实验通过滑块、状态变化和判断题，把这些不可见机制转化为可观察行为。</p>
+<p>每一关基本遵循同一个产品结构：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>提出问题</span></span>
+<span data-line><span>  → 操作模拟</span></span>
+<span data-line><span>  → 观察差异</span></span>
+<span data-line><span>  → 解释原理</span></span>
+<span data-line><span>  → 判断题确认理解</span></span>
+<span data-line><span>  → 回到原始研究</span></span></code></pre></figure>
+<p>它还把进度保存在本地浏览器，不要求注册；同时明确实验做了哪些简化、哪些能力没有实现。这些细节让它更像一个学习产品，而不只是带动画的文章。</p>
+<hr/>
+<h2 id="8-如何复用到个人技术品牌">8. 如何复用到个人技术品牌<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#8-如何复用到个人技术品牌" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>如果要围绕 AI Native 与 AI 业务安全持续创作，可以复用这套生产链：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>真实问题或技术研究</span></span>
+<span data-line><span>  → 完整技术文章</span></span>
+<span data-line><span>  → 三分钟摘要</span></span>
+<span data-line><span>  → 一个可操作实验</span></span>
+<span data-line><span>  → 产品开发记录</span></span>
+<span data-line><span>  → 社交媒体切片</span></span></code></pre></figure>
+<p>例如“AI Agent 工具越权”可以拆成：</p>
+<ol>
+<li><strong>技术文章</strong>：解释 Planner、Tool Call、权限令牌、人工确认和审计链。</li>
+<li><strong>互动实验</strong>：切换最小权限、自动执行和人工确认，观察同一请求产生的不同结果。</li>
+<li><strong>产品记录</strong>：公开需求判断、原型、失败方案和迭代过程。</li>
+<li><strong>短内容</strong>：提炼一个反直觉结论，引导读者回到完整实验。</li>
+</ol>
+<p>这样做的结果不是“多发几篇文章”，而是把研究沉淀成可以体验、引用和持续迭代的产品资产。</p>
+<hr/>
+<h2 id="9-最终启示">9. 最终启示<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#9-最终启示" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Linear Sync Engine 给出的技术启示是：</p>
+<blockquote>
+<p>快速体验来自本地即时反馈，可靠性来自持久化事务、服务端排序、增量同步和权限边界。</p>
+</blockquote>
+<p>围绕它产生的研究与互动实验，则给出了内容产品化启示：</p>
+<blockquote>
+<p>深度内容负责建立可信度，摘要负责降低门槛，互动体验负责让理解真正发生。</p>
+</blockquote>
+<p>对独立开发者而言，两者可以合在一起：研究真实技术问题，把结论做成可运行的小产品，再公开记录构建过程。技术因此不再只是笔记，内容也不再只是文章。</p></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-2" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#0-来源与阅读边界" data-for="0-来源与阅读边界">0. 来源与阅读边界</a></li><li class="depth-0"><a href="#1-linear-为什么会让人感觉很快" data-for="1-linear-为什么会让人感觉很快">1. Linear 为什么会让人感觉很快</a></li><li class="depth-0"><a href="#2-同步引擎的关键组成" data-for="2-同步引擎的关键组成">2. 同步引擎的关键组成</a></li><li class="depth-1"><a href="#21-model-与-modelregistry" data-for="21-model-与-modelregistry">2.1 Model 与 ModelRegistry</a></li><li class="depth-1"><a href="#22-object-pool" data-for="22-object-pool">2.2 Object Pool</a></li><li class="depth-1"><a href="#23-indexeddb-与启动恢复" data-for="23-indexeddb-与启动恢复">2.3 IndexedDB 与启动恢复</a></li><li class="depth-1"><a href="#24-lazy-hydration" data-for="24-lazy-hydration">2.4 Lazy Hydration</a></li><li class="depth-0"><a href="#3-transaction同步系统的核心抽象" data-for="3-transaction同步系统的核心抽象">3. Transaction：同步系统的核心抽象</a></li><li class="depth-0"><a href="#4-syncid-与-delta-packet" data-for="4-syncid-与-delta-packet">4. syncId 与 Delta Packet</a></li><li class="depth-0"><a href="#5-权限不是隐藏按钮而是控制数据分发" data-for="5-权限不是隐藏按钮而是控制数据分发">5. 权限不是隐藏按钮，而是控制数据分发</a></li><li class="depth-0"><a href="#6-这套技术如何用于-ai-native-产品" data-for="6-这套技术如何用于-ai-native-产品">6. 这套技术如何用于 AI Native 产品</a></li><li class="depth-0"><a href="#7-从技术研究到内容产品" data-for="7-从技术研究到内容产品">7. 从技术研究到内容产品</a></li><li class="depth-1"><a href="#71-完整研究是可信度底座" data-for="71-完整研究是可信度底座">7.1 完整研究是可信度底座</a></li><li class="depth-1"><a href="#72-summary-负责降低入口门槛" data-for="72-summary-负责降低入口门槛">7.2 SUMMARY 负责降低入口门槛</a></li><li class="depth-1"><a href="#73-互动实验把不可见过程变得可见" data-for="73-互动实验把不可见过程变得可见">7.3 互动实验把不可见过程变得可见</a></li><li class="depth-0"><a href="#8-如何复用到个人技术品牌" data-for="8-如何复用到个人技术品牌">8. 如何复用到个人技术品牌</a></li><li class="depth-0"><a href="#9-最终启示" data-for="9-最终启示">9. 最终启示</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../ai-native/index.cn" class="internal">AI Native</a></li><li><a href="../ai-native/" class="internal">AI Native</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>

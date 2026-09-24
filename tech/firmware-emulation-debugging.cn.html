@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>固件仿真与调试（QEMU / FirmAE）</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="固件仿真与调试（QEMU / FirmAE）"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="固件仿真与调试（QEMU / FirmAE）"/><meta name="twitter:description" content="使用 QEMU、FirmAE、chroot 与调试工具搭建授权固件分析环境，并定位常见启动与 CGI 问题。"/><meta property="og:description" content="使用 QEMU、FirmAE、chroot 与调试工具搭建授权固件分析环境，并定位常见启动与 CGI 问题。"/><meta property="og:image:alt" content="使用 QEMU、FirmAE、chroot 与调试工具搭建授权固件分析环境，并定位常见启动与 CGI 问题。"/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/tech/firmware-emulation-debugging.cn"/><meta property="twitter:url" content="https://chokebit.github.io/tech/firmware-emulation-debugging.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="使用 QEMU、FirmAE、chroot 与调试工具搭建授权固件分析环境，并定位常见启动与 CGI 问题。"/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="tech/firmware-emulation-debugging.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../products/index.cn" class="nav-link">产品</a><a href="../ai-native/index.cn" class="nav-link">AI Native</a><a href="../tech/index.cn" class="nav-link" aria-current="page">技术档案</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Archive</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>固件仿真与调试（QEMU / FirmAE）</a></div></nav><h1 class="article-title">固件仿真与调试（QEMU / FirmAE）</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-14T00:00:00.000Z">Aug 14, 2026</time><span>20 min read</span></p><ul class="tags"><li><a href="../tags/iot" class="internal tag-link">iot</a></li><li><a href="../tags/firmware" class="internal tag-link">firmware</a></li><li><a href="../tags/qemu" class="internal tag-link">qemu</a></li><li><a href="../tags/firmae" class="internal tag-link">firmae</a></li><li><a href="../tags/emulation" class="internal tag-link">emulation</a></li><li><a href="../tags/debugging" class="internal tag-link">debugging</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><blockquote>
+<p>本文介绍在<strong>授权范围内</strong>对固件做仿真与调试的方法：用 QEMU 跑起二进制、用 FirmAE 批量仿真路由器、以及用 <code>chroot + qemu</code> / <code>gdb</code> / <code>strace</code> 分析固件里的 CGI 程序。所有操作都假定你分析的是<strong>自己拥有的设备 / 已授权的样本</strong>（如厂商开发板、自购硬件、官方固件）。请勿对他人设备实施。
+内容难免有误，请带着辩证视角阅读。</p>
+</blockquote>
+<h2 id="本文内容">本文内容<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#本文内容" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>QEMU 两种模式</strong>：全系统仿真 vs 用户态仿真；TCG vs KVM</li>
+<li><strong>QEMU 网络模型</strong>：<code>-net</code>（旧）vs <code>-netdev</code>+<code>-device</code>；桥接 vs 用户态 NAT；端口转发</li>
+<li><strong>各架构启动命令</strong>：mips / mipsel / armel / aarch64 / powerpc（含 <code>-dtb</code> 设备树）</li>
+<li><strong>镜像启动模式对比</strong>：ARM/MIPS 需 <code>-kernel</code>；x86/PowerPC 自带 bootloader；<code>qemu-img</code> 格式转换</li>
+<li><strong>FirmAE 框架</strong>：NVRAM 模拟、fixImage/makeImage、scratch 目录、串口 / 监视器接入</li>
+<li><strong>其他框架速览</strong>：Firmadyne / FAP / EMUX / FAT / Qiling / Unicorn / FACT_core / emba</li>
+<li><strong>CGI 调试（授权分析）</strong>：提取环境变量、QEMU <code>-E</code> 传参、<code>chroot + qemu</code>、用 <code>LD_PRELOAD</code> 暂停短命进程、原生 webserver 仿真、三层排错法</li>
+<li><strong>防御视角</strong>：CGI 环境变量的攻击面认知（不提供利用代码）</li>
+</ul>
+<hr/>
+<h2 id="一qemu-两种仿真模式">一、QEMU 两种仿真模式<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一qemu-两种仿真模式" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>模式</th><th>说明</th><th>典型用途</th></tr></thead><tbody><tr><td><strong>全系统仿真</strong>（system emulation）</td><td>模拟整台机器：CPU、外设、板级设备，跑完整内核 + 用户态</td><td>启动整个固件系统（<code>qemu-system-*</code>）</td></tr><tr><td><strong>用户态仿真</strong>（user-mode）</td><td>只模拟 CPU，直接在宿主机 OS 上跑单个跨架构二进制（<code>qemu-*-static</code>）</td><td>单跑一个 CGI / 守护进程，无需整套系统</td></tr></tbody></table></div>
+<ul>
+<li><strong>TCG vs KVM</strong>：在宿主机架构与 Guest 不同（如 x86 上跑 MIPS）时，QEMU 用 <strong>TCG</strong>（纯软件翻译）；当架构相同（x86 on x86）时可用 <strong>KVM</strong> 硬件加速。IoT 仿真几乎都是跨架构，走 TCG。</li>
+<li><strong>binfmt_misc</strong>：Kali/Ubuntu 等发行版通过 <code>/proc/sys/fs/binfmt_misc</code> + <code>qemu-binfmt</code> 让你直接 <code>./mips_binary</code> 就能跑（内核自动调用对应 <code>qemu-*-static</code>），无需手写前缀。</li>
+</ul>
+<hr/>
+<h2 id="二qemu-网络模型">二、QEMU 网络模型<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#二qemu-网络模型" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="旧写法已废弃">旧写法（已废弃）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#旧写法已废弃" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-system-mipsel</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -M</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> malta</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -kernel</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vmlinux</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -hda</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rootfs.cpio</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -append</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;root=/dev/sda1 console=tty0&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -net</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nic</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -net</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> tap</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -nographic</span></span></code></pre></figure>
+<p><code>-net nic -net tap</code> 是老接口，<strong>新版本 QEMU 已废弃</strong>，推荐用 <code>-netdev</code> + <code>-device</code> 拆开「后端」与「前端」：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-system-mipsel</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -M</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> malta</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -kernel</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vmlinux</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -hda</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rootfs.cpio</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -netdev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> tap,id=net0,ifname=tap0,script=no,downscript=no</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rtl8139,netdev=net0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -nographic</span></span></code></pre></figure>
+<h3 id="用户态-nat无需-root最省事">用户态 NAT（无需 root、最省事）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#用户态-nat无需-root最省事" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-system-arm</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -M</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> virt</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -kernel</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> zImage</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -initrd</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rootfs.cpio</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -netdev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> user,id=net0,hostfwd=tcp::443-:443</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -device</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> virtio-net-device,netdev=net0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -nographic</span></span></code></pre></figure>
+<p><code>hostfwd=tcp::443-:443</code> 把宿主机 443 端口转发到 Guest 443——访问 <code>宿主机IP:443</code> 即可访问 Guest 服务。</p>
+<h3 id="桥接让-guest-真正出现在局域网">桥接（让 Guest 真正出现在局域网）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#桥接让-guest-真正出现在局域网" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>需要 <code>ip_forward</code> 与 <code>iptables</code> 做 NAT 转发：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sysctl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -w</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> net.ipv4.ip_forward=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">1</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">iptables</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -t</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -A</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> POSTROUTING</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> eth0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -j</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> MASQUERADE</span></span></code></pre></figure>
+<p>（桥接的底层 <code>tunctl</code> / <code>brctl</code> / <code>/etc/qemu-ifup</code> 配置，见《网络命名空间与 VLAN 隔离》的 QEMU 网络一节。）</p>
+<hr/>
+<h2 id="三各架构-qemu-启动命令">三、各架构 QEMU 启动命令<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#三各架构-qemu-启动命令" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>架构</th><th>用户态二进制</th><th>系统态二进制</th><th>备注</th></tr></thead><tbody><tr><td>MIPS 大端</td><td><code>qemu-mips-static</code></td><td><code>qemu-system-mips</code></td><td><code>-M malta</code></td></tr><tr><td>MIPS 小端</td><td><code>qemu-mipsel-static</code></td><td><code>qemu-system-mipsel</code></td><td><code>-M malta</code></td></tr><tr><td>ARM</td><td><code>qemu-arm-static</code></td><td><code>qemu-system-arm</code></td><td><code>-M virt</code> 或具体开发板</td></tr><tr><td>ARM64</td><td><code>qemu-aarch64-static</code></td><td><code>qemu-system-aarch64</code></td><td><code>-M virt</code></td></tr><tr><td>PowerPC</td><td><code>qemu-ppc-static</code></td><td><code>qemu-system-ppc</code></td><td></td></tr></tbody></table></div>
+<p>用户态调试单个程序（开 gdbserver 端口 1234）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-mipsel-static</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -g</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1234</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -L</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./webs/cgi-bin/webapp</span></span></code></pre></figure>
+<blockquote>
+<p><code>-L</code> 指定运行库目录（根文件系统根），<code>-g</code> 开启 GDB 远程调试桩。常见坑：直接 <code>qemu-mips-static ./bin/boa</code> 会报 <code>no user program specified</code>，必须把程序路径放在 <code>-L</code> 之后。</p>
+</blockquote>
+<h3 id="设备树--dtb">设备树 <code>-dtb</code><a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#设备树--dtb" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>部分板子（尤其 ARM/MIPS 开发板）的内核需要单独传入设备树二进制（<code>.dtb</code>，Device Tree Blob）来描述板级硬件布局。QEMU 用 <code>-dtb</code> 指定：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-system-mipsel</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -M</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> malta</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -kernel</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vmlinux</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -hda</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rootfs.ext2</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -dtb</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> malta.dtb</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-system-aarch64</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -M</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> virt,gic_version=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">3</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -cpu</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> host</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -dtb</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> board.dtb</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --enable-kvm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ...</span></span></code></pre></figure>
+<p>若内核本身已内嵌 dtb（很多现代内核通过 <code>CONFIG_ARM_APPENDED_DTB</code> 拼进 zImage，或打包时合并），则可省略 <code>-dtb</code>。</p>
+<hr/>
+<h2 id="四镜像启动模式对比">四、镜像启动模式对比<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#四镜像启动模式对比" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>架构</th><th>是否需 <code>-kernel</code></th><th>启动方式</th></tr></thead><tbody><tr><td>ARM</td><td>需要（多数）</td><td>单独给内核 + initrd，U-Boot 常被省略</td></tr><tr><td>MIPS</td><td>需要（多数）</td><td><code>-M malta</code> + <code>-kernel vmlinux</code></td></tr><tr><td>PowerPC</td><td>自带 bootloader</td><td>镜像内含引导程序</td></tr><tr><td>x86</td><td>自带 bootloader</td><td>直接 <code>-hda</code> 即可</td></tr></tbody></table></div>
+<p><code>-initrd</code> 与 <code>-hda</code> 区别：</p>
+<ul>
+<li><strong><code>-initrd</code></strong>：初始 RAM 磁盘（initramfs），内核启动前临时挂载，用来加载驱动、准备真正的根文件系统。</li>
+<li><strong><code>-hda</code></strong>：虚拟硬盘镜像，挂载为持久化根文件系统。</li>
+</ul>
+<h3 id="镜像格式转换qemu-img">镜像格式转换（qemu-img）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#镜像格式转换qemu-img" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>固件仿真时常需要在 raw / qcow2 / vmdk 之间转换（例如把 VMware 虚拟磁盘转成 qcow2 给 QEMU 用）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-img</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> convert</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vmdk</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -O</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> qcow2</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> source.vmdk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> destination.qcow2</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-img</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> convert</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> qcow2</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -O</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vmdk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> source.qcow2</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> destination.vmdk</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-img</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> convert</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vmdk</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -O</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> qcow2</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> compress</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mydisk.vmdk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mydisk.qcow2</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">   # 压缩</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-img</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> info</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mydisk.qcow2</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                                              # 查看镜像信息</span></span></code></pre></figure>
+<p><code>-f</code> 指定源格式，<code>-O</code> 指定目标格式（不写则自动探测）。</p>
+<hr/>
+<h2 id="五firmae-框架">五、FirmAE 框架<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#五firmae-框架" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>FirmAE（基于 Firmadyne）是目前最实用的<strong>批量路由器固件仿真</strong>框架。核心思路：提取固件 → 修补文件系统（补 NVRAM、补配置）→ 构 QEMU 磁盘镜像 → 自动推断网络、启动 Web 服务、自动化漏洞分析。</p>
+<h3 id="1-nvram-模拟关键">1. NVRAM 模拟（关键）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-nvram-模拟关键" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>很多固件通过 <code>nvram_get(&quot;xxx&quot;)</code> 读配置。FirmAE 用 <code>libnvram.so</code> 这个<strong>自定义共享库</strong>拦截 NVRAM 调用，从 <code>key-value</code> 文件（<code>/etc/nvram.default</code>、<code>/etc/nvram.conf</code>、<code>/var/etc/nvram.default</code> 等）返回默认值。</p>
+<p>局限：如果固件把 NVRAM 实现成 MTD 分区上的自定义数据结构、或调用了未模拟的函数，就会失效，需要手动补。</p>
+<h3 id="2-核心脚本scripts">2. 核心脚本（<code>scripts/</code>）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-核心脚本scripts" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong><code>fixImage.sh</code></strong>：镜像修复——补目录、补 NVRAM 值、初始化缺失的配置文件（FirmAE 精华）。</li>
+<li><strong><code>makeImage.sh</code></strong>：把 <code>extractor.py</code> 解出的 tar.gz 文件系统做成 QEMU 启动镜像（<code>losetup</code> 建分区 → 格式化 ext4 → 挂载 → 拷 firmadyne 工具 → <code>chroot</code> + <code>inferFile.sh</code> 统计启动文件 / Web 服务 → <code>chroot</code> + <code>fixImage.sh</code> 修补）。</li>
+<li><strong><code>inferFile.sh</code></strong>：统计可能的启动脚本、Web 服务器类型与配置，写入 <code>/firmadyne</code>。</li>
+<li><strong><code>makeNetwork.py</code></strong>：网络配置与「预模拟」（pre-emulation）——通过拦截文件系统 / 网络 / 内核子系统的系统调用，推断系统与网络配置。</li>
+<li><strong><code>inferKernel.py</code></strong>：从内核里找 <code>init</code> 路径、收集 <code>kernelCmd</code>（内核命令行）、波特率、文件系统类型等，用于排障。</li>
+</ul>
+<h3 id="3-scratch-工作目录">3. scratch 工作目录<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-scratch-工作目录" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>每次分析有独立 <code>IID</code>（Image ID），目录布局（<code>scratch/&lt;IID>/</code>）：</p>
+<pre><code>name / brand / result / ip / web / architecture   # 状态文件
+image.raw            # QEMU 磁盘镜像
+qemu.*.log          # QEMU 运行日志（initial=预模拟，final=正式）
+makeImage.log / makeNetwork.log
+nvram_keys / nvram_files
+kernelCmd / kernelInit / kernelVersion
+run_*.sh             # 各种运行脚本的符号链接
+</code></pre>
+<h3 id="4-接入-qemu-调试">4. 接入 QEMU 调试<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-接入-qemu-调试" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>串口日志</strong>：<code>-serial file:scratch/&lt;IID>/qemu.final.serial.log</code></li>
+<li><strong>UNIX socket 串口</strong>（外部交互）：
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">-serial</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> unix:/tmp/qemu.</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">II</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">D</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">.S1,server,nowait</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 连接：</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">socat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -,raw,echo=0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> unix-connect:/tmp/qemu.</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">II</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">D</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">.S1</span></span></code></pre></figure>
+</li>
+<li><strong>监视器接口</strong>（发 QEMU 命令如 <code>system_reset</code> / <code>info registers</code> / <code>savevm</code>）：
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">-monitor</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> unix:/tmp/qemu.</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">II</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">D</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">,server,nowait</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">socat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -,raw,echo=0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> unix-connect:/tmp/qemu.</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">II</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">D</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span></span></code></pre></figure>
+</li>
+</ul>
+<h3 id="5-基本用法">5. 基本用法<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-基本用法" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">./init.sh</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                  # 初始化（装依赖、建数据库）</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./run.sh</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -d</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">bran</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">d</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">firmwar</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">e</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">   # -d 调试模式</span></span></code></pre></figure>
+<hr/>
+<h2 id="六其他仿真框架速览">六、其他仿真框架速览<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#六其他仿真框架速览" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>框架</th><th>特点</th><th>链接</th></tr></thead><tbody><tr><td><strong>Firmadyne</strong></td><td>FirmAE 前身，启动较慢、较复杂</td><td><a href="https://github.com/firmadyne/firmadyne" class="external">https://github.com/firmadyne/firmadyne<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td><strong>FAP</strong>（firmware-analysis-plus）</td><td>基于 Firmadyne，配置简单</td><td><a href="https://github.com/liyansong2018/firmware-analysis-plus" class="external">https://github.com/liyansong2018/firmware-analysis-plus<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td><strong>EMUX</strong></td><td>配置步骤多，默认 <code>root</code> 登录，端口映射表固定（如 20080→80）</td><td><a href="https://github.com/therealsaumil/emux" class="external">https://github.com/therealsaumil/emux<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td><strong>FAT</strong>（Firmware Analysis Toolkit）</td><td>图形化套件</td><td>—</td></tr><tr><td><strong>Qiling</strong></td><td>高层仿真框架（PE/MachO/ELF 加载、动态链接、syscall），基于 Unicorn</td><td><a href="https://github.com/qilingframework/qiling" class="external">https://github.com/qilingframework/qiling<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td><strong>Unicorn</strong></td><td>纯 CPU 仿真引擎（裸指令，无 OS 上下文）</td><td><a href="https://github.com/unicorn-engine/unicorn" class="external">https://github.com/unicorn-engine/unicorn<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td><strong>FACT_core</strong></td><td>固件综合分析框架（解包、漏洞扫描、软件成分分析），偏审计流水线</td><td><a href="https://github.com/fkie-cad/FACT_core" class="external">https://github.com/fkie-cad/FACT_core<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr><tr><td><strong>emba</strong></td><td>固件安全扫描器，专注漏洞 / CVE / 薄弱配置检测，报告丰富</td><td><a href="https://github.com/e-m-b-a/emba" class="external">https://github.com/e-m-b-a/emba<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td></tr></tbody></table></div>
+<hr/>
+<h2 id="七cgi-调试授权分析">七、CGI 调试（授权分析）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#七cgi-调试授权分析" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>固件里的 Web 接口大多由 CGI 二进制（如 <code>boa</code>、<code>lighttpd+mod_cgi</code>、<code>goahead</code>、<code>thttpd</code>）处理。要在 x86 工作站上分析这些跨架构 CGI，常用 <code>chroot + qemu-user</code> 组合。</p>
+<h3 id="1-提取-cgi-需要的环境变量">1. 提取 CGI 需要的环境变量<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-提取-cgi-需要的环境变量" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>CGI 程序通过环境变量（<code>REQUEST_METHOD</code>、<code>QUERY_STRING</code>、<code>CONTENT_LENGTH</code>、<code>REMOTE_ADDR</code> 等）和 stdin（POST body）获取请求。设备上运行时，可以从 <code>/proc/&lt;pid>/environ</code> 抓：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">cat</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /proc/</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">PI</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">D</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/environ</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> tr</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '\0'</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '\n'</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">     # 查看完整环境变量</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">pmap</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -x</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">PI</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">D</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                              # 看内存布局（含环境变量位置）</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">strace</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -e</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> env</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pri.cgi</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                       # 跟踪对环境变量的修改</span></span></code></pre></figure>
+<p>把抓到的变量存成 <code>env.sh</code>（<code>export ...</code>），之后本地 <code>source env.sh</code> 再跑程序即可复现大致运行环境。</p>
+<h3 id="2-用-qemu--e-直接传参用户态">2. 用 QEMU <code>-E</code> 直接传参（用户态）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-用-qemu--e-直接传参用户态" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># GET 方式</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qemu-mips-static</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -E</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> REQUEST_METHOD=GET</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -E</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> QUERY_STRING=&quot;param1=value1&amp;param2=value2&quot;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./cgi_program</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># POST 方式（CONTENT_LENGTH 必须与 stdin 实际长度一致！）</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">echo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;param1=value1&amp;param2=value2&quot;</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  qemu-mips-static</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -E</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> REQUEST_METHOD=POST</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -E</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> CONTENT_TYPE=&quot;application/x-www-form-urlencoded&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -E</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> CONTENT_LENGTH=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">23</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./cgi_program</span></span></code></pre></figure>
+<blockquote>
+<p><code>CONTENT_LENGTH</code> 一定要和实际输入字节数匹配，否则 CGI 读到的 body 会截断或阻塞。</p>
+</blockquote>
+<h3 id="3-chroot--qemu-本地仿真">3. chroot + qemu 本地仿真<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-chroot--qemu-本地仿真" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>把固件文件系统 <code>chroot</code> 进去，用内部自带的 qemu 跑，能解决库路径与地址偏移问题：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> chroot</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> .</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /usr/bin/env</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -i</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  REQUEST_METHOD=POST</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  CONTENT_LENGTH=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">wc</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -c</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> postdata.xml</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">) </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">\</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  CONTENT_TYPE=&quot;application/x-www-form-urlencoded&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  HTTP_COOKIE=&quot;sessionid=aaaaaaaaaaaaaaaaaa&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  QUERY_STRING=&quot;&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  SCRIPT_NAME=&quot;/cgi-bin/webapp&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  REMOTE_ADDR=&quot;127.0.0.1&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ./qemu-mips-static</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -g</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1234</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./webs/cgi-bin/webapp</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> postdata.xml</span></span></code></pre></figure>
+<h3 id="4-用-ld_preload-暂停短命cgi调试技巧">4. 用 <code>LD_PRELOAD</code> 暂停「短命」CGI（调试技巧）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-用-ld_preload-暂停短命cgi调试技巧" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>CGI 进程往往一闪而过，来不及 attach。一个干净的办法：写一个 <code>.so</code>，在构造函数里读 <code>/proc/self/cmdline</code>，若匹配目标进程名就 <code>sleep</code> 一段时间，把你争取到的窗口用来 <code>gdb attach</code>。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="c" data-theme="github-light github-dark"><code data-language="c" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// hook.c —— 仅供授权调试</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">#include</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &lt;stdio.h></span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">#include</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &lt;string.h></span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">#include</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &lt;unistd.h></span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">void</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> __attribute__</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">((constructor)) </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">init</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">void</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">) {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    FILE</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">*</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> f </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> fopen</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;/proc/self/cmdline&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;r&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">);</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    static</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> char</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70;"> name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">[</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">1024</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">];</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (f </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&amp;&amp;</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> fgets</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(name, </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">sizeof</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(name), f)) {</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">        if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">strstr</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(name, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;mainfunction&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">))</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">   // 匹配目标 CGI 名</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">            sleep</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">60</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">);</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                       // 留下调试窗口</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    }</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (f) </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">fclose</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(f);</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<p>交叉编译后放进固件根，并写入 <code>/etc/ld.so.preload</code>（或由 <code>LD_PRELOAD</code> 环境变量指定）。这样目标 CGI 启动即睡 60 秒，期间从容 <code>gdb attach</code>。</p>
+<blockquote>
+<p>注意：多加载一个 <code>.so</code> 会改变内存布局（基址偏移），真机 ROP 偏移需重新核对；且调试时 <code>gdb</code> 一定要带目标文件路径以加载符号表（<code>gdb-multiarch &lt;file> -x &lt;script></code>），否则下不到函数符号断点。</p>
+</blockquote>
+<h3 id="5-原生-webserver-仿真">5. 原生 webserver 仿真<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-原生-webserver-仿真" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>直接在 chroot 里跑固件自带的 httpd，能绕过登录、直接观察 UI 与请求结构：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># busybox httpd</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> chroot</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> .</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./qemu-mips-static</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./busybox.mipsel</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> httpd</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -p</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8000</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -h</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ./webs</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 原生 lighttpd（注意配置文件里的相对路径要先 cd 进去）</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> chroot</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> .</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /bin/sh</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -c</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;cd /home/lighttpd/config &amp;&amp; </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">\</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ./qemu-arm-static /home/lighttpd/sbin/lighttpd -f ./lighttpd.conf -D&quot;</span></span></code></pre></figure>
+<p>常见报错与修复：</p>
+<ul>
+<li><code>opening /dev/null failed</code> → 在 chroot 里 <code>mknod -m 666 dev/null c 1 3</code></li>
+<li><code>SSL: not enough entropy</code> → <code>mknod -m 444 dev/random c 1 8 &amp;&amp; mknod -m 444 dev/urandom c 1 9</code></li>
+<li><code>No such file or directory</code> 类路径错误 → 先 <code>cd</code> 到配置所在目录再启动</li>
+</ul>
+<h3 id="6-三层排错法">6. 三层排错法<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#6-三层排错法" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>程序本身、<code>gdb</code>、系统调用追踪三者构成完整闭环：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>层</th><th>目的</th><th>命令示例</th></tr></thead><tbody><tr><td>程序层</td><td>看运行输出 / 库依赖 / ELF 架构</td><td><code>./program >log 2>&amp;1</code>、<code>ldd</code>、<code>file</code>、<code>readelf -h</code></td></tr><tr><td>GDB 层</td><td>指令级单步、断点、看寄存器/内存</td><td><code>gdb --args qemu-*-static ./p</code>、<code>si</code>/<code>ni</code>、<code>bt</code>、<code>info reg</code>、<code>x/16xw $sp</code></td></tr><tr><td>系统调用层</td><td>追踪 open/read/connect 等</td><td><code>QEMU_STRACE=1 qemu-mips-static ./p</code>，或 <code>strace -f -e open,read,write</code></td></tr></tbody></table></div>
+<p><code>QEMU_STRACE=1</code>（或 <code>--strace</code>）比 <code>strace</code> 更优：它走 QEMU 内核接口层，能完整捕获所有 syscall（包括部分 libc 内部路径），而 <code>strace</code> 在 MIPS user 模式下很多库函数不会显示。三者结合常能定位到 <code>open(&quot;/etc/xxx&quot;,&quot;No such file&quot;)</code> 这类根因。</p>
+<h3 id="7-补丁制造调试窗口把-cgi-改成死循环">7. 补丁制造调试窗口（把 CGI 改成死循环）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#7-补丁制造调试窗口把-cgi-改成死循环" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>除了 <code>LD_PRELOAD</code> 睡眠，另一条路是<strong>直接把目标 CGI 二进制的入口改成「跳转到自身」（死循环）</strong>：进程起来后卡在原地，从容 <code>gdb attach</code>，再手动把指令恢复成原样继续跑。比 sleep 法更稳——不依赖额外 <code>.so</code>、不改变内存布局。</p>
+<h3 id="8-自动-attach-gdbserver轮询脚本">8. 自动 attach gdbserver（轮询脚本）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#8-自动-attach-gdbserver轮询脚本" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>如果目标进程是按需拉起、名字固定（如 <code>lighttpd</code>、<code>share.cgi</code>、<code>libsqlite</code> 相关），可以写循环脚本等它出现并自动 attach。下面是一段实测可用的思路（在固件 chroot 环境里跑）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">#!/bin/bash</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">while</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">do</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # [/] 写法避免 grep 自身被匹配</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    pid</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ps</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '[/]tmp/lighttpd.conf'</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> awk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '{print $1}'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    [ </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">-z</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$pid</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> ] &amp;&amp; { </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sleep</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">continue</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">; }</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # 从 /proc/$pid/maps 取第一个基址，按阈值决定 kill 还是 attach</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    base_addr</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">cat</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /proc/</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$pid</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/maps</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> libsqlite</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> head</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> awk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '{print $1}'</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> cut</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">'-'</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [ </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$base_addr</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \&lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;401a0000&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> ]; </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">then</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        echo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Killing </span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$pid</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> (</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$base_addr</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">)&quot;</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        kill</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -9</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> $pid</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    else</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        echo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Attaching gdbserver to </span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$pid</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> (</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">$base_addr</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">)&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">        ./gdbserver</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> *</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">:1234</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --attach</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> $pid</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    fi</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    sleep</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 2</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">done</span></span></code></pre></figure>
+<p>变体（按进程名直接 attach）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> pid </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> $(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">busybox</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ps</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> grep</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> share.cgi</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> busybox</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> awk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '{print $1}'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">); </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">do</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    if</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> kill</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> $pid &amp;</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">/dev/null; </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">then</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">        gdbserver</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 0.0.0.0:1234</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --attach</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> $pid</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">        break</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    fi</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">done</span></span></code></pre></figure>
+<blockquote>
+<p>这类脚本的价值在于：CGI 往往「一闪而过」，人工来不及 attach；轮询脚本能在进程存活窗口里抢到 gdbserver。注意字符串比较基址是十六进制字典序技巧，真机上要核对 hertz 与内存布局。</p>
+</blockquote>
+<hr/>
+<h2 id="八cgi-环境变量的攻击面攻防视角">八、CGI 环境变量的攻击面（攻防视角）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#八cgi-环境变量的攻击面攻防视角" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>理解上面这套环境变量机制，<strong>对攻防两端都重要</strong>：攻击者利用它拿 shell，防御者靠它定位加固点。下面把几类公开漏洞的<strong>编号、触发条件、利用链路</strong>讲清楚，便于在隔离授权环境里复现验证。<strong>所有手法仅用于自有 / 已授权设备，对他人设备实施属未授权行为。</strong></p>
+<h3 id="81-标准-cgi-里stdin--post-body这一事实">8.1 标准 CGI 里「stdin = POST body」这一事实<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#81-标准-cgi-里stdin--post-body这一事实" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>绝大多数命令注入 / 环境变量劫持的根，都在于：标准 CGI 把 HTTP 请求的 <strong>body（POST 主体）通过 stdin 喂给 CGI 程序</strong>，而 <code>QUERY_STRING</code>、各 <code>HTTP_*</code> 头则放在环境变量里。只要 CGI 内部又去读 stdin 当命令执行，攻击者就能让「POST body 被当成 shell 执行」。</p>
+<p>可以用下面这段最小 CGI 验证「stdin 只包含 body、不含请求头」：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="sh" data-theme="github-light github-dark"><code data-language="sh" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">#!/bin/sh</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">echo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Content-type: text/plain&quot;</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">echo</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 把 stdin 原样写到文件，便于观察 CGI 实际拿到了什么</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">cat</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> ></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /tmp/cgi_stdin.txt</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">echo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Wrote stdin to /tmp/cgi_stdin.txt&quot;</span></span></code></pre></figure>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -v</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -X</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> POST</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 'http://localhost/cgi-bin/test.sh'</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -d</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> $'cmd=echo hello; id'</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 查看 /tmp/cgi_stdin.txt，确认只有 POST body（如 cmd=...），不含请求头</span></span></code></pre></figure>
+<h3 id="82-典型漏洞与边界条件">8.2 典型漏洞与边界条件<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#82-典型漏洞与边界条件" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>CVE</th><th>组件 / 类型</th><th>审计时应关注的边界</th></tr></thead><tbody><tr><td><strong>CVE-2021-33514</strong></td><td>NETGEAR 多款交换机预认证命令注入</td><td>CGI 把未经安全处理的 HTTP 头带入 shell 命令；审计重点是外部输入到命令执行函数的数据流。</td></tr><tr><td><strong>CVE-2017-17562</strong></td><td>GoAhead 3.6.5 之前版本的 CGI 远程代码执行</td><td>CGI 把不可信请求参数带入进程环境，动态链接程序又信任了 <code>LD_PRELOAD</code>；漏洞成立还依赖 CGI 与动态链接等条件。</td></tr><tr><td><strong>CVE-2014-6271</strong></td><td>Bash 环境变量函数注入（Shellshock）</td><td>Web 服务器把请求头映射为环境变量，而下游 Bash 错误解析函数定义后的内容；关键是跨组件信任边界。</td></tr><tr><td><strong>CVE-2023-4911</strong></td><td>glibc <code>GLIBC_TUNABLES</code> 本地提权</td><td><code>ld.so</code> 处理环境变量时发生缓冲区溢出，影响 SUID 程序边界，属于本地提权而非远程 CGI 漏洞。</td></tr><tr><td><strong>CVE-2025-4802</strong></td><td>glibc 静态 setuid 程序的库搜索路径问题</td><td>特定静态 setuid 程序调用 <code>dlopen</code> 时可能错误信任 <code>LD_LIBRARY_PATH</code>；这是有严格前提的本地问题。</td></tr></tbody></table></div>
+<blockquote>
+<p>实际限制：上述 <code>$(cat)</code> 类技巧成立的前提是——server 把 POST body 作为 stdin 提供（标准 CGI 会，自实现服务未必）；body 若被先解析消费则读不到；<code>multipart/form-data</code> 会读到边界与 part 头；<code>Content-Length</code> 为 0 或受限会失败/阻塞；WAF/IDS 可能检测到 <code>$(cat)</code> + 可疑 body 组合。</p>
+</blockquote>
+<h3 id="83-防御审计清单">8.3 防御审计清单<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#83-防御审计清单" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>明确 CGI 如何接收 body、query string 与请求头，画出它们进入环境变量、stdin 和配置文件的路径。</li>
+<li>搜索 <code>system</code>、<code>popen</code>、shell 调用、模板求值和动态库加载等高风险操作，验证参数是否来自外部输入。</li>
+<li>启动 CGI 前清理 <code>LD_*</code> 等危险环境变量，并用固定允许列表重建子进程环境。</li>
+<li>让 Web 服务和 CGI 以独立低权限账户运行，限制文件系统写入、网络出口和可执行程序集合。</li>
+<li>在隔离环境中记录系统调用与进程树，确认测试输入没有跨越预期信任边界。</li>
+</ul>
+<p>对设备厂商而言，核心是严格校验外部输入、收紧子进程环境并落实最小权限；对研究者而言，前面的仿真与调试流程用于验证这些边界是否真实生效。</p>
+<hr/>
+<h2 id="参考">参考<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#参考" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>QEMU 网络文档：<a href="https://wiki.qemu.org/Documentation/Networking" class="external">https://wiki.qemu.org/Documentation/Networking<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>FirmAE：<a href="https://github.com/pr0v3rbs/FirmAE" class="external">https://github.com/pr0v3rbs/FirmAE<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>Firmadyne：<a href="https://github.com/firmadyne/firmadyne" class="external">https://github.com/firmadyne/firmadyne<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>Qiling：<a href="https://github.com/qilingframework/qiling" class="external">https://github.com/qilingframework/qiling<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>Unicorn：<a href="https://www.unicorn-engine.org/" class="external">https://www.unicorn-engine.org/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>NETGEAR CVE-2021-33514 公告：<a href="https://kb.netgear.com/000063641/" class="external">https://kb.netgear.com/000063641/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>GoAhead CVE-2017-17562：<a href="https://nvd.nist.gov/vuln/detail/CVE-2017-17562" class="external">https://nvd.nist.gov/vuln/detail/CVE-2017-17562<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>glibc CVE-2025-4802：<a href="https://sourceware.org/cgit/glibc/tree/advisories/GLIBC-SA-2025-0002" class="external">https://sourceware.org/cgit/glibc/tree/advisories/GLIBC-SA-2025-0002<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>调试 httpd fork+exec 的 CGI（看雪）：<a href="https://bbs.kanxue.com/thread-276464.htm" class="external">https://bbs.kanxue.com/thread-276464.htm<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>LD_PRELOAD 简介：<a href="https://blog.csdn.net/whatday/article/details/108890018" class="external">https://blog.csdn.net/whatday/article/details/108890018<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-15" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#本文内容" data-for="本文内容">本文内容</a></li><li class="depth-0"><a href="#一qemu-两种仿真模式" data-for="一qemu-两种仿真模式">一、QEMU 两种仿真模式</a></li><li class="depth-0"><a href="#二qemu-网络模型" data-for="二qemu-网络模型">二、QEMU 网络模型</a></li><li class="depth-1"><a href="#旧写法已废弃" data-for="旧写法已废弃">旧写法（已废弃）</a></li><li class="depth-1"><a href="#用户态-nat无需-root最省事" data-for="用户态-nat无需-root最省事">用户态 NAT（无需 root、最省事）</a></li><li class="depth-1"><a href="#桥接让-guest-真正出现在局域网" data-for="桥接让-guest-真正出现在局域网">桥接（让 Guest 真正出现在局域网）</a></li><li class="depth-0"><a href="#三各架构-qemu-启动命令" data-for="三各架构-qemu-启动命令">三、各架构 QEMU 启动命令</a></li><li class="depth-1"><a href="#设备树--dtb" data-for="设备树--dtb">设备树 -dtb</a></li><li class="depth-0"><a href="#四镜像启动模式对比" data-for="四镜像启动模式对比">四、镜像启动模式对比</a></li><li class="depth-1"><a href="#镜像格式转换qemu-img" data-for="镜像格式转换qemu-img">镜像格式转换（qemu-img）</a></li><li class="depth-0"><a href="#五firmae-框架" data-for="五firmae-框架">五、FirmAE 框架</a></li><li class="depth-1"><a href="#1-nvram-模拟关键" data-for="1-nvram-模拟关键">1. NVRAM 模拟（关键）</a></li><li class="depth-1"><a href="#2-核心脚本scripts" data-for="2-核心脚本scripts">2. 核心脚本（scripts/）</a></li><li class="depth-1"><a href="#3-scratch-工作目录" data-for="3-scratch-工作目录">3. scratch 工作目录</a></li><li class="depth-1"><a href="#4-接入-qemu-调试" data-for="4-接入-qemu-调试">4. 接入 QEMU 调试</a></li><li class="depth-1"><a href="#5-基本用法" data-for="5-基本用法">5. 基本用法</a></li><li class="depth-0"><a href="#六其他仿真框架速览" data-for="六其他仿真框架速览">六、其他仿真框架速览</a></li><li class="depth-0"><a href="#七cgi-调试授权分析" data-for="七cgi-调试授权分析">七、CGI 调试（授权分析）</a></li><li class="depth-1"><a href="#1-提取-cgi-需要的环境变量" data-for="1-提取-cgi-需要的环境变量">1. 提取 CGI 需要的环境变量</a></li><li class="depth-1"><a href="#2-用-qemu--e-直接传参用户态" data-for="2-用-qemu--e-直接传参用户态">2. 用 QEMU -E 直接传参（用户态）</a></li><li class="depth-1"><a href="#3-chroot--qemu-本地仿真" data-for="3-chroot--qemu-本地仿真">3. chroot + qemu 本地仿真</a></li><li class="depth-1"><a href="#4-用-ld_preload-暂停短命cgi调试技巧" data-for="4-用-ld_preload-暂停短命cgi调试技巧">4. 用 LD_PRELOAD 暂停「短命」CGI（调试技巧）</a></li><li class="depth-1"><a href="#5-原生-webserver-仿真" data-for="5-原生-webserver-仿真">5. 原生 webserver 仿真</a></li><li class="depth-1"><a href="#6-三层排错法" data-for="6-三层排错法">6. 三层排错法</a></li><li class="depth-1"><a href="#7-补丁制造调试窗口把-cgi-改成死循环" data-for="7-补丁制造调试窗口把-cgi-改成死循环">7. 补丁制造调试窗口（把 CGI 改成死循环）</a></li><li class="depth-1"><a href="#8-自动-attach-gdbserver轮询脚本" data-for="8-自动-attach-gdbserver轮询脚本">8. 自动 attach gdbserver（轮询脚本）</a></li><li class="depth-0"><a href="#八cgi-环境变量的攻击面攻防视角" data-for="八cgi-环境变量的攻击面攻防视角">八、CGI 环境变量的攻击面（攻防视角）</a></li><li class="depth-1"><a href="#81-标准-cgi-里stdin--post-body这一事实" data-for="81-标准-cgi-里stdin--post-body这一事实">8.1 标准 CGI 里「stdin = POST body」这一事实</a></li><li class="depth-1"><a href="#82-典型漏洞与边界条件" data-for="82-典型漏洞与边界条件">8.2 典型漏洞与边界条件</a></li><li class="depth-1"><a href="#83-防御审计清单" data-for="83-防御审计清单">8.3 防御审计清单</a></li><li class="depth-0"><a href="#参考" data-for="参考">参考</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../tech/index.cn" class="internal">技术档案</a></li><li><a href="../tech/" class="internal">Tech Archive</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>

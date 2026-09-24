@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>IDA Pro 使用技巧速查</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="IDA Pro 使用技巧速查"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="IDA Pro 使用技巧速查"/><meta name="twitter:description" content="汇总 IDA Pro 导航、类型恢复、交叉引用、反编译与 IDAPython 自动化的实用技巧。"/><meta property="og:description" content="汇总 IDA Pro 导航、类型恢复、交叉引用、反编译与 IDAPython 自动化的实用技巧。"/><meta property="og:image:alt" content="汇总 IDA Pro 导航、类型恢复、交叉引用、反编译与 IDAPython 自动化的实用技巧。"/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/tech/ida-pro-tips.cn"/><meta property="twitter:url" content="https://chokebit.github.io/tech/ida-pro-tips.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="汇总 IDA Pro 导航、类型恢复、交叉引用、反编译与 IDAPython 自动化的实用技巧。"/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="tech/ida-pro-tips.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../products/index.cn" class="nav-link">产品</a><a href="../ai-native/index.cn" class="nav-link">AI Native</a><a href="../tech/index.cn" class="nav-link" aria-current="page">技术档案</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Archive</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>IDA Pro 使用技巧速查</a></div></nav><h1 class="article-title">IDA Pro 使用技巧速查</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-24T00:00:00.000Z">Aug 24, 2026</time><span>22 min read</span></p><ul class="tags"><li><a href="../tags/ida" class="internal tag-link">ida</a></li><li><a href="../tags/reverse-engineering" class="internal tag-link">reverse-engineering</a></li><li><a href="../tags/tooling" class="internal tag-link">tooling</a></li><li><a href="../tags/disassembly" class="internal tag-link">disassembly</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><blockquote>
+<p>内容基于公开 IDA Pro 技巧与个人实践整理（参考 firmianay/ida-pro-tips、Hex-Rays 官方博客、各大安全社区），难免有误，请带着辩证视角阅读；本文仅用于授权环境下的程序分析、逆向研究与防护加固。</p>
+<p>约定：文中快捷键以 Windows 布局为准；示例中的 <code>&lt;IDA安装目录></code>、<code>&lt;用户名></code>、<code>&lt;代理IP></code>、<code>&lt;回连IP></code> 等为脱敏占位符，请替换为你的实际环境；原草稿中的 Yuque 截图因含第三方账号信息已全部省略。</p>
+</blockquote>
+<h1 id="ida-pro-使用技巧速查">IDA Pro 使用技巧速查<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#ida-pro-使用技巧速查" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="1-界面基础与导航">1. 界面基础与导航<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-界面基础与导航" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="11-说明与常用操作">1.1 说明与常用操作<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#11-说明与常用操作" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>栈偏移内容：<code>+</code> 为参数，<code>-</code> 为局部变量。</li>
+<li>数据转换快捷键（光标处）：
+<ul>
+<li><code>C</code> 解析为代码（code），常用于把数据区的 shellcode 转成汇编。</li>
+<li><code>P</code> 在函数的起始地址处，把当前地址解析成函数。</li>
+<li><code>D</code> 解析为数据（data），并在字节/字/双字之间循环切换。</li>
+<li><code>A</code> 解析为 ASCII 字符串。</li>
+<li><code>U</code> 解析为未定义（unDefined）。</li>
+</ul>
+</li>
+<li>查看引用：<code>X</code>（jump to xref）。</li>
+<li>重命名：<code>N</code>。</li>
+<li>搜索地址或符号：<code>G</code>。</li>
+<li>退到上一个操作地址：<code>ESC</code>；前进到下一个：<code>Ctrl+Enter</code>。</li>
+<li>反汇编窗口在「文本视图 / 图形视图」间切换：空格键。</li>
+</ul>
+<h3 id="12-注释">1.2 注释<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#12-注释" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">位置</th><th style="text-align:left;">快捷键</th><th style="text-align:left;">说明</th></tr></thead><tbody><tr><td style="text-align:left;">汇编代码窗口</td><td style="text-align:left;">冒号 <code>:</code></td><td style="text-align:left;">普通注释</td></tr><tr><td style="text-align:left;">汇编代码窗口</td><td style="text-align:left;">分号 <code>;</code></td><td style="text-align:left;">可重复注释，引用处也会显示该注释</td></tr><tr><td style="text-align:left;">伪代码窗口</td><td style="text-align:left;"><code>/</code></td><td style="text-align:left;">注释</td></tr></tbody></table></div>
+<blockquote>
+<p>习惯写法：<code>shift+;</code> 普通注释，<code>;</code> 重复注释（repeater comment）。</p>
+</blockquote>
+<h3 id="13-标签书签">1.3 标签（书签）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#13-标签书签" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>添加标签：<code>ALT+M</code></li>
+<li>列出所有标签：<code>CTRL+M</code></li>
+</ul>
+<h3 id="14-段与数据转换">1.4 段与数据转换<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#14-段与数据转换" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>打开二进制段列表（查看各段的开始/结束地址）：<code>CTRL+S</code></li>
+<li>设置指令分析格式（如切换 ARM/Thumb、64/32 位）：<code>ALT+G</code></li>
+<li>导出反编译结果：<code>Ctrl+F5</code>（注意：导出内容容易出错，见「常见问题」）</li>
+<li>导出反汇编结果：<code>Alt+F10</code></li>
+</ul>
+<h2 id="2-搜索与定位关键代码">2. 搜索与定位关键代码<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-搜索与定位关键代码" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">目标</th><th style="text-align:left;">快捷键</th></tr></thead><tbody><tr><td style="text-align:left;">程序里的字符串（Strings 窗口）</td><td style="text-align:left;"><code>Shift+F12</code></td></tr><tr><td style="text-align:left;">文本搜索</td><td style="text-align:left;"><code>ALT+T</code></td></tr><tr><td style="text-align:left;">16 进制（二进制字节序列）搜索</td><td style="text-align:left;"><code>ALT+B</code></td></tr><tr><td style="text-align:left;">函数搜索</td><td style="text-align:left;"><code>CTRL+F</code></td></tr><tr><td style="text-align:left;">重复上一个搜索</td><td style="text-align:left;"><code>CTRL+T</code>（文本）/ <code>CTRL+B</code>（二进制）</td></tr></tbody></table></div>
+<p>定位关键代码的典型思路：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>搜索特征字符串：</span></span>
+<span data-line><span>  ① Ctrl+S 打开段选择对话框 → 双击 Strings 跳到字符串段</span></span>
+<span data-line><span>     → 菜单 Search → Text</span></span>
+<span data-line><span>  ② 或直接 Alt+T，在对话框中输入要找的字符串，OK 即可</span></span></code></pre></figure>
+<p>匹配括号（找对应的 <code>{</code> / <code>}</code>）：<code>%</code>（即 <code>Shift+5</code>）。</p>
+<h2 id="3-快捷键速查">3. 快捷键速查<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-快捷键速查" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="31-调试快捷键">3.1 调试快捷键<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#31-调试快捷键" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">快捷键</th><th style="text-align:left;">功能</th></tr></thead><tbody><tr><td style="text-align:left;"><code>F7</code></td><td style="text-align:left;">单步步进（step into）</td></tr><tr><td style="text-align:left;"><code>F8</code></td><td style="text-align:left;">单步步过（step over）</td></tr><tr><td style="text-align:left;"><code>F9</code></td><td style="text-align:left;">继续运行</td></tr><tr><td style="text-align:left;"><code>F4</code></td><td style="text-align:left;">运行到光标所在行</td></tr><tr><td style="text-align:left;"><code>Ctrl+F7</code></td><td style="text-align:left;">直到当前函数返回才停止</td></tr><tr><td style="text-align:left;"><code>Ctrl+F2</code></td><td style="text-align:left;">终止正在运行的进程</td></tr><tr><td style="text-align:left;"><code>F2</code></td><td style="text-align:left;">设置断点</td></tr><tr><td style="text-align:left;"><code>Ctrl+Alt+B</code></td><td style="text-align:left;">打开断点列表</td></tr></tbody></table></div>
+<h3 id="32-导航与寄存器">3.2 导航与寄存器<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#32-导航与寄存器" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>快速导航菜单：按住 <code>Alt</code> 同时按带下划线的字母（加速器 accelerator）。</li>
+<li>快速搜索下一个：在列表/窗口中 <code>Alt+上/下</code>。</li>
+<li>跳转到上一个 / 下一个函数（IDA 7.2+）：<code>Ctrl+Shift+Up</code> / <code>Ctrl+Shift+Down</code>。</li>
+<li>快速定位寄存器的「定义（写入）」与「使用（读取）」位置（IDA 7.5+，目前对 x86/x64、ARM、MIPS 支持）：
+<ul>
+<li><code>Shift+Alt+Up</code>：查找选定寄存器的前一个被定义位置。</li>
+<li><code>Shift+Alt+Down</code>：查找选定寄存器的下一个被使用位置。</li>
+<li>在以高优化级别编译的大型函数中尤其有用。</li>
+</ul>
+</li>
+</ul>
+<h3 id="33-杂项清单">3.3 杂项清单<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#33-杂项清单" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>ESC              返回</span></span>
+<span data-line><span>Ctrl+Enter       进入</span></span>
+<span data-line><span>F12              获得执行流程图</span></span>
+<span data-line><span>idagui.cfg       快捷键配置文件</span></span>
+<span data-line><span>shift+;          普通注释</span></span>
+<span data-line><span>;                重复注释（引用处出现）</span></span>
+<span data-line><span>ALT+M            添加书签</span></span>
+<span data-line><span>CTRL+M           显示所有书签</span></span>
+<span data-line><span>xref[p/j/o]      p=procedure, j=jump, o=offset</span></span>
+<span data-line><span>ALT+P            编辑函数（查看所属函数、起止地址）</span></span>
+<span data-line><span>C                数据变汇编</span></span>
+<span data-line><span>D                数据类型转换（字节/字/双字间切换）</span></span>
+<span data-line><span>ALT+T / CTRL+T   搜索字符串 / 重复</span></span>
+<span data-line><span>ALT+B / CTRL+B   二进制字节序列搜索 / 重复</span></span></code></pre></figure>
+<h2 id="4-栈帧参数与变量识别">4. 栈帧、参数与变量识别<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-栈帧参数与变量识别" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>核心规则：<strong>参数用加法（<code>+</code>），局部变量用减法（<code>-</code>）</strong>。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>envp</span></span>
+<span data-line><span>-----ebp +0x10   ; and esp, 0FFFFFFF0h</span></span>
+<span data-line><span>argc</span></span>
+<span data-line><span>-----ebp+8</span></span>
+<span data-line><span>argv</span></span>
+<span data-line><span>-----ebp+4</span></span>
+<span data-line><span>ret</span></span>
+<span data-line><span>-----</span></span>
+<span data-line><span>ebp              ; push ebp</span></span>
+<span data-line><span>-----ebp         ; mov ebp, esp</span></span>
+<span data-line><span>局部变量</span></span>
+<span data-line><span>----</span></span></code></pre></figure>
+<p>以 64 位 ARM 为例（<code>fpd=0x30</code>）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>var_30 = -0x30   ; 栈顶</span></span>
+<span data-line><span>var_1C = -0x1C</span></span>
+<span data-line><span>var_18 = -0x18</span></span>
+<span data-line><span>...</span></span>
+<span data-line><span>STR W0, [X29,#0x30+var_14]   ; 距 ebp 实际为 0x30-0x18 = 0x18</span></span></code></pre></figure>
+<p>栈偏移数据转换（<code>K</code> / <code>Q</code>）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>[SP,#0x70+var_50]   按 Q 转成下面的模式</span></span>
+<span data-line><span>[SP,#0x20]          按 K 转成上面的模式</span></span></code></pre></figure>
+<blockquote>
+<p><code>K</code> 会显示变量名（红色，已识别），未显示的需计算（如 <code>-0x50+0x40=-0x10</code>，位于 ebp 下方，绿色）。
+其他架构同理：以 <code>sp</code> 为参照基准，通过加减分配参数与局部变量。</p>
+</blockquote>
+<h2 id="5-反编译与函数识别">5. 反编译与函数识别<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-反编译与函数识别" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>IDA 没能识别出函数</strong>：跳到该地址，按 <code>P</code>（或右键 <code>Create function</code>）新建函数，再 <code>F5</code>。</li>
+<li><strong>修正函数声明 / 参数</strong>：在伪代码窗口选中函数名，按 <code>y</code> 修改类型声明。</li>
+<li><strong>F5 的坑</strong>：
+<ol>
+<li>F5 还原的代码需要自己比对汇编修正，否则容易出错。</li>
+<li><code>Ctrl+F5</code> 导出的反编译内容经常不准。</li>
+</ol>
+<ul>
+<li>解决：建议比对汇编手动整理，或用 <code>Shift+E</code> 导出原始数据。</li>
+</ul>
+</li>
+<li><strong>处理 <code>sp-analysis failed</code> / too big function</strong>：见「常见问题」与「逆向经验」。</li>
+</ul>
+<h2 id="6-结构体与类型">6. 结构体与类型<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#6-结构体与类型" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="61-三种创建方式">6.1 三种创建方式<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#61-三种创建方式" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>0x01 在 IDA 中手动创建</strong></p>
+<ol>
+<li>打开结构体子视图：<code>View → Open Subview → Structures</code>（<code>Shift+F9</code>）。</li>
+<li>按 <code>I</code> 弹出创建窗口，输入结构体名。</li>
+<li>在 <code>ends</code> 行按 <code>d</code> 创建成员；继续按 <code>d</code> 修改数据类型（<code>db</code>/<code>dw</code>/<code>dd</code>/<code>dq</code>）；右键选 <code>Array</code> 可建数组。</li>
+<li>按 <code>y</code> 把成员类型改为结构体名。</li>
+<li>给局部变量指定结构体：快捷键 <code>t</code>。
+<ul>
+<li>若成员本身是结构体：按 <code>Alt+Q</code> 选择已存在的结构体变量。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>缺点：只能逐个字段手动添加。</li>
+</ul>
+<p><strong>0x02 通过头文件创建</strong></p>
+<ol>
+<li>打开 <code>Local Types</code> 子视图：<code>View → Open Subviews → Local Types</code>（<code>Shift+F1</code>）→ <code>Insert</code>。</li>
+<li>输入结构体定义（如 <code>struct student { char name[16]; int age; };</code>）。</li>
+<li>按 <code>y</code> 修改变量的 Type 即可。</li>
+</ol>
+<p><strong>0x03 导入标准结构体</strong></p>
+<p>创建结构体时按 <code>I</code>，在弹出的库类型列表里直接选择 IDA 自带的标准结构体（如 <code>sockaddr</code>、<code>FILE</code> 等）。</p>
+<blockquote>
+<p>逆向分析的本质：取名字 —— 还原结构体、函数名、全局变量类型、参数类型等。</p>
+</blockquote>
+<h3 id="62-数据--结构体重建">6.2 数据 + 结构体重建<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#62-数据--结构体重建" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>参考 6.1 创建结构体后，在 <code>IDA View</code> 中把数据修复为结构体成员（用 <code>t</code> 指定），才能在伪代码中显示子成员。</li>
+<li>注意：若只做整体重命名（如 <code>v35 = off_171D4</code>），子成员不会展开；必须在 <code>IDA View</code> 中按结构体字段修复。</li>
+</ul>
+<h2 id="7-常用插件">7. 常用插件<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#7-常用插件" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">插件</th><th style="text-align:left;">用途</th></tr></thead><tbody><tr><td style="text-align:left;"><a href="https://github.com/L4ys/LazyIDA" class="external">LazyIDA<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td style="text-align:left;">快速转换、解码、批量操作等</td></tr><tr><td style="text-align:left;"><a href="https://github.com/Accenture/VulFi" class="external">VulFi<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td style="text-align:left;">漏洞候选函数扫描</td></tr><tr><td style="text-align:left;"><a href="https://github.com/cseagle/blc" class="external">blc<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td style="text-align:left;">把 Ghidra 的反编译器作为 IDA 插件集成</td></tr><tr><td style="text-align:left;"><a href="https://github.com/mrexodia/ida-pro-mcp" class="external">ida-pro-mcp<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></td><td style="text-align:left;">让 IDA 暴露 MCP 接口，供 AI 客户端调用</td></tr></tbody></table></div>
+<p><strong>ida-pro-mcp 安装要点</strong>（脱敏）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>pip install git+https://github.com/mrexodia/ida-pro-mcp</span></span>
+<span data-line><span>ida-pro-mcp --install      # 自动写入各客户端（Cline/Roo/Claude/Cursor）的 json 配置</span></span></code></pre></figure>
+<blockquote>
+<p>原草稿里的代理与用户目录路径（<code>http://&lt;代理IP>:&lt;端口></code>、<code>C:\Users\&lt;用户名>\...</code>）已脱敏；实际安装请以你本机环境为准。</p>
+</blockquote>
+<h2 id="8-idapython-常用脚本">8. IDAPython 常用脚本<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#8-idapython-常用脚本" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="81-批量修正数据类型--宽度">8.1 批量修正数据类型 / 宽度<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#81-批量修正数据类型--宽度" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="python" data-theme="github-light github-dark"><code data-language="python" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idaapi</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">start_address </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> 0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">000000041EABB84</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">end_address   </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> 0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">000000041EAC0F0</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">address </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> start_address</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">while</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> address </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&lt;=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> end_address:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    idaapi.create_data(address, idaapi.</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">FF_DWORD</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">4</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, idaapi.</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">BADADDR</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    address </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">+=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 4</span></span></code></pre></figure>
+<h3 id="82-获取导入表与交叉引用">8.2 获取导入表与交叉引用<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#82-获取导入表与交叉引用" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="python" data-theme="github-light github-dark"><code data-language="python" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># IDA 7.7 验证</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idaapi, idautils, idc, ida_segment</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1) 遍历导入模块</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">nimps </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idaapi.get_import_module_qty()</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> i </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> range</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(nimps):</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Module:&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, idaapi.get_import_module_name(i))</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    def</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> cb</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(ea, name, ord):</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot; &quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">hex</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(ea), name)</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">        return</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> True</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    idaapi.enum_import_names(i, cb)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2) 遍历指向某 PLT stub 的所有调用者</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">plt_ea </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> 0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">A2B0</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">callers </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> []</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> xref </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idautils.XrefsTo(plt_ea):</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    caller </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> xref.frm</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.is_code(idc.get_full_flags(caller)):</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        func_start </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.get_func_attr(caller, idc.</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">FUNCATTR_START</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        offset </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> caller </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">-</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> func_start </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> func_start </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">!=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">BADADDR</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> else</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 0</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        callers.append(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">func_start</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">:X</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">+</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">offset</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">:X</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;[0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">plt_ea</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">:X</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">] callers:&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> c </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> callers:</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot; &quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, c)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 3) 按名过滤导入表 / external 符号</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">target_func </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Get_NAS_Group_List_Of_User_Ex&quot;</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> i </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> range</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(nimps):</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    def</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> cb2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(ea, name, ordinal):</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">        if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">==</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> target_func </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">or</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">and</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> target_func </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> name):</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">            print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;[IAT/PLT] </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">name</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> at 0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">ea</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">:08X</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">        return</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> True</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    idaapi.enum_import_names(i, cb2)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> ea, name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idautils.Names():</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">==</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> target_func </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">or</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">and</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> target_func </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> name):</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        seg </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> ida_segment.getseg(ea)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        seg_name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> ida_segment.get_segm_name(seg) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> seg </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">else</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;UNKNOWN&quot;</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;[EXTERN] </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">name</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> at 0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">ea</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">:08X</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> in segment </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">seg_name</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span></code></pre></figure>
+<blockquote>
+<p>重点理解：<strong>PLT 存根函数的入口地址</strong>与<strong>指向 IAT 条目的指令地址</strong>不一样。
+例如 <code>.plt:0000A2B0</code> 是 <code>Get_NAS_Group_List_Of_User_Ex</code> 的入口，所有外部调用都引用它；
+而包含 <code>LDR PC, [...]</code> 跳转到导入地址的指令在 <code>.plt:0000A2B8</code>。
+<code>XrefsTo(import_ea)</code> 报告的 <code>frm</code> 是使用该导入的<strong>指令</strong>地址（即 <code>0xA2B8</code>），
+所以正确的 xref 应该用 <code>0x0000A2B0</code>（入口）去统计。</p>
+</blockquote>
+<h3 id="83-字符串识别">8.3 字符串识别<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#83-字符串识别" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>可借助栈字符串识别插件（如 bingghost 的 IDA 插件）或社区脚本批量将字节序列转为字符串；也可参考 CSDN/博客园的「IDA 转字符串技巧」。</p>
+<h2 id="9-ida-api-速查idapython">9. IDA API 速查（IDAPython）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#9-ida-api-速查idapython" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="91-基本信息获取">9.1 基本信息获取<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#91-基本信息获取" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">功能</th><th style="text-align:left;">API 示例</th></tr></thead><tbody><tr><td style="text-align:left;">获取当前光标地址</td><td style="text-align:left;"><code>idc.here()</code> / <code>idc.get_screen_ea()</code></td></tr><tr><td style="text-align:left;">获取函数名</td><td style="text-align:left;"><code>idc.get_func_name(ea)</code></td></tr><tr><td style="text-align:left;">获取指令操作码（助记符）</td><td style="text-align:left;"><code>idc.print_insn_mnem(ea)</code></td></tr><tr><td style="text-align:left;">获取操作数原始数值</td><td style="text-align:left;"><code>idc.get_operand_value(ea, n)</code></td></tr><tr><td style="text-align:left;">获取操作数字符串表示</td><td style="text-align:left;"><code>idc.print_operand(ea, n)</code></td></tr></tbody></table></div>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="python" data-theme="github-light github-dark"><code data-language="python" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">ea </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.here()</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">mnem  </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.print_insn_mnem(ea)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">op0   </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.print_operand(ea, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">op1_v </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.get_operand_value(ea, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{hex</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(ea)</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">mnem</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> {</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">op0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{hex</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(op1_v)</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 示例 0x41f52c: li $t8, 0x3e8</span></span></code></pre></figure>
+<h3 id="92-函数与段信息">9.2 函数与段信息<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#92-函数与段信息" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">功能</th><th style="text-align:left;">API</th></tr></thead><tbody><tr><td style="text-align:left;">遍历所有函数</td><td style="text-align:left;"><code>idautils.Functions()</code></td></tr><tr><td style="text-align:left;">遍历函数内所有指令</td><td style="text-align:left;"><code>idautils.FuncItems(func_ea)</code></td></tr><tr><td style="text-align:left;">获取函数属性</td><td style="text-align:left;"><code>idc.get_func_attr(ea, idc.FUNCATTR_FLAGS)</code></td></tr><tr><td style="text-align:left;">判断是否为库函数</td><td style="text-align:left;"><code>flags &amp; idc.FUNC_LIB != 0</code></td></tr></tbody></table></div>
+<p>常用属性：<code>FUNCATTR_START</code> / <code>FUNCATTR_END</code> / <code>FUNCATTR_FLAGS</code>，配合 <code>FUNC_LIB</code> 位运算。</p>
+<h3 id="93-交叉引用xrefs">9.3 交叉引用（Xrefs）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#93-交叉引用xrefs" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">功能</th><th style="text-align:left;">API</th></tr></thead><tbody><tr><td style="text-align:left;">某地址被谁引用</td><td style="text-align:left;"><code>idautils.XrefsTo(ea)</code></td></tr><tr><td style="text-align:left;">某地址引用到哪</td><td style="text-align:left;"><code>idautils.XrefsFrom(ea)</code></td></tr></tbody></table></div>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="python" data-theme="github-light github-dark"><code data-language="python" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idautils, idc</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> func_ea </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idautils.Functions():</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idc.get_func_name(func_ea)</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Function: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">name</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> ref </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> idautils.XrefsTo(func_ea):</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;  Called from: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">idc.get_func_name(ref.frm)</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span></code></pre></figure>
+<h3 id="94-字符串与结构体">9.4 字符串与结构体<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#94-字符串与结构体" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">功能</th><th style="text-align:left;">API</th></tr></thead><tbody><tr><td style="text-align:left;">枚举字符串</td><td style="text-align:left;"><code>idautils.Strings()</code></td></tr><tr><td style="text-align:left;">获取结构体 ID</td><td style="text-align:left;"><code>idc.get_struc_id(&quot;my_struct&quot;)</code></td></tr><tr><td style="text-align:left;">读取结构体大小</td><td style="text-align:left;"><code>idc.get_struc_size(id)</code></td></tr><tr><td style="text-align:left;">添加结构体成员</td><td style="text-align:left;"><code>idc.add_struc_member(...)</code></td></tr></tbody></table></div>
+<h3 id="95-设置--修改信息">9.5 设置 / 修改信息<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#95-设置--修改信息" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">功能</th><th style="text-align:left;">API</th></tr></thead><tbody><tr><td style="text-align:left;">重命名地址</td><td style="text-align:left;"><code>idc.set_name(ea, &quot;new_name&quot;)</code></td></tr><tr><td style="text-align:left;">添加注释</td><td style="text-align:left;"><code>idc.set_cmt(ea, &quot;comment&quot;, 0)</code></td></tr><tr><td style="text-align:left;">设置数据类型</td><td style="text-align:left;"><code>idc.create_struct(ea, size, &quot;struct_name&quot;)</code></td></tr><tr><td style="text-align:left;">设置字符串</td><td style="text-align:left;"><code>idc.create_strlit(ea, length)</code></td></tr></tbody></table></div>
+<h3 id="96-导出--自动化">9.6 导出 / 自动化<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#96-导出--自动化" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">功能</th><th style="text-align:left;">API</th></tr></thead><tbody><tr><td style="text-align:left;">导出伪代码（需 Hex-Rays）</td><td style="text-align:left;"><code>ida_hexrays.decompile(func_ea)</code></td></tr><tr><td style="text-align:left;">当前文件路径</td><td style="text-align:left;"><code>ida_nalt.get_input_file_path()</code></td></tr><tr><td style="text-align:left;">根文件名</td><td style="text-align:left;"><code>ida_nalt.get_root_filename()</code></td></tr><tr><td style="text-align:left;">执行外部脚本</td><td style="text-align:left;"><code>exec(open(&quot;script.py&quot;).read())</code></td></tr></tbody></table></div>
+<h2 id="10-常见问题">10. 常见问题<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#10-常见问题" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="101-got-sigtrap-signal-tracebreakpoint-trap">10.1 <code>got SIGTRAP signal (Trace/breakpoint trap)</code><a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#101-got-sigtrap-signal-tracebreakpoint-trap" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>断点陷阱只是表示处理器遇到了断点。可能原因：初始化代码被反复命中（CPU 复位）、或断点映射到的代码/执行路径不清晰（激进优化时尤甚）。
+解决：换用 GDB 调试，或在 IDA 中调整断点位置。</p>
+<h3 id="102-f5-导出--反编译不准">10.2 F5 导出 / 反编译不准<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#102-f5-导出--反编译不准" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>见 5 节。结论：F5 代码需人工比对汇编；<code>Ctrl+F5</code> 导出易错；优先 <code>Shift+E</code> 导出原始数据后手工整理。</p>
+<h3 id="103-字符串在-strings-窗口看不到但-altt-搜得到">10.3 字符串在 Strings 窗口看不到，但 Alt+T 搜得到<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#103-字符串在-strings-窗口看不到但-altt-搜得到" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>常见原因：</p>
+<ul>
+<li>段类型未正确识别为可读字符串区域（段属性未标记为可读/数据段）。</li>
+<li>数据类型未定义（字符串未以 NUL 结尾，或加密/压缩数据）。</li>
+<li>IDA 自动分析范围未覆盖该段（部分被标记为未定义）。</li>
+<li>自定义加密/编码，手动搜得到但 IDA 无法自动识别。</li>
+</ul>
+<h3 id="104-识别回连端口--ip">10.4 识别回连端口 / IP<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#104-识别回连端口--ip" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>看 <code>connect</code> 的参数；结合 <code>gethostbyname(&quot;...&quot;)</code> 找到域名，再在汇编里看端口。注意：被优化后端口可能以常量内联形式散落在指令中，需对照汇编还原 <code>ip:port</code>。</p>
+<h3 id="105-字符串找不到交叉引用">10.5 字符串找不到交叉引用<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#105-字符串找不到交叉引用" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>可能是反汇编引擎没把这段数据正确识别为代码/数据，IDA 因此没标记 xref；Ghidra 有时能补上。可尝试在 <code>IDA View</code> 中手动按 <code>A</code>/<code>C</code> 修复，或刷新分析。</p>
+<h3 id="106-sp-analysis-failed--f5-失败">10.6 <code>sp-analysis failed</code> / F5 失败<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#106-sp-analysis-failed--f5-失败" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><code>sp</code> 问题：函数栈指针分析失败，常见原因是代码混淆、手动 patch 或调用约定异常；可参考 CSDN 相关文章手动修正 <code>sp</code>。</li>
+<li><code>too big function</code>：函数过大导致反编译器放弃。局部可用 <code>Edit → Plugins → Hex-Rays Decompiler → Options → Analysis Options 3</code>；全局改 <code>hexrays.cfg</code> 的 <code>MAX_FUNCSIZE</code>。</li>
+<li><code>Cannot continue after an internal error</code>：本草稿未解决，可尝试重启 IDA 重建数据库。</li>
+</ul>
+<h3 id="107-符号表被删ida-为何还能识别导入函数名">10.7 符号表被删，IDA 为何还能识别导入函数名<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#107-符号表被删ida-为何还能识别导入函数名" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>即使 <code>.symtab</code> 被 strip，导入函数名通常仍保留在导入表（<code>.dynsym</code> / <code>.dynstr</code>）中：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>ELF：DT_NEEDED / DT_SYMTAB / DT_STRTAB 动态段保留 printf、memcpy 等；</span></span>
+<span data-line><span>     IDA 解析 .plt + .got，结合 .dynsym 还原导入函数。</span></span>
+<span data-line><span>PE ：IAT / INT 中保留 kernel32.dll!CreateFileA 等名称。</span></span></code></pre></figure>
+<p>此外，IDA 的 <strong>FLIRT</strong>（Fast Library Identification and Recognition Technology）通过二进制特征识别库函数；并且 <code>BL printf</code> 这类调用会经 <code>.plt → .got → .dynsym+.dynstr</code> 反查到名字。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>BL 0x4005f0</span></span>
+<span data-line><span>   └─▶ .plt entry (printf@plt)</span></span>
+<span data-line><span>         └─▶ .rel.plt entry ─▶ .dynsym[idx] ─▶ name: &quot;printf&quot; (from .dynstr)</span></span></code></pre></figure>
+<blockquote>
+<p>注意：<strong>动态链接的 ELF 无法完全去除 <code>.dynsym/.dynstr</code></strong>，否则运行时找不到库函数。</p>
+</blockquote>
+<h3 id="108-relplt-与-relaplt-的区别">10.8 <code>.rel.plt</code> 与 <code>.rela.plt</code> 的区别<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#108-relplt-与-relaplt-的区别" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">类型</th><th style="text-align:left;">架构</th><th style="text-align:left;">特点</th></tr></thead><tbody><tr><td style="text-align:left;"><code>.rel.plt</code></td><td style="text-align:left;">ARM、x86</td><td style="text-align:left;">不带显式 addend</td></tr><tr><td style="text-align:left;"><code>.rela.plt</code></td><td style="text-align:left;">x86_64、AArch64</td><td style="text-align:left;">带 addend 字段</td></tr></tbody></table></div>
+<ul>
+<li><code>addend</code> 是参与地址重定位计算的常量。</li>
+<li><code>.rel</code> 把 addend 写在目标内存位置（间接）；<code>.rela</code> 把 addend 显式写在重定位表里。</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>一条 .rel.plt 表项示例：</span></span>
+<span data-line><span>Offset     Info    Type           Sym.Value  Sym.Name</span></span>
+<span data-line><span>0804a00c   00000707 R_ARM_JUMP_SLOT 00000000   printf</span></span>
+<span data-line><span>  Offset  → 指向 .got 中的某一项（函数指针位置）</span></span>
+<span data-line><span>  Info    → 编码符号索引 + 重定位类型（07 = JUMP_SLOT）</span></span>
+<span data-line><span>  Sym.Name→ .dynsym 中对应符号名</span></span></code></pre></figure>
+<h2 id="11-逆向经验与调试思路">11. 逆向经验与调试思路<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#11-逆向经验与调试思路" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="111-调试定位出发点">11.1 调试定位「出发点」<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#111-调试定位出发点" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>先确定数据读入位置，单步执行，及时观察触发结果（构造一个容易观察的触发，例如执行了某命令就会生成标记文件）。</li>
+<li>因为有些 <code>system</code> 执行不打印输出，需要时刻盯着构造的命令是否产生了预期副作用。</li>
+<li>多个程序关联触发时，必须先理清各自功能与触发关系。</li>
+</ul>
+<h3 id="112-代码还原思路">11.2 代码还原思路<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#112-代码还原思路" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li>确定被比较的值 <code>cmp_value</code> 如何生成：回溯追踪。</li>
+<li>分析它需要哪些参数、变量、常量，经过什么算法。</li>
+<li>若提取代码与动态调试结果不同：先确认逻辑，再重点检查「输入点数据」（影响结果的是变量），可用二分法排查。</li>
+</ol>
+<h3 id="113-实战经验条目节选">11.3 实战经验条目（节选）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#113-实战经验条目节选" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>1) IDA 7.7 识别错误坑：</span></span>
+<span data-line><span>   value = (int)&amp;v1[v5 + v199[0] + 123]</span></span>
+<span data-line><span>   实际应为 value = v1 + v5 + v199[0] + 123</span></span>
+<span data-line><span>   （不是 (v5+v199[0]+123)*4 + &amp;v1）</span></span>
+<span data-line> </span>
+<span data-line><span>2) F5 两数相加的 bug：红色为错、绿色为对，最终以汇编为准。</span></span>
+<span data-line> </span>
+<span data-line><span>4) 代码还原：ida 调试输出数据 → 编译提取代码调试对比数据；</span></span>
+<span data-line><span>   逻辑是前提，变量是结果的关键。</span></span>
+<span data-line> </span>
+<span data-line><span>6) 修复字符串：统一修复只能靠 API；原因之一可能是 IDA 架构/位数选错。</span></span>
+<span data-line> </span>
+<span data-line><span>7) Hex View 导出大量数据：选中开始地址，ALT+L 锁定光标，</span></span>
+<span data-line><span>   G 跳到目的地址，右键保存；或 API：</span></span>
+<span data-line><span>     data = ida_bytes.get_bytes(start, end-start)</span></span>
+<span data-line><span>     open(&quot;dumped.bin&quot;,&quot;wb&quot;).write(data)</span></span>
+<span data-line> </span>
+<span data-line><span>8) Strings 窗口看不到 .data 字符：段类型/数据类型/分析范围/自加密。</span></span>
+<span data-line> </span>
+<span data-line><span>11) 指针识别：*(_DWORD*)(unsigned int)(0x12345678) 与</span></span>
+<span data-line><span>    *(unsigned int*)0x12345678 结果相同，都是解引用该地址。</span></span>
+<span data-line> </span>
+<span data-line><span>12) 识别回连端口：看 connect 参数，结合 gethostbyname；ip:port 在汇编里。</span></span>
+<span data-line> </span>
+<span data-line><span>14) 抽取代码还原：F5 代码多为 Windows 标准 API/调用约定，</span></span>
+<span data-line><span>    移植到 Linux 需改调用约定（__fastcall→GCC 属性）、</span></span>
+<span data-line><span>    类型（_BYTE=char, BOOL=bool）、宏（LOBYTE 自行实现）。</span></span>
+<span data-line> </span>
+<span data-line><span>15) 修正函数声明：快捷键 y。</span></span>
+<span data-line> </span>
+<span data-line><span>17) 判断 F5 伪代码变量类型的“宽度”可看汇编，但有无符号不能准确判断，</span></span>
+<span data-line><span>    需结合有符号指令或动态调试看符号标志位。</span></span>
+<span data-line> </span>
+<span data-line><span>18) 符号表删除后 IDA 仍能识别导入函数：见 10.7。</span></span>
+<span data-line> </span>
+<span data-line><span>21) 寻找相同偏移猜测引用变量：不同代码块中数据输入/输出点，</span></span>
+<span data-line><span>    观察相同规律后搜索偏移（如搜字节序列 8c 00 00 00）。</span></span>
+<span data-line> </span>
+<span data-line><span>24) 结构体字段全局引用显示不全：F5 进一个函数才多显示一行，</span></span>
+<span data-line><span>    用 Ctrl+Alt+X 弹出全局交叉引用列表，首次可能为空，</span></span>
+<span data-line><span>    右键或 Ctrl+U 刷新（会反编译全部函数并缓存）。</span></span>
+<span data-line> </span>
+<span data-line><span>27) 数据 + 结构体重建：必须先在 IDA View 修复成员，才能展开子成员。</span></span>
+<span data-line> </span>
+<span data-line><span>29) 字符串找不到引用/实际已引用：可试改基址显示字符串，</span></span>
+<span data-line><span>    但仍可能看不到 xref；原因多为反汇编引擎未识别为代码。</span></span>
+<span data-line> </span>
+<span data-line><span>31) 源码编译程序制作 FLIRT/Rizzo 符号：</span></span>
+<span data-line><span>    FLIRT 只适合静态编译的 .lib/.o（pelf → sigmake）；</span></span>
+<span data-line><span>    IoT 固件用 IDB2PAT（flare-ida）从 .idb 生成 .pat；</span></span>
+<span data-line><span>    另有 Rizzo、Karta（开源代码搜索）等。</span></span>
+<span data-line> </span>
+<span data-line><span>32) 字符串 grep 不到但 F5 能看到：编译器优化把字符串内联进指令，</span></span>
+<span data-line><span>    按 R 键可将立即数转字符显示。</span></span></code></pre></figure>
+<h2 id="12-c-与虚表vtable">12. C++ 与虚表（vtable）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#12-c-与虚表vtable" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><strong>non-virtual thunk / virtual thunk</strong> 是编译器自动生成的小函数（几行汇编），用于调整 <code>this</code> 指针后再调用真正的目标函数，常见于多重继承 / 虚继承。</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>unsigned int __cdecl `non-virtual thunk to'IftTlsTransport::onIftTlsIpcMessage(</span></span>
+<span data-line><span>        IftTlsTransport *this, char *a2,</span></span>
+<span data-line><span>        const IftTlsHeader *IFT_hdr, __guard *a4)</span></span>
+<span data-line><span>{</span></span>
+<span data-line><span>  return IftTlsTransport::onIftTlsIpcMessage(</span></span>
+<span data-line><span>        (IftTlsTransport *)((char *)this - 56), a2, IFT_hdr, a4);</span></span>
+<span data-line><span>}</span></span></code></pre></figure>
+<ul>
+<li><code>non-virtual thunk</code>：用于非虚函数 / 虚表中非动态分发的函数。</li>
+<li><code>virtual thunk</code>：用于虚函数调用（出现在虚表中）。</li>
+</ul>
+<p>多重继承下，每个基类子对象起始地址不同，调用前需调整 <code>this</code> 指向正确子对象。在 IDA 中从 thunk 的 xref 往上追，可找到调用方或主类的虚表。</p>
+<blockquote>
+<p>识别 C++ 符号：虚表（<code>_ZTV15IftTlsTransport</code>）在 <code>.data.rel.ro</code> 段，结合 <code>_ZThn48_...</code>、<code>offset to this</code>（负值，如 <code>-48</code>/<code>-56</code>）可还原继承偏移。</p>
+</blockquote>
+<h2 id="13-python-环境适配">13. Python 环境适配<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#13-python-环境适配" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><code>idapyswitch.exe</code> 负责切换 IDA 使用的 Python 版本。</li>
+<li>主机有多个 Python 时，用对应版本的 <code>python.exe -m pip</code> 安装包，避免版本冲突：</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span># 用哪个 Python 运行安装脚本，pip 就关联到哪个版本</span></span>
+<span data-line><span>D:\&lt;IDA安装目录>\python311> python.exe get-pip.py</span></span>
+<span data-line><span>D:\&lt;IDA安装目录>\python311> ./python.exe -m pip install --upgrade pip</span></span></code></pre></figure>
+<h2 id="14-配置与参考">14. 配置与参考<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#14-配置与参考" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>配置文件目录：<code>%IDADIR%\cfg</code>；用户级扩展可通过 <code>IDAUSR</code> 环境变量指定。</li>
+<li>IDA 官方博客（Igor Tip of the Week 系列）：<a href="https://hex-rays.com/blog" class="external">https://hex-rays.com/blog<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>IDA Pro 技巧参考：<a href="https://firmianay.gitbook.io/ida-pro-tips" class="external">https://firmianay.gitbook.io/ida-pro-tips<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>ELF 文件结构：<a href="https://chuquan.me/2018/05/21/elf-introduce/" class="external">https://chuquan.me/2018/05/21/elf-introduce/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>C++ 虚函数表逆向：<a href="https://rioasmara.com/2020/08/23/ida-pro-c-vtable/" class="external">https://rioasmara.com/2020/08/23/ida-pro-c-vtable/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>、<a href="https://mez.one/2021/03/09/2021-03-09-CPP-virtual/" class="external">https://mez.one/2021/03/09/2021-03-09-CPP-virtual/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>angr + IDA 联合分析（Sink 地址映射、静态调用链、动态污点验证）可作为进阶工作流。</li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-19" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#ida-pro-使用技巧速查" data-for="ida-pro-使用技巧速查">IDA Pro 使用技巧速查</a></li><li class="depth-1"><a href="#1-界面基础与导航" data-for="1-界面基础与导航">1. 界面基础与导航</a></li><li class="depth-2"><a href="#11-说明与常用操作" data-for="11-说明与常用操作">1.1 说明与常用操作</a></li><li class="depth-2"><a href="#12-注释" data-for="12-注释">1.2 注释</a></li><li class="depth-2"><a href="#13-标签书签" data-for="13-标签书签">1.3 标签（书签）</a></li><li class="depth-2"><a href="#14-段与数据转换" data-for="14-段与数据转换">1.4 段与数据转换</a></li><li class="depth-1"><a href="#2-搜索与定位关键代码" data-for="2-搜索与定位关键代码">2. 搜索与定位关键代码</a></li><li class="depth-1"><a href="#3-快捷键速查" data-for="3-快捷键速查">3. 快捷键速查</a></li><li class="depth-2"><a href="#31-调试快捷键" data-for="31-调试快捷键">3.1 调试快捷键</a></li><li class="depth-2"><a href="#32-导航与寄存器" data-for="32-导航与寄存器">3.2 导航与寄存器</a></li><li class="depth-2"><a href="#33-杂项清单" data-for="33-杂项清单">3.3 杂项清单</a></li><li class="depth-1"><a href="#4-栈帧参数与变量识别" data-for="4-栈帧参数与变量识别">4. 栈帧、参数与变量识别</a></li><li class="depth-1"><a href="#5-反编译与函数识别" data-for="5-反编译与函数识别">5. 反编译与函数识别</a></li><li class="depth-1"><a href="#6-结构体与类型" data-for="6-结构体与类型">6. 结构体与类型</a></li><li class="depth-2"><a href="#61-三种创建方式" data-for="61-三种创建方式">6.1 三种创建方式</a></li><li class="depth-2"><a href="#62-数据--结构体重建" data-for="62-数据--结构体重建">6.2 数据 + 结构体重建</a></li><li class="depth-1"><a href="#7-常用插件" data-for="7-常用插件">7. 常用插件</a></li><li class="depth-1"><a href="#8-idapython-常用脚本" data-for="8-idapython-常用脚本">8. IDAPython 常用脚本</a></li><li class="depth-2"><a href="#81-批量修正数据类型--宽度" data-for="81-批量修正数据类型--宽度">8.1 批量修正数据类型 / 宽度</a></li><li class="depth-2"><a href="#82-获取导入表与交叉引用" data-for="82-获取导入表与交叉引用">8.2 获取导入表与交叉引用</a></li><li class="depth-2"><a href="#83-字符串识别" data-for="83-字符串识别">8.3 字符串识别</a></li><li class="depth-1"><a href="#9-ida-api-速查idapython" data-for="9-ida-api-速查idapython">9. IDA API 速查（IDAPython）</a></li><li class="depth-2"><a href="#91-基本信息获取" data-for="91-基本信息获取">9.1 基本信息获取</a></li><li class="depth-2"><a href="#92-函数与段信息" data-for="92-函数与段信息">9.2 函数与段信息</a></li><li class="depth-2"><a href="#93-交叉引用xrefs" data-for="93-交叉引用xrefs">9.3 交叉引用（Xrefs）</a></li><li class="depth-2"><a href="#94-字符串与结构体" data-for="94-字符串与结构体">9.4 字符串与结构体</a></li><li class="depth-2"><a href="#95-设置--修改信息" data-for="95-设置--修改信息">9.5 设置 / 修改信息</a></li><li class="depth-2"><a href="#96-导出--自动化" data-for="96-导出--自动化">9.6 导出 / 自动化</a></li><li class="depth-1"><a href="#10-常见问题" data-for="10-常见问题">10. 常见问题</a></li><li class="depth-2"><a href="#101-got-sigtrap-signal-tracebreakpoint-trap" data-for="101-got-sigtrap-signal-tracebreakpoint-trap">10.1 got SIGTRAP signal (Trace/breakpoint trap)</a></li><li class="depth-2"><a href="#102-f5-导出--反编译不准" data-for="102-f5-导出--反编译不准">10.2 F5 导出 / 反编译不准</a></li><li class="depth-2"><a href="#103-字符串在-strings-窗口看不到但-altt-搜得到" data-for="103-字符串在-strings-窗口看不到但-altt-搜得到">10.3 字符串在 Strings 窗口看不到，但 Alt+T 搜得到</a></li><li class="depth-2"><a href="#104-识别回连端口--ip" data-for="104-识别回连端口--ip">10.4 识别回连端口 / IP</a></li><li class="depth-2"><a href="#105-字符串找不到交叉引用" data-for="105-字符串找不到交叉引用">10.5 字符串找不到交叉引用</a></li><li class="depth-2"><a href="#106-sp-analysis-failed--f5-失败" data-for="106-sp-analysis-failed--f5-失败">10.6 sp-analysis failed / F5 失败</a></li><li class="depth-2"><a href="#107-符号表被删ida-为何还能识别导入函数名" data-for="107-符号表被删ida-为何还能识别导入函数名">10.7 符号表被删，IDA 为何还能识别导入函数名</a></li><li class="depth-2"><a href="#108-relplt-与-relaplt-的区别" data-for="108-relplt-与-relaplt-的区别">10.8 .rel.plt 与 .rela.plt 的区别</a></li><li class="depth-1"><a href="#11-逆向经验与调试思路" data-for="11-逆向经验与调试思路">11. 逆向经验与调试思路</a></li><li class="depth-2"><a href="#111-调试定位出发点" data-for="111-调试定位出发点">11.1 调试定位「出发点」</a></li><li class="depth-2"><a href="#112-代码还原思路" data-for="112-代码还原思路">11.2 代码还原思路</a></li><li class="depth-2"><a href="#113-实战经验条目节选" data-for="113-实战经验条目节选">11.3 实战经验条目（节选）</a></li><li class="depth-1"><a href="#12-c-与虚表vtable" data-for="12-c-与虚表vtable">12. C++ 与虚表（vtable）</a></li><li class="depth-1"><a href="#13-python-环境适配" data-for="13-python-环境适配">13. Python 环境适配</a></li><li class="depth-1"><a href="#14-配置与参考" data-for="14-配置与参考">14. 配置与参考</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../tech/index.cn" class="internal">技术档案</a></li><li><a href="../tech/" class="internal">Tech Archive</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>

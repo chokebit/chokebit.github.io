@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>裸机固件基址与入口定位</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="裸机固件基址与入口定位"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="裸机固件基址与入口定位"/><meta name="twitter:description" content="从向量表、绝对地址与内存映射入手，定位裸机固件的加载基址和 Reset 入口。"/><meta property="og:description" content="从向量表、绝对地址与内存映射入手，定位裸机固件的加载基址和 Reset 入口。"/><meta property="og:image:alt" content="从向量表、绝对地址与内存映射入手，定位裸机固件的加载基址和 Reset 入口。"/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/tech/baremetal-firmware-base-entry.cn"/><meta property="twitter:url" content="https://chokebit.github.io/tech/baremetal-firmware-base-entry.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="从向量表、绝对地址与内存映射入手，定位裸机固件的加载基址和 Reset 入口。"/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="tech/baremetal-firmware-base-entry.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../products/index.cn" class="nav-link">产品</a><a href="../ai-native/index.cn" class="nav-link">AI Native</a><a href="../tech/index.cn" class="nav-link" aria-current="page">技术档案</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Archive</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>裸机固件基址与入口定位</a></div></nav><h1 class="article-title">裸机固件基址与入口定位</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-14T00:00:00.000Z">Aug 14, 2026</time><span>8 min read</span></p><ul class="tags"><li><a href="../tags/firmware" class="internal tag-link">firmware</a></li><li><a href="../tags/reverse-engineering" class="internal tag-link">reverse-engineering</a></li><li><a href="../tags/ghidra" class="internal tag-link">ghidra</a></li><li><a href="../tags/stm32" class="internal tag-link">stm32</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><blockquote>
+<p>内容难免有误，请带着辩证视角阅读。本文讨论的是无文件系统、直接烧录到 MCU 的裸固件（bare-metal firmware）在逆向工具里的加载地址与入口定位，属于通用逆向工程基础。</p>
+</blockquote>
+<h2 id="本文内容">本文内容<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#本文内容" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>为什么裸固件需要「找基址」</strong>：工具不知道加载地址，乱加载会满屏红地址</li>
+<li><strong>三种手工定位基址的方法</strong>：switch 跳转表、JUMPOUT、LDR 绝对地址猜测</li>
+<li><strong>自动化工具</strong>：rbasefind</li>
+<li><strong>Ghidra 实操</strong>：以 STM32F103 为例，手动重建内存映射</li>
+<li><strong>SVD-Loader 插件</strong>：自动创建内存段与外设</li>
+<li>**入口点（reset 向量）**的定位</li>
+</ul>
+<hr/>
+<h2 id="一为什么裸固件要先找基址">一、为什么裸固件要先找基址<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一为什么裸固件要先找基址" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>裸固件是一段原始二进制（没有 ELF/PE 那种自带加载信息的头），IDA / Ghidra 拿到它时<strong>不知道该把它放到内存的哪个地址</strong>。如果直接加载到 <code>0x0</code>，反汇编出来的绝对地址引用会全部标红（工具在文件里找不到对应偏移），字符串也没有交叉引用。</p>
+<p>解决思路：先推断出正确的加载基地址（base address），再重新加载，让绝对地址能落到文件内的真实偏移上。</p>
+<p>原笔记里的经验做法：先加载到 <code>0</code> 地址并<strong>全量分析</strong>，再通过观察绝对地址引用反推基地址。</p>
+<hr/>
+<h2 id="二三种手工定位基址的方法">二、三种手工定位基址的方法<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#二三种手工定位基址的方法" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="方法-1通过-switch-跳转表jump-table定位">方法 1：通过 switch 跳转表（jump table）定位<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#方法-1通过-switch-跳转表jump-table定位" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>这是最常用、最稳的办法。C 的 <code>switch</code> 编译后常生成跳转表，表里存的是<strong>绝对地址</strong>。例如某处反汇编：</p>
+<pre><code>ROM:00001E70  LDR  R5, =...
+ROM:00001E74  ; JUMP TABLE FOR SWITCH STATEMENT
+ROM:00001E78  DCD 0x81601E9C
+ROM:00001E7C  DCD 0x81601EE4
+ROM:00001E80  DCD 0x81601ECC
+...
+</code></pre>
+<p>表里的 <code>0x81601E9C</code> 是文件偏移 <code>0x1E9C</code> 处的真实运行地址，于是：</p>
+<pre><code>基地址 = 0x81601E9C - 0x1E9C = 0x81600000
+</code></pre>
+<p>（最常见的是 default case 分支，它往往直接指向某个函数入口。）</p>
+<h3 id="方法-2f5-后通过-jumpout-定位">方法 2：F5 后通过 JUMPOUT 定位<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#方法-2f5-后通过-jumpout-定位" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>反编译（F5）后若出现大量 <code>JUMPOUT(xxx)</code> 提示，说明函数边界因地址错误没切分对；结合这些异常跳转目标地址，也能反推出基址区间。</p>
+<h3 id="方法-3通过-ldr-rx-0x-猜测">方法 3：通过 <code>LDR Rx, =0x...</code> 猜测<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#方法-3通过-ldr-rx-0x-猜测" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>类似：</p>
+<pre><code>LDR  R0, =0x403102EC
+LDR  PC, =0xXXXXXXXX
+</code></pre>
+<p>这类加载绝对常量的指令里经常出现外设基址或固定地址，是推断基址的重要线索。</p>
+<hr/>
+<h2 id="三自动化工具-rbasefind">三、自动化工具 rbasefind<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#三自动化工具-rbasefind" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>手工方法适合小样本，大文件可用启发式工具自动猜基址：</p>
+<ul>
+<li>项目：<a href="https://github.com/sgayou/rbasefind" class="external">https://github.com/sgayou/rbasefind<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul>
+<p>它通过统计绝对地址的分布来推测最可能的加载地址，可作为手工验证的补充。</p>
+<hr/>
+<h2 id="四ghidra-实操以-stm32f103-为例">四、Ghidra 实操：以 STM32F103 为例<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#四ghidra-实操以-stm32f103-为例" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>参考：<a href="https://blog.attify.com/analyzing-bare-metal-firmware-binaries-in-ghidra/" class="external">https://blog.attify.com/analyzing-bare-metal-firmware-binaries-in-ghidra/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></p>
+<h3 id="1-加载固件">1. 加载固件<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-加载固件" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Ghidra 导入原始二进制后，第一步选对<strong>语言</strong>。STM32F103 是 ARM Cortex-M3（32 位小端），选 <code>ARM-Cortex-32-little</code>。</p>
+<h3 id="2-识别加载错了的特征">2. 识别「加载错了」的特征<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-识别加载错了的特征" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>分析完后若发现：</p>
+<ul>
+<li>形如 <code>0x08000XXX</code> 的地址被标红（双击无结果）；</li>
+<li>对 <code>0xE000xxxx</code>（内核外设）、<code>0x20000xxx</code>（SRAM）的引用解析不了；</li>
+<li>字符串没有任何交叉引用；</li>
+</ul>
+<p>就说明<strong>基地址不对</strong>。</p>
+<h3 id="3-查数据表确定基地址">3. 查数据表确定基地址<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-查数据表确定基地址" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>STM32F103 的闪存（Flash）基地址是 <code>0x08000000</code>，这同时就是固件映像的加载地址。SRAM 从 <code>0x20000000</code> 开始。可以从芯片头文件（<code>stm32f103x6.h</code>）或数据表的内存映射确认：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="c" data-theme="github-light github-dark"><code data-language="c" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">#define</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> FLASH_BASE</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">   0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">08000000</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">UL</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  // 闪存基址 = 固件加载地址</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">#define</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> SRAM_BASE</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">20000000</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">UL</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  // SRAM 基址</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">#define</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> PERIPH_BASE</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">  0x</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">40000000</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">UL</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  // 外设基址</span></span></code></pre></figure>
+<h3 id="4-重新创建内存映射">4. 重新创建内存映射<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-重新创建内存映射" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>重新导入时，在导入对话框的 Options 里把基地址设为 <code>0x08000000</code>。然后手动补两块内存：</p>
+<ul>
+<li><strong>Flash 段</strong>：base <code>0x08000000</code>，长度 = 固件文件大小（如 64 KiB = <code>0x10000</code>）。</li>
+<li><strong>SRAM 段</strong>：base <code>0x20000000</code>，长度按芯片 SRAM 大小（如 20 KiB = <code>0x5000</code>）。</li>
+<li><strong>Peripherals 段</strong>：base <code>0xE0000000</code>，长度 <code>0x100000</code>（ Cortex-M 内核外设 / 位带区）。</li>
+</ul>
+<blockquote>
+<p>注意：设好内存映射后若反汇编没自动刷新，可在 <code>Analysis → Auto Analyze</code> 重跑默认分析。</p>
+</blockquote>
+<p>重新分析后：</p>
+<ul>
+<li><code>0x08000xxx</code> 不再标红；</li>
+<li>字符串旁边开始出现交叉引用；</li>
+</ul>
+<p>说明加载地址与内存映射都对了，可以正常分析代码逻辑。</p>
+<blockquote>
+<p>提醒：Ghidra 不会自动识别所有函数边界——有些地址处是代码还是数据仍需手工判断（快捷键 <code>D</code> 转代码、<code>C</code> 转数据）。</p>
+</blockquote>
+<hr/>
+<h2 id="五svd-loader-插件">五、SVD-Loader 插件<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#五svd-loader-插件" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>手动建内存映射很繁琐。Leveldown Security 的 <strong>SVD-Loader</strong>（<a href="https://github.com/leveldown-security/SVD-Loader-Ghidra%EF%BC%89%E8%83%BD%E8%A7%A3%E6%9E%90" class="external">https://github.com/leveldown-security/SVD-Loader-Ghidra）能解析<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> SVD（System View Description）文件，<strong>自动创建</strong>裸机 ARM 固件的内存段和外设寄存器。</p>
+<p>用法：</p>
+<ol>
+<li>安装：把插件目录加入 Ghidra 脚本管理器（Window → Script Manager）的脚本目录列表。</li>
+<li>先把固件以正确基地址（<code>0x08000000</code>）加载进来。</li>
+<li>从脚本管理器运行 <code>SVD-Loader.py</code>，按提示选择对应芯片的 <code>.svd</code> 文件（如 <code>STM32F103xx.svd</code>，可从 <a href="https://github.com/posborne/cmsis-svd" class="external">https://github.com/posborne/cmsis-svd<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 获取）。</li>
+<li>插件会自动建好外设段；但 <strong>SRAM 段（<code>0x20000000</code>）插件不会自动创建</strong>，需手动补上。</li>
+</ol>
+<p>之后同「手动恢复」后续步骤一样跑自动分析即可。</p>
+<p>相关资源：</p>
+<ul>
+<li>CMSIS SVD 仓库：<a href="https://github.com/cmsis-svd/cmsis-svd" class="external">https://github.com/cmsis-svd/cmsis-svd<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>STM32 SVD：<a href="https://github.com/modm-io/cmsis-svd-stm32" class="external">https://github.com/modm-io/cmsis-svd-stm32<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul>
+<hr/>
+<h2 id="六入口点reset-向量定位">六、入口点（Reset 向量）定位<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#六入口点reset-向量定位" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>裸固件的「入口」不是 <code>main</code>，而是芯片上电后硬件读取的 <strong>向量表（vector table）</strong>。以 Cortex-M 为例，向量表固定在 Flash 起始处：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>偏移</th><th>内容</th><th>含义</th></tr></thead><tbody><tr><td><code>0x00</code></td><td>初始 SP 值</td><td>栈顶地址（指向 SRAM 顶部，如 <code>0x2000XXXX</code>）</td></tr><tr><td><code>0x04</code></td><td>Reset 处理例程地址</td><td>复位后第一条执行的指令（入口点）</td></tr><tr><td><code>0x08</code></td><td>NMI 处理例程</td><td></td></tr><tr><td>…</td><td>各类异常 / 中断向量</td><td></td></tr></tbody></table></div>
+<p>所以一旦基址确定（如 <code>0x08000000</code>）：</p>
+<ul>
+<li><code>0x08000000</code> 处的 4 字节 = 初始栈指针；</li>
+<li><code>0x08000004</code> 处的 4 字节 = <strong>复位入口地址</strong>，也就是真正的程序起点。</li>
+</ul>
+<p>顺着这个地址往下，就是芯片初始化、搬移数据、最终跳到 <code>main</code> 的启动代码。结合前面「基址定位」的结果，向量表里的绝对地址应当能正确解析。</p>
+<hr/>
+<h2 id="参考">参考<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#参考" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>固件安全之加载地址分析：<a href="https://bbs.kanxue.com/thread-267719-1.htm" class="external">https://bbs.kanxue.com/thread-267719-1.htm<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>Analyzing bare metal firmware binaries in Ghidra：<a href="https://blog.attify.com/analyzing-bare-metal-firmware-binaries-in-ghidra/" class="external">https://blog.attify.com/analyzing-bare-metal-firmware-binaries-in-ghidra/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>另一示例分析：<a href="https://tttang.com/archive/1418/" class="external">https://tttang.com/archive/1418/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-9" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#本文内容" data-for="本文内容">本文内容</a></li><li class="depth-0"><a href="#一为什么裸固件要先找基址" data-for="一为什么裸固件要先找基址">一、为什么裸固件要先找基址</a></li><li class="depth-0"><a href="#二三种手工定位基址的方法" data-for="二三种手工定位基址的方法">二、三种手工定位基址的方法</a></li><li class="depth-1"><a href="#方法-1通过-switch-跳转表jump-table定位" data-for="方法-1通过-switch-跳转表jump-table定位">方法 1：通过 switch 跳转表（jump table）定位</a></li><li class="depth-1"><a href="#方法-2f5-后通过-jumpout-定位" data-for="方法-2f5-后通过-jumpout-定位">方法 2：F5 后通过 JUMPOUT 定位</a></li><li class="depth-1"><a href="#方法-3通过-ldr-rx-0x-猜测" data-for="方法-3通过-ldr-rx-0x-猜测">方法 3：通过 LDR Rx, =0x... 猜测</a></li><li class="depth-0"><a href="#三自动化工具-rbasefind" data-for="三自动化工具-rbasefind">三、自动化工具 rbasefind</a></li><li class="depth-0"><a href="#四ghidra-实操以-stm32f103-为例" data-for="四ghidra-实操以-stm32f103-为例">四、Ghidra 实操：以 STM32F103 为例</a></li><li class="depth-1"><a href="#1-加载固件" data-for="1-加载固件">1. 加载固件</a></li><li class="depth-1"><a href="#2-识别加载错了的特征" data-for="2-识别加载错了的特征">2. 识别「加载错了」的特征</a></li><li class="depth-1"><a href="#3-查数据表确定基地址" data-for="3-查数据表确定基地址">3. 查数据表确定基地址</a></li><li class="depth-1"><a href="#4-重新创建内存映射" data-for="4-重新创建内存映射">4. 重新创建内存映射</a></li><li class="depth-0"><a href="#五svd-loader-插件" data-for="五svd-loader-插件">五、SVD-Loader 插件</a></li><li class="depth-0"><a href="#六入口点reset-向量定位" data-for="六入口点reset-向量定位">六、入口点（Reset 向量）定位</a></li><li class="depth-0"><a href="#参考" data-for="参考">参考</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../tech/index.cn" class="internal">技术档案</a></li><li><a href="../tech/" class="internal">Tech Archive</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>磁盘解密与获取 Shell（授权 / 防御视角）</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="磁盘解密与获取 Shell（授权 / 防御视角）"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="磁盘解密与获取 Shell（授权 / 防御视角）"/><meta name="twitter:description" content="面向自有或授权设备，梳理 LUKS、LVM、救援 Shell 与设备访问面的排查和加固方法。"/><meta property="og:description" content="面向自有或授权设备，梳理 LUKS、LVM、救援 Shell 与设备访问面的排查和加固方法。"/><meta property="og:image:alt" content="面向自有或授权设备，梳理 LUKS、LVM、救援 Shell 与设备访问面的排查和加固方法。"/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/tech/disk-decryption-and-shell-access.cn"/><meta property="twitter:url" content="https://chokebit.github.io/tech/disk-decryption-and-shell-access.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="面向自有或授权设备，梳理 LUKS、LVM、救援 Shell 与设备访问面的排查和加固方法。"/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="tech/disk-decryption-and-shell-access.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../products/index.cn" class="nav-link">产品</a><a href="../ai-native/index.cn" class="nav-link">AI Native</a><a href="../tech/index.cn" class="nav-link" aria-current="page">技术档案</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../tech/">Tech Archive</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>磁盘解密与获取 Shell（授权 / 防御视角）</a></div></nav><h1 class="article-title">磁盘解密与获取 Shell（授权 / 防御视角）</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-14T00:00:00.000Z">Aug 14, 2026</time><span>13 min read</span></p><ul class="tags"><li><a href="../tags/iot" class="internal tag-link">iot</a></li><li><a href="../tags/lvm" class="internal tag-link">lvm</a></li><li><a href="../tags/luks" class="internal tag-link">luks</a></li><li><a href="../tags/forensics" class="internal tag-link">forensics</a></li><li><a href="../tags/defensive" class="internal tag-link">defensive</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><blockquote>
+<p>本文内容涉及磁盘解密与「如何拿到设备 shell」。这些技术的合法用途包括：<strong>恢复你自己的加密磁盘、对自有 / 已授权设备进行安全评估、事件响应与取证</strong>。请勿将文中任何方法用于你无权操作的设备。没有合法授权的前提下访问他人设备，是违法行为。
+内容难免有误，请带着辩证视角阅读。</p>
+</blockquote>
+<h2 id="本文内容">本文内容<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#本文内容" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><strong>磁盘探测</strong>：识别传统分区 vs LVM（lsblk / pvs / fdisk / /dev/mapper）</li>
+<li><strong>LUKS 解密与挂载</strong>：有密钥时 <code>cryptsetup luksOpen</code>；无密码时为何无法解密</li>
+<li><strong>GRUB <code>cryptomount</code> vs <code>init=/bin/sh</code></strong>：两种「启动到 shell」的环境差异与恢复</li>
+<li><strong>设备被拿到 shell 的 8 类路径（防御视角）</strong>：把攻击手法当作攻击面清单，反向指导加固</li>
+</ul>
+<hr/>
+<h2 id="一磁盘探测传统分区还是-lvm">一、磁盘探测：传统分区还是 LVM？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一磁盘探测传统分区还是-lvm" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>分析一块磁盘 / 镜像前，先判断它是普通分区还是 <strong>LVM（Logical Volume Manager，逻辑卷管理）</strong>——这决定后续挂载方式。</p>
+<h3 id="方法一lsblk--f">方法一：<code>lsblk -f</code><a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#方法一lsblk--f" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">lsblk</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span></span></code></pre></figure>
+<ul>
+<li>若某分区 <code>FSTYPE</code> 是 <code>LVM2_member</code> → 它是 LVM 物理卷。</li>
+<li>若设备名形如 <code>/dev/mapper/...</code> → 它是逻辑卷。</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>NAME                FSTYPE      MOUNTPOINT</span></span>
+<span data-line><span>sda</span></span>
+<span data-line><span>├─sda1              ext4        /boot</span></span>
+<span data-line><span>└─sda2              LVM2_member</span></span>
+<span data-line><span>  └─ubuntu--vg-root ext4        /</span></span></code></pre></figure>
+<h3 id="方法二fdisk--parted">方法二：<code>fdisk</code> / <code>parted</code><a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#方法二fdisk--parted" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> fdisk</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -l</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/sdb</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> parted</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/sdb</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> print</span></span></code></pre></figure>
+<ul>
+<li>分区类型 <code>Linux LVM</code>（fdisk 里 ID 为 <code>8e</code>）→ LVM。</li>
+<li><code>Linux</code> / <code>EFI System</code> → 传统分区。</li>
+</ul>
+<h3 id="方法三pvs--vgs--lvs">方法三：<code>pvs</code> / <code>vgs</code> / <code>lvs</code><a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#方法三pvs--vgs--lvs" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pvs</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">     # 物理卷</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vgs</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">     # 卷组</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lvs</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">     # 逻辑卷</span></span></code></pre></figure>
+<p>有输出即启用了 LVM。</p>
+<h3 id="方法四看-devmapper">方法四：看 <code>/dev/mapper/</code><a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#方法四看-devmapper" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ls</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/mapper/</span></span></code></pre></figure>
+<p>出现 <code>vgname-lvname</code> 即启用 LVM。</p>
+<h3 id="传统分区-vs-lvm-速查">传统分区 vs LVM 速查<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#传统分区-vs-lvm-速查" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>标志</th><th>是否 LVM</th></tr></thead><tbody><tr><td><code>ext4</code> / <code>xfs</code> 等，挂载点 <code>/dev/sda1</code></td><td>否</td></tr><tr><td><code>LVM2_member</code>（或 fdisk 类型 <code>8e</code>）</td><td>是</td></tr><tr><td><code>/dev/mapper/...</code></td><td>是</td></tr></tbody></table></div>
+<blockquote>
+<p>若 <code>lvdisplay</code> 无输出：可能根本没用 LVM（用 <code>lsblk</code> 确认）；若确认用了却扫不到，试 <code>sudo vgscan</code>、<code>sudo vgchange -a y</code> 激活卷组。</p>
+</blockquote>
+<hr/>
+<h2 id="二解密并挂载-luks-加密分区">二、解密并挂载 LUKS 加密分区<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#二解密并挂载-luks-加密分区" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>LUKS 是 Linux 主流的磁盘加密方案。前提是你<strong>拥有合法的密码或密钥文件</strong>。</p>
+<h3 id="已知密钥解密--挂载">已知密钥：解密 + 挂载<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#已知密钥解密--挂载" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1. 打开 LUKS 分区（my_secure_disk 为自定义映射名）</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> cryptsetup</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> luksOpen</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/sdb2</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> my_secure_disk</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 输入加密密码后，生成映射设备 /dev/mapper/my_secure_disk</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2. 看解密后是什么</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">lsblk</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 若是 LVM：</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vgscan</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> &amp;&amp; </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vgchange</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -ay</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> &amp;&amp; </span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> lvscan</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 若是普通文件系统（如 ext4）：</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mount</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/mapper/my_secure_disk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /mnt</span></span></code></pre></figure>
+<h3 id="用密钥文件而非口令">用密钥文件而非口令<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#用密钥文件而非口令" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> cryptsetup</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> luksOpen</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/sdb2</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> my_secure_disk</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --key-file</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">密钥文</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">件</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mount</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/mapper/my_secure_disk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /mnt</span></span></code></pre></figure>
+<h3 id="没有密码--没有密钥文件怎么办">没有密码 / 没有密钥文件怎么办？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#没有密码--没有密钥文件怎么办" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>需要明确：<strong>LUKS 是强加密，没有密码或（合法的）密钥文件，无法解密该分区</strong>，数据不可恢复。这是 LUKS 的设计目标，也是它作为防护手段的价值所在。</p>
+<p>合法的「找回密钥」途径仅限于：你有<strong>备份的密钥文件</strong>或<strong>恢复密钥</strong>；或设备自带自动解锁脚本（如 <code>mount.sh</code> / <code>unlock.sh</code>）里引用了密钥文件——可以审查该脚本确认其引用的密钥路径（注意密钥文件常为二进制，用 <code>file</code> 判断类型，不要直接当文本打开）。</p>
+<blockquote>
+<p>内存中恢复密钥：在<strong>系统运行且已解锁</strong>的状态下，可从 RAM 提取 LUKS 主密钥（需物理访问 / 调试接口）。这是数据恢复手段，相关公开研究见 rce.moe 与 wzt.ac.cn 的 LUKS 内存取证文章。它同样只适用于你有权操作的系统。</p>
+</blockquote>
+<hr/>
+<h2 id="三grub-cryptomount-与-initbinsh-的区别">三、GRUB <code>cryptomount</code> 与 <code>init=/bin/sh</code> 的区别<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#三grub-cryptomount-与-initbinsh-的区别" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>想「在启动阶段拿到一个 shell」有两种常见场景，环境不同、能用的命令也不同：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>环境</th><th>说明</th><th>能否运行 <code>cryptomount</code></th></tr></thead><tbody><tr><td><strong>GRUB 命令行</strong></td><td>系统启动前、GRUB 提供的交互 shell</td><td>✅ 可以（<code>cryptomount -a</code> 等）</td></tr><tr><td><strong>Linux shell（<code>init=/bin/sh</code>）</strong></td><td>内核启动后进入的最小用户空间</td><td>❌ 不行（没有 GRUB 模块）</td></tr></tbody></table></div>
+<h3 id="用-initbinsh-进救援-shell">用 <code>init=/bin/sh</code> 进救援 shell<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#用-initbinsh-进救援-shell" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>在 bootloader 的 kernel 命令行加 <code>init=/bin/sh</code>，可绕过正常 init、直接拿到 root shell（常用于<strong>你自己设备的密码恢复 / 救援模式</strong>）。但此时很多服务没起来、文件系统可能只读。</p>
+<p>想从这个单用户 shell <strong>恢复成正常启动</strong>，可以：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">exec</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /sbin/init</span></span></code></pre></figure>
+<p><code>exec</code> 会用正常 init 进程替换掉当前 shell，从而继续正常的系统启动流程。</p>
+<blockquote>
+<p>反向看，这正是为什么设备要防「物理 / 启动攻击」：任何人只要能改 bootargs 或进 bootloader，就能轻易拿到 root shell。防御上需要：禁用 / 锁死串口控制台交互、给 bootloader 设密码、启用<strong>签名启动（secure boot）</strong>，让未经签名的启动参数与内核无法加载。</p>
+</blockquote>
+<hr/>
+<h2 id="四设备被拿到-shell-的-8-类路径防御视角">四、设备被拿到 Shell 的 8 类路径（防御视角）<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#四设备被拿到-shell-的-8-类路径防御视角" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>下面这张表把「攻击者如何拿到设备 shell」做成了<strong>攻击面清单</strong>。对安全研究者，它是评估<strong>自己拥有或已授权</strong>设备的 checklist；对设备厂商，它是应当重点加固的方向。这里<strong>保留公开漏洞编号与手法原理以便理解闭环，但不提供可复制的利用步骤与载荷</strong>——理解「为什么会被攻破」比复制 exploit 更有价值。所有手法都假定仅用于自有 / 授权设备，对他人设备实施属未授权行为。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>#</th><th>手法</th><th>核心手段（原理）</th><th>公开案例背景</th><th>防御要点</th></tr></thead><tbody><tr><td>1</td><td><strong>N-day / 0-day 漏洞利用</strong></td><td>利用已知（或私有）漏洞取得代码执行，部分场景还会继续尝试提权</td><td><strong>CVE-2023-28771</strong>：Zyxel 防火墙 IKEv2 解析中的未认证 OS 命令注入</td><td>及时打补丁、最小化暴露面、按固件版本做漏洞管理</td></tr><tr><td>2</td><td><strong>UART / 串口调试口</strong></td><td>焊接 / 接串口进 bootloader，改启动参数（如 <code>init=/bin/sh</code> 一类）进 Linux shell</td><td>路由器串口解锁：进 U-Boot 手动设启动参数进 shell；部分设备会在 bootloader 禁交互，需短接 / 拔 flash 引导</td><td>禁用串口交互、bootloader 加锁、启用签名启动</td></tr><tr><td>3</td><td><strong>磁盘改写 / 固件篡改</strong></td><td>卸下存储介质挂到 PC，改 <code>/etc/passwd</code> 或注入启动脚本，重打包刷回</td><td>磁盘篡改后门案例：挂载系统分区植入后门脚本与 SSH key 再刷回</td><td>固件签名校验、防回滚、物理 tamper 检测</td></tr><tr><td>4</td><td><strong>内存改写</strong></td><td>用调试器（JTAG / ICE / gdbstub）直接改内存或关键变量</td><td>智能设备 JTAG 调试：停机改 root 密码变量，恢复运行即获 shell（掉电丢失，需配合持久化）</td><td>生产熔断 JTAG 等调试接口、安全启动</td></tr><tr><td>5</td><td><strong>Telnet + 提权</strong></td><td>设备已开放或能启用 telnet，登低权账号后用本地提权漏洞升 root</td><td>某摄像头默认 telnet：默认低权账号登录后借提权漏洞（如 dirty cow 类）拿 root</td><td>默认关闭 telnet、修提权漏洞、最小权限</td></tr><tr><td>6</td><td><strong>管理接口失陷</strong></td><td>输入处理缺陷或认证绕过使攻击者获得管理能力，再借高权限功能扩大影响</td><td><strong>CVE-2022-40684</strong>：FortiOS 等产品管理接口认证绕过</td><td>管理面不暴露公网、修补认证缺陷、服务以最小权限运行</td></tr><tr><td>7</td><td><strong>OTA 更新劫持</strong></td><td>篡改升级固件或在更新链路做中间人注入恶意包</td><td>NAS OTA 篡改研究：劫持更新请求返回植入后门固件</td><td>固件签名验证、HTTPS + 证书绑定</td></tr><tr><td>8</td><td><strong>本地外设漏洞</strong></td><td>USB HID / USB 存储触发 udev 自动执行脚本</td><td>特制 USB 存储插入后触发 autorun 脚本获 shell（依赖热插拔 udev 规则）</td><td>收紧 udev 规则、禁用自动执行</td></tr></tbody></table></div>
+<blockquote>
+<p>「闭环」提示：上面 8 条可归为两类入口——<strong>物理 / 近场</strong>（UART、JTAG、USB、取下磁盘）与<strong>软件漏洞 / 配置错误</strong>（未过滤输入、默认弱凭证、未签名固件）。加固优先级即「封死物理与启动入口 + 修复软件攻击面 + 全链路签名校验」。</p>
+</blockquote>
+<p><strong>核心结论</strong>：绝大多数「拿 shell」路径，要么依赖<strong>物理 / 近场访问</strong>（UART、JTAG、USB、磁盘取下），要么依赖<strong>软件漏洞 / 配置错误</strong>（未过滤输入、默认弱凭证、未签名固件）。设备 hardening 的优先级很清晰：<strong>封死物理与启动入口 + 修复软件攻击面 + 全链路签名校验</strong>。</p>
+<h3 id="41-发布前的设备防御验证清单">4.1 发布前的设备防御验证清单<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#41-发布前的设备防御验证清单" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>在自有或已授权设备上，建议把验证结果记录成“入口、预期控制、实际结果、修复负责人”四列，而不是只记录是否拿到 Shell：</p>
+<ol>
+<li><strong>远程服务</strong>：确认固件版本、补丁状态和外部暴露面；Web、SSH、Telnet 等服务均以最小权限运行。</li>
+<li><strong>调试接口</strong>：量产设备的 UART、JTAG、ICE 不应提供未认证的交互入口，必要时通过熔丝或可信配置关闭。</li>
+<li><strong>启动链</strong>：修改内核、启动参数或根文件系统后，设备应拒绝启动并留下可审计记录。</li>
+<li><strong>存储保护</strong>：离线读取存储介质时，敏感数据应处于加密状态，密钥不应与密文一起明文保存。</li>
+<li><strong>本地服务</strong>：默认账户、弱口令和遗留调试服务应在出厂配置中被移除。</li>
+<li><strong>输入处理</strong>：管理后台与本地 API 对命令、路径和模板输入做严格校验，服务进程不持有多余权限。</li>
+<li><strong>OTA 更新</strong>：升级包必须验证数字签名并实施防回滚；TLS 只保护传输，不能替代固件签名。</li>
+<li><strong>外设策略</strong>：USB 与热插拔规则不应自动执行不可信内容，敏感操作需要明确授权。</li>
+</ol>
+<blockquote>
+<p>一句话收束：验证目标不是证明“可以攻破”，而是确认每条信任边界都存在可重复、可审计的控制。</p>
+</blockquote>
+<hr/>
+<h2 id="参考">参考<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#参考" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>LVM 官方文档：<a href="https://wiki.archlinux.org/title/LVM" class="external">https://wiki.archlinux.org/title/LVM<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>cryptsetup / LUKS：<a href="https://gitlab.com/cryptsetup/cryptsetup" class="external">https://gitlab.com/cryptsetup/cryptsetup<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>LUKS 内存取证（公开研究）：rce.moe、wzt.ac.cn 相关文章</li>
+<li>GRUB <code>cryptomount</code>：<a href="https://www.gnu.org/software/grub/manual/grub/html_node/cryptomount.html" class="external">https://www.gnu.org/software/grub/manual/grub/html_node/cryptomount.html<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-12" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#本文内容" data-for="本文内容">本文内容</a></li><li class="depth-0"><a href="#一磁盘探测传统分区还是-lvm" data-for="一磁盘探测传统分区还是-lvm">一、磁盘探测：传统分区还是 LVM？</a></li><li class="depth-1"><a href="#方法一lsblk--f" data-for="方法一lsblk--f">方法一：lsblk -f</a></li><li class="depth-1"><a href="#方法二fdisk--parted" data-for="方法二fdisk--parted">方法二：fdisk / parted</a></li><li class="depth-1"><a href="#方法三pvs--vgs--lvs" data-for="方法三pvs--vgs--lvs">方法三：pvs / vgs / lvs</a></li><li class="depth-1"><a href="#方法四看-devmapper" data-for="方法四看-devmapper">方法四：看 /dev/mapper/</a></li><li class="depth-1"><a href="#传统分区-vs-lvm-速查" data-for="传统分区-vs-lvm-速查">传统分区 vs LVM 速查</a></li><li class="depth-0"><a href="#二解密并挂载-luks-加密分区" data-for="二解密并挂载-luks-加密分区">二、解密并挂载 LUKS 加密分区</a></li><li class="depth-1"><a href="#已知密钥解密--挂载" data-for="已知密钥解密--挂载">已知密钥：解密 + 挂载</a></li><li class="depth-1"><a href="#用密钥文件而非口令" data-for="用密钥文件而非口令">用密钥文件而非口令</a></li><li class="depth-1"><a href="#没有密码--没有密钥文件怎么办" data-for="没有密码--没有密钥文件怎么办">没有密码 / 没有密钥文件怎么办？</a></li><li class="depth-0"><a href="#三grub-cryptomount-与-initbinsh-的区别" data-for="三grub-cryptomount-与-initbinsh-的区别">三、GRUB cryptomount 与 init=/bin/sh 的区别</a></li><li class="depth-1"><a href="#用-initbinsh-进救援-shell" data-for="用-initbinsh-进救援-shell">用 init=/bin/sh 进救援 shell</a></li><li class="depth-0"><a href="#四设备被拿到-shell-的-8-类路径防御视角" data-for="四设备被拿到-shell-的-8-类路径防御视角">四、设备被拿到 Shell 的 8 类路径（防御视角）</a></li><li class="depth-1"><a href="#41-发布前的设备防御验证清单" data-for="41-发布前的设备防御验证清单">4.1 发布前的设备防御验证清单</a></li><li class="depth-0"><a href="#参考" data-for="参考">参考</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../tech/index.cn" class="internal">技术档案</a></li><li><a href="../tech/" class="internal">Tech Archive</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>
