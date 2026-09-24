@@ -11,7 +11,7 @@ const config: QuartzConfig = {
       websiteId: "chokebit",
     },
     locale: "en-US",
-    // baseUrl 留空，部署时填写如 "chokebit.github.io"
+    baseUrl: "chokebit.github.io",
     ignorePatterns: ["private", "templates", ".gitkeep"],
     defaultDateType: "created",
     theme: {

@@ -20,6 +20,8 @@ tags:
 - **网络通信四种路径**：本机、同网段、跨网段、NAT
 - **NAT / iptables / conntrack 深度解析**：三者关系与排障方法
 - **双网卡管理**：多路由表、DHCP、nmcli
+- **NAT 行为探测与 STUN**：判断是否位于 NAT 之后、NAT 类型与映射分析
+- **安全研究视角（授权环境）**：ARP 欺骗 / 反弹 Shell / DNS 枚举的原理与防御——理解攻击面
 - **工具速查**：Linux + Windows 最小工具集
 
 ---
@@ -503,9 +505,7 @@ NIC Driver
 内核协议栈入口
   │
 Netfilter PREROUTING
-  ├─ raw → mangle → nat (DNAT)
-  │
-conntrack
+  ├─ raw → conntrack → mangle → nat (DNAT)
   │
 路由决策
   ├─ INPUT  → mangle → filter → 本地进程
@@ -611,10 +611,15 @@ tcpdump -i eth0
 | conntrack | WFP (Windows Filtering Platform) |
 | NAT | ICS / RRAS |
 
-Windows NAT：
+Windows NAT（注意不是 `netsh interface portproxy`——那是端口转发，不是 NAT）：
+
+- 消费级：**ICS（Internet 连接共享）**，在「适配器属性 → 共享」里开启。
+- 服务器级：**RRAS（路由和远程访问）** 做 NAT 路由。
 
 ```bash
-netsh interface portproxy
+# RRAS NAT（旧版 netsh routing，Server 版可用）
+netsh routing ip nat install
+netsh routing ip nat add interface "以太网" full
 ```
 
 ---
@@ -731,6 +736,184 @@ pktmon      — 抓包
 ```
 Wireshark   — 图形化抓包分析
 ```
+
+---
+
+## 十五、NAT 行为探测与 STUN
+
+前面讲了 NAT 的原理与排障，这一节讲**如何确认自己是否位于 NAT 之后，以及 NAT 到底做了什么映射**。在做 P2P、WebRTC、端口映射类问题时特别有用。
+
+### 判断是否位于 NAT 之后（4 种方法）
+
+**方法 1：对比本机 IP 与公网 IP**
+
+```bash
+ip addr show | grep inet        # 看本机地址
+curl ifconfig.me               # 看公网地址
+```
+
+若本机是 `192.168.x.x` / `10.x.x.x` / `172.16~31.x.x`，而公网是另一段地址，说明你在 NAT 之后。
+
+**方法 2：看默认网关是不是私网地址**
+
+```bash
+ip route show
+# default via 192.168.1.1 dev eth0  → 私网网关 → 一定经过 NAT
+```
+
+**方法 3：用 STUN 协议精确探测（最推荐）**
+
+STUN（Session Traversal Utilities for NAT）向公网 STUN 服务器发包，服务器把"它看到的你的源 IP:端口"原样回显，从而暴露你的外部映射身份。
+
+```bash
+# Debian/Ubuntu
+sudo apt install stun-client
+stun stun.l.google.com:19302
+# 输出示例：
+# Primary: Open NAT, mapped address is 203.0.113.10:54321
+```
+
+它能告诉你两件事：NAT 类型（Full Cone / Restricted / Symmetric 等），以及外部映射的 IP 和端口。
+
+**方法 4：在网关/路由器上看 NAT 表**
+
+```bash
+sudo iptables -t nat -L -v
+sudo conntrack -L
+# tcp 6 ... src=192.168.1.100 dst=142.250.4.110 sport=53210 dport=443 ...
+#   → 内部地址 / 外部地址 / 映射端口一目了然
+```
+
+### NAT 过程中"谁被改了"（对照分析）
+
+| 层级 | NAT 修改内容 | 分析方法 |
+|------|--------------|----------|
+| IP 层 | 源 IP 被替换 | `tcpdump -n -i eth0 src <内网IP>` |
+| 传输层 | 源端口被改写 | `conntrack -L` |
+| NAT 表 | 动态映射记录 | `iptables -t nat -L -v` |
+| 内外对比 | 包头逐字段比对 | NAT 前后双点抓包对比 |
+
+**典型实验**：在主机 `eth0` 抓内网侧，在网关外网口 `eth1` 抓公网侧，用 Wireshark 对比两份 pcap，观察源 IP / 源端口是否变化、负载是否不变。
+
+### NAT 是否影响了通信（常见现象）
+
+| 现象 | 原因 | 验证方式 |
+|------|------|----------|
+| 外网无法主动连回你 | 没有公网端口映射 | `nmap -Pn <公网IP>` 测端口可达性 |
+| P2P 连接失败 | Symmetric NAT | 用 `stun` 检测 NAT 类型 |
+| SSH / Web / 出向代理可用 | 典型出向 NAT 正常 | 无需公网映射 |
+
+### STUN 原理（简化）
+
+```
+内网主机 ──UDP──▶ NAT 路由器 ──▶ STUN 服务器
+  （内网 IP 如 192.168.1.100；服务器看到的源 = 203.0.113.10:54321）
+        ◀──── 服务器把"看到的源地址"回显给客户端 ─────
+客户端比较：自己发出的 src vs 服务器回显的 mapped
+  → 不同 = 经过 NAT；一致 = 直连公网
+```
+
+STUN 核心探测逻辑：
+
+| 探测目标 | 方法 | 说明 |
+|----------|------|------|
+| 映射 IP / 端口 | 服务器回显的源地址 | 判断是否经过 NAT |
+| 映射是否恒定 | 连续请求不同 STUN 服务器比较 | 映射不同 → NAT 重新分配端口 |
+| 过滤策略 | 让服务器从不同 IP 回包测试是否被丢 | 判断是否限制回包源 |
+| Hairpin 支持 | 从映射地址回发自己 | 测试内网回环是否可行 |
+
+### NAT 类型分类（STUN 识别结果）
+
+| 类型 | 特性 | 穿透性 | 举例 |
+|------|------|--------|------|
+| Full Cone | 任意外部主机都能访问映射端口 | ✅ 最好 | 早期简单 NAT（现代家庭路由少见） |
+| Restricted Cone | 仅被你访问过的 IP 能回包 | ⚠️ 一般 | 中性路由 |
+| Port-Restricted Cone | 必须 IP + 端口都匹配 | ⚠️ 较差 | 安全型 NAT |
+| Symmetric | 每个目标 IP 生成不同映射 | ❌ 最差 | 企业 / 运营商 NAT |
+
+> 一句话：STUN 像一面镜子，让你看到自己在 NAT 外部世界中的"真实网络身份"——外部看到你是谁、你穿了哪套 IP 伪装、能否"穿墙而出"。
+
+---
+
+## 十六、安全研究视角（仅限授权环境）
+
+前面都是工程排查视角。本章把几个常被用于攻击的技术**以「攻击面 / 防御」视角**讲清原理与排查路径，便于在自有 / 授权设备上理解与加固。**所有内容仅用于自己拥有或已授权的目标，对他人设施实施属未授权行为。**
+
+### 1. ARP 欺骗与中间人嗅探
+
+原理：攻击机持续向「受害者」与「网关」双向发送伪造的 ARP reply，把双方的 MAC 映射都改成攻击机——于是双方流量都先经过攻击机（中间人），攻击机转发的同时可抓包分析。这是理解「为什么明文流量会被窃听」最直观的案例，也正好对应第七章的 ARP 阶段。
+
+```bash
+# 仅在你自己隔离的实验网络里使用；IP/网卡一律用占位符
+# 单向：让受害者以为攻击机是网关（只能抓到受害者发出的请求）
+# arpspoof -i <网卡> -t <受害者IP> <网关IP>
+
+# 双向：同时欺骗受害者与网关，能抓到请求 + 响应
+# arpspoof -i <网卡> -r <网关IP> -t <受害者IP>
+```
+
+被欺骗时受害者侧看到的就是一条伪造 ARP reply（攻击机 MAC 冒充网关 IP）：
+
+```
+<攻击者MAC> <受害者MAC> 0806 42: arp reply <网关IP> is-at <攻击者MAC>
+```
+
+抓到明文流量后可还原内容，例如把 HTTP 图片流提取出来：
+
+```bash
+# driftnet 从网卡抓图片（HTTPS 无法抓取）
+# driftnet -i <网卡> -b -a -d <输出目录>
+```
+
+排查 / 防御要点：
+
+- 交换网络开启 **DAI（Dynamic ARP Inspection）** 与端口安全，校验 ARP 合法性。
+- 关键主机用**静态 ARP** 绑定。
+- 敏感流量一律走 **HTTPS / VPN**，避免明文被嗅探（HTTP 图片、表单可被还原）。
+- 主机侧用 `arp -n` 观察是否存在「一个 IP 对应多个 MAC / 网关 MAC 频繁变化」的异常。
+
+### 2. 异常外连与反弹 Shell（防御检测视角）
+
+原理：与其让控制端连进目标（常被入站防火墙挡住），不如**让目标机主动向外 `connect()` 到控制端**，从而拿到交互式 shell。排查一条反弹 shell 是否通，本质就是前面各章的连通性排查：
+
+```
+目标机
+  ↓ connect()
+  ↓ 经过 Internet
+控制端（监听）
+```
+
+公开文章不提供可直接复制的回连载荷，重点放在识别与阻断：
+
+- 用 `ss -tpn`、`lsof -i` 或 EDR 检查 shell、脚本解释器与非常用外部地址之间的长连接。
+- 用 DNS、代理、NetFlow 与防火墙日志关联「新域名、非常用端口、周期性短连接」等异常行为。
+- 对服务器实施 egress 白名单，限制能够访问的目的地址、端口和协议。
+- 对 Bash、Python、Perl、Netcat 等常被滥用的解释器和工具建立进程树与网络连接告警。
+
+排查通信路径时仍可按 `route` → `iptables` → `NAT` → `conntrack` 的顺序进行；防御关键点是**目标主动外连**，因此出向控制通常比单纯封堵入站端口更有效。
+
+### 3. DNS 枚举（资产暴露面梳理）
+
+原理：通过查询目标域名的各类记录（A/AAAA、MX、NS、TXT，以及区域传送 AXFR 等）来梳理一个组织的网络资产与暴露面——对防御者而言，这是「先对手一步暴露自己域名信息」该做的自查。
+
+```bash
+# 解析各类记录
+# dig <域名>           # A 记录
+# dig <域名> MX        # 邮件服务器
+# dig <域名> NS        # 权威 DNS
+# dig <域名> TXT       # 文本记录（SPF / 验证信息常在此暴露）
+# nslookup -query=<记录类型> <域名>
+
+# 区域传送：若 DNS 服务器未限制，可一次拉出整个域内主机列表
+# dig axfr @<权威DNS服务器> <域名>
+
+# 反向查询（已知 IP 反查域名）
+# dig -x <IP> +short
+```
+
+防御侧：限制 zone transfer（仅允许可信次级 DNS）、采用 split-horizon DNS、监控对外可查的敏感记录（TXT 里可能泄露 SPF/验证 token）。
+
+> 一句话：这些技术既能用于攻击，也能用于「在授权范围内理解并加固自己的系统」——理解攻击者怎么想，是防御的起点。
 
 ---
 
