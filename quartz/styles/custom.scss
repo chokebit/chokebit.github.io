@@ -173,13 +173,9 @@ body[data-slug^="products/"] {
   .pl-project-number,
   .pl-project-topline,
   .pl-project-meta,
-  .pl-section-head > span,
   .pl-detail-nav,
-  .pl-metrics span,
-  .pl-bet > span,
   .pl-timeline time,
-  .pl-timeline section > div > span,
-  .pl-principles section > span {
+  .pl-timeline section > div > span {
     font-family: var(--codeFont);
     font-size: 0.76rem;
     letter-spacing: 0.055em;
@@ -249,40 +245,6 @@ body[data-slug^="products/"] {
     line-height: 1.75;
   }
 
-  .pl-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-bottom: 4rem;
-    border-block: 1px solid var(--product-line);
-  }
-
-  .pl-stats > div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    padding: 1.35rem 1.5rem;
-    border-right: 1px solid var(--product-line);
-  }
-
-  .pl-stats > div:first-child {
-    padding-left: 0;
-  }
-
-  .pl-stats > div:last-child {
-    border-right: 0;
-  }
-
-  .pl-stats strong {
-    font-family: var(--codeFont);
-    font-size: 1.65rem;
-    font-weight: 500;
-  }
-
-  .pl-stats span {
-    color: var(--gray);
-    font-size: 0.82rem;
-  }
-
   .pl-section-head {
     display: flex;
     align-items: flex-end;
@@ -296,10 +258,6 @@ body[data-slug^="products/"] {
     font-size: 1.15rem;
   }
 
-  .pl-section-head > span {
-    color: var(--gray);
-  }
-
   .pl-project-card {
     display: block;
     padding: 1.5rem;
@@ -308,11 +266,11 @@ body[data-slug^="products/"] {
     border: 1px solid var(--product-line);
     border-radius: 0.8rem;
     text-decoration: none;
-    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
   }
 
-  .pl-project-card:hover {
-    transform: translateY(-3px);
+  .pl-project-card:hover,
+  .pl-project-card:focus-within {
     border-color: var(--product-accent);
     box-shadow: 0 1rem 2.5rem var(--product-accent-soft);
   }
@@ -344,6 +302,22 @@ body[data-slug^="products/"] {
     letter-spacing: -0.045em;
   }
 
+  .pl-project-card a.pl-project-title,
+  .pl-project-card a.pl-arrow {
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .pl-project-title {
+    color: var(--dark);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--product-accent);
+    }
+  }
+
   .pl-project-body p:last-child {
     max-width: 35rem;
     margin: 0;
@@ -356,6 +330,7 @@ body[data-slug^="products/"] {
     color: var(--product-accent);
     font-size: 2.2rem;
     line-height: 1;
+    text-decoration: none;
     transition: transform 160ms ease;
   }
 
@@ -376,30 +351,6 @@ body[data-slug^="products/"] {
     border-radius: 0.25rem;
   }
 
-  .pl-principles {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--product-line);
-  }
-
-  .pl-principles section > span {
-    color: var(--product-accent);
-  }
-
-  .pl-principles h3 {
-    margin: 0.6rem 0 0.45rem;
-    font-size: 1rem;
-  }
-
-  .pl-principles p {
-    margin: 0;
-    color: var(--gray);
-    font-size: 0.88rem;
-    line-height: 1.55;
-  }
 }
 
 .product-build-log {
@@ -461,62 +412,11 @@ body[data-slug^="products/"] {
     border-color: var(--product-accent);
   }
 
-  .pl-metrics {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin: 1rem 0 4rem;
-    border-block: 1px solid var(--product-line);
-  }
-
-  .pl-metrics > div {
-    padding: 1.2rem 1rem;
-    border-right: 1px solid var(--product-line);
-  }
-
-  .pl-metrics > div:first-child {
-    padding-left: 0;
-  }
-
-  .pl-metrics > div:last-child {
-    border-right: 0;
-  }
-
-  .pl-metrics span,
-  .pl-metrics strong {
-    display: block;
-  }
-
-  .pl-metrics span {
-    margin-bottom: 0.4rem;
-    color: var(--gray);
-  }
-
-  .pl-metrics strong {
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
   > h2 {
     margin-top: 4rem;
     padding-top: 1rem;
     font-size: 1.35rem;
     border-top: 1px solid var(--product-line);
-  }
-
-  .pl-bet {
-    padding: 1.35rem 1.5rem;
-    background: var(--product-accent-soft);
-    border-left: 3px solid var(--product-accent);
-    border-radius: 0 0.55rem 0.55rem 0;
-  }
-
-  .pl-bet > span {
-    color: var(--product-accent);
-  }
-
-  .pl-bet p {
-    margin: 0.65rem 0 0;
-    line-height: 1.75;
   }
 
   .pl-timeline {
@@ -573,29 +473,6 @@ body[data-slug^="products/"] {
     line-height: 1.65;
   }
 
-  .pl-next {
-    display: grid;
-    gap: 0.7rem;
-  }
-
-  .pl-next > div {
-    display: grid;
-    grid-template-columns: 2.2rem 1fr;
-    gap: 1rem;
-    align-items: start;
-    padding: 0.95rem 0;
-    border-bottom: 1px solid var(--product-line);
-  }
-
-  .pl-next span {
-    color: var(--product-accent);
-    font-family: var(--codeFont);
-  }
-
-  .pl-next p {
-    margin: 0;
-  }
-
   .pl-detail-footer {
     display: flex;
     justify-content: space-between;
@@ -620,22 +497,6 @@ body[data-slug^="products/"] {
       font-size: 2.8rem;
     }
 
-    .pl-stats,
-    .pl-principles {
-      grid-template-columns: 1fr;
-    }
-
-    .pl-stats > div,
-    .pl-stats > div:first-child {
-      padding: 0.9rem 0;
-      border-right: 0;
-      border-bottom: 1px solid var(--product-line);
-    }
-
-    .pl-stats > div:last-child {
-      border-bottom: 0;
-    }
-
     .pl-project-body {
       align-items: flex-start;
       margin: 2rem 0;
@@ -650,26 +511,6 @@ body[data-slug^="products/"] {
     .pl-detail-nav,
     .pl-detail-footer {
       flex-direction: column;
-    }
-
-    .pl-metrics {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .pl-metrics > div,
-    .pl-metrics > div:first-child {
-      padding: 0.9rem 0;
-      border-right: 0;
-      border-bottom: 1px solid var(--product-line);
-    }
-
-    .pl-metrics > div:nth-child(odd) {
-      padding-right: 0.8rem;
-      border-right: 1px solid var(--product-line);
-    }
-
-    .pl-metrics > div:nth-child(even) {
-      padding-left: 0.8rem;
     }
 
     .pl-timeline::before {

@@ -11,7 +11,7 @@ tags:
   - knowledge-management
   - quartz
 created: 2026-05-18
-modified: 2026-09-11
+modified: 2026-09-24
 ---
 
 <div class="pl-detail-nav"><a href="../products/index">← Back to Product Lab</a><span>PROJECT / 001</span></div>
@@ -23,23 +23,9 @@ modified: 2026-09-11
   <div class="pl-detail-links"><a href="../index">Visit site ↗</a><a href="https://github.com/chokebit">GitHub ↗</a></div>
 </div>
 
-<div class="pl-metrics" aria-label="Project overview">
-  <div><span>STARTED</span><strong>2026.05</strong></div>
-  <div><span>STAGE</span><strong>Content Fit</strong></div>
-  <div><span>STACK</span><strong>Quartz</strong></div>
-  <div><span>MODEL</span><strong>Open Knowledge</strong></div>
-</div>
-
 ## Why it exists
 
 Collecting is not learning. Once raw notes accumulate, the real question is no longer whether the information exists, but whether it can still be found, understood, and reused. This project builds a durable pipeline: source material goes in; AI filters, merges, and connects it; a human makes the final editorial and publishing decisions.
-
-## Current bet
-
-<div class="pl-bet">
-  <span>CURRENT BET / 2026.09</span>
-  <p>Deep, reproducible technical writing is a stronger long-term personal brand asset than high-frequency news. The next stage is not about publishing more—it is about developing recognizable research themes and a consistent product narrative.</p>
-</div>
 
 ## Build log
 
@@ -50,7 +36,7 @@ Collecting is not learning. Once raw notes accumulate, the real question is no l
   </section>
   <section>
     <time>2026.08.25</time>
-    <div><span>POSITIONING</span><h3>Established the AI Native direction</h3><p>Grouped AI agents, AI security, and incident analysis into a focused theme, moving the site from generic technical notes toward security research.</p></div>
+    <div><span>POSITIONING</span><h3>Explored the AI Native direction</h3><p>Began grouping AI agents, AI security, and incident analysis; later narrowed the focus to AI Native products and security for AI-powered businesses.</p></div>
   </section>
   <section>
     <time>2026.08.14</time>
@@ -65,16 +51,8 @@ Collecting is not learning. Once raw notes accumulate, the real question is no l
 ## What I learned
 
 - Bilingual publishing is not just translation; navigation, links, structure, and release workflow all have to agree.
-- Content volume does not create positioning. Repeated, recognizable research themes do.
+- More content does not make the site easier to use; clear themes and entry points help readers find what matters.
 - LLMs are best used for the first editorial pass; facts, judgment, and publishing boundaries remain human work.
 - Building in public must preserve assumptions and decisions, or it becomes only a changelog.
 
-## Next milestones
-
-<div class="pl-next">
-  <div><span>01</span><p>Finish the personal brand homepage so visitors understand the research direction within ten seconds.</p></div>
-  <div><span>02</span><p>Create one reusable status, metrics, build-log, and retrospective format for every product.</p></div>
-  <div><span>03</span><p>Publish the first flagship collection around AI Native Security.</p></div>
-</div>
-
-<div class="pl-detail-footer"><span>Last updated: 2026.09.11</span><a href="../products/index">View all products →</a></div>
+<div class="pl-detail-footer"><span>Last updated: 2026.09.24</span><a href="../products/index">View all products →</a></div>
