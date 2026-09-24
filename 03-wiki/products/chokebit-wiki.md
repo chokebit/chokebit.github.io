@@ -10,14 +10,13 @@ tags:
   - build-in-public
   - knowledge-management
   - quartz
-created: 2026-05-18
 modified: 2026-09-24
 ---
 
 <div class="pl-detail-nav"><a href="../products/index">← Back to Product Lab</a><span>PROJECT / 001</span></div>
 
 <div class="pl-detail-hero">
-  <div class="pl-project-topline"><span class="pl-status"><i></i> ACTIVE</span><span>PUBLIC BETA</span></div>
+  <div class="pl-project-topline"><span class="pl-status"><i></i> BUILDING</span><span>LAUNCHING 2026.09.25</span></div>
   <h1>Chokebit Wiki</h1>
   <p>Turning years of fragmented notes into a public, bilingual, interconnected security research knowledge base.</p>
   <div class="pl-detail-links"><a href="../index">Visit site ↗</a><a href="https://github.com/chokebit">GitHub ↗</a></div>
@@ -41,10 +40,6 @@ Collecting is not learning. Once raw notes accumulate, the real question is no l
   <section>
     <time>2026.08.14</time>
     <div><span>CONTENT SYSTEM</span><h3>Built security research clusters</h3><p>Created long-form notes around networking, firmware, reversing, and debugging while removing obsolete images and consolidating fragments into master notes.</p></div>
-  </section>
-  <section>
-    <time>2026.05.18</time>
-    <div><span>LAUNCH</span><h3>Shipped the first version</h3><p>Defined the boundaries between private sources, drafts, and the public Wiki, then completed the Quartz and GitHub Pages publishing pipeline.</p></div>
   </section>
 </div>
 

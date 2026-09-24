@@ -10,14 +10,13 @@ tags:
   - build-in-public
   - knowledge-management
   - quartz
-created: 2026-05-18
 modified: 2026-09-24
 ---
 
 <div class="pl-detail-nav"><a href="../products/index.cn">← 返回产品实验室</a><span>PROJECT / 001</span></div>
 
 <div class="pl-detail-hero">
-  <div class="pl-project-topline"><span class="pl-status"><i></i> ACTIVE</span><span>PUBLIC BETA</span></div>
+  <div class="pl-project-topline"><span class="pl-status"><i></i> 开发中</span><span>计划 2026.09.25 发布</span></div>
   <h1>Chokebit Wiki</h1>
   <p>把多年积累的碎片笔记，转化成公开、双语、可互联的安全研究知识库。</p>
   <div class="pl-detail-links"><a href="../index.cn">访问站点 ↗</a><a href="https://github.com/chokebit">GitHub ↗</a></div>
@@ -41,10 +40,6 @@ modified: 2026-09-24
   <section>
     <time>2026.08.14</time>
     <div><span>CONTENT SYSTEM</span><h3>形成安全研究内容集群</h3><p>围绕网络、固件、逆向与调试整理长文，清理无效截图并把零散知识合并为 Master Notes。</p></div>
-  </section>
-  <section>
-    <time>2026.05.18</time>
-    <div><span>LAUNCH</span><h3>第一版上线</h3><p>确定私有原始区、草稿区和公开 Wiki 的边界，完成 Quartz 构建与 GitHub Pages 发布流程。</p></div>
   </section>
 </div>
 

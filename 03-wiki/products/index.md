@@ -23,8 +23,8 @@ tags:
 
 <div class="pl-project-card">
   <div class="pl-project-topline">
-    <span class="pl-status"><i></i> ACTIVE</span>
-    <span>2026.05 → NOW</span>
+    <span class="pl-status"><i></i> BUILDING</span>
+    <span>LAUNCHING 2026.09.25</span>
   </div>
   <div class="pl-project-body">
     <div>
