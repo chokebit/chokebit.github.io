@@ -6,65 +6,65 @@
       <description>Last 10 notes on CHOKEBIT</description>
       <generator>Quartz -- quartz.jzhao.xyz</generator>
       <item>
-    <title>DNS 从概念到信息挖掘</title>
-    <link>https://chokebit.github.io/tech/dns-from-concepts-to-enumeration.cn</link>
-    <guid>https://chokebit.github.io/tech/dns-from-concepts-to-enumeration.cn</guid>
-    <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 DNS 核心概念：域名、主机、子域、FQDN、Name Server、Zone File、Record Types DNS 工作原理：递归查询流程，Root → TLD → Authoritative Zone File 与记录类型：SOA、A/AAAA、CNAME、MX、NS、PTR、CAA DNS 信息挖掘：nslookup、dig、host 工具实战 DNS 关联查询 — 对抗 404 小技巧：域名 ↔ IP 正向反向查找，关联失效排查 参考链接 一、DNS 核心概念 DNS（Domain Name System，域名系统） 互联网的”电话... ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
-  </item><item>
-    <title>DNS — From Concepts to Enumeration</title>
-    <link>https://chokebit.github.io/tech/dns-from-concepts-to-enumeration</link>
-    <guid>https://chokebit.github.io/tech/dns-from-concepts-to-enumeration</guid>
-    <description><![CDATA[  Errors are inevitable — read critically. ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
-  </item><item>
-    <title>技术档案</title>
-    <link>https://chokebit.github.io/tech/index.cn</link>
-    <guid>https://chokebit.github.io/tech/index.cn</guid>
-    <description><![CDATA[ Chokebit 过去积累的网络、逆向、固件与 AI 业务安全技术笔记。 ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
-  </item><item>
-    <title>Tech Archive</title>
-    <link>https://chokebit.github.io/tech/</link>
-    <guid>https://chokebit.github.io/tech/</guid>
-    <description><![CDATA[ Chokebit's archived notes on networking, reverse engineering, firmware, and AI business security. ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
-  </item><item>
-    <title>Markdown-Quartz 渲染一致性速查表</title>
-    <link>https://chokebit.github.io/tech/markdown-quartz-rendering-cheatsheet.cn</link>
-    <guid>https://chokebit.github.io/tech/markdown-quartz-rendering-cheatsheet.cn</guid>
-    <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 为什么 Obsidian 里好好的，Web 上就乱了：实时预览 vs 标准渲染。 换行三型法：空行、双空格+回车、单回车，各自的效果和适用场景。 图片语法：从 Obsidian 粘贴到生产就绪路径。 文件路径与 URL：slug 是什么，文件命名如何决定访问地址。 发布前验证：Obsidian 阅读模式 = Quartz 渲染结果。 一、Obsidian 和 Quartz 对 Markdown 的处理不同 Obsidian 的实时预览（Live Preview）为了写作体验更流畅，单回车就换行。但 Quartz 使用的 remark 渲染器遵循 ... ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
-  </item><item>
-    <title>Markdown-Quartz Rendering Consistency Cheatsheet</title>
-    <link>https://chokebit.github.io/tech/markdown-quartz-rendering-cheatsheet</link>
-    <guid>https://chokebit.github.io/tech/markdown-quartz-rendering-cheatsheet</guid>
-    <description><![CDATA[  Errors are inevitable — read critically. Contents Why it looks fine in Obsidian but breaks on the web: Live Preview vs. standard rendering. ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
-  </item><item>
-    <title>网络排查实战手册</title>
-    <link>https://chokebit.github.io/tech/network-troubleshooting-handbook.cn</link>
-    <guid>https://chokebit.github.io/tech/network-troubleshooting-handbook.cn</guid>
-    <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 核心思想：网络问题本质 = 数据包没有按预期路径流动 黄金排查流程：从底层往上层，逐层排除 十一个排查阶段：接口 → IP → 路由 → ARP → 连通性 → 路由检测 → 端口 → 抓包 ping 的完整生命周期：一次 ping 背后发生了什么 网络通信四种路径：本机、同网段、跨网段、NAT NAT / iptables / conntrack 深度解析：三者关系与排障方法 双网卡管理：多路由表、DHCP、nmcli NAT 行为探测与 STUN：判断是否位于 NAT 之后、NAT 类型与映射分析 安全研究视角（授权环境）：ARP 欺骗 / ... ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
-  </item><item>
     <title>Network Troubleshooting Handbook</title>
     <link>https://chokebit.github.io/tech/network-troubleshooting-handbook</link>
     <guid>https://chokebit.github.io/tech/network-troubleshooting-handbook</guid>
     <description><![CDATA[  Errors are inevitable — read critically. ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
   </item><item>
     <title>硬件逆向基础：从电阻到芯片，一块电路板的完整分析指南</title>
     <link>https://chokebit.github.io/tech/pcb-reverse-engineering-guide.cn</link>
     <guid>https://chokebit.github.io/tech/pcb-reverse-engineering-guide.cn</guid>
     <description><![CDATA[  内容难免有误，请带着辩证视角阅读。 本文内容 上拉/下拉电阻：理解数字电路的底层逻辑基石，以及为什么 Flash 读取必须用下拉电阻。 芯片引脚识别：所有芯片通用的引脚 1 定位法与逆时针排列规律。 三大存储芯片（SDRAM / NOR / NAND）：从用途、封装、丝印到逆向价值的完整对比。 定位固件位置：通过电路板布局快速判断固件在哪颗芯片上。 PCB 逆向实操：不靠丝印，靠蛇形线找内存、靠 BGA 找 CPU、靠 SOP 找 Flash。 调试接口识别：UART / SWD / JTAG / Boot Pin 的引脚排列和判断依据。 非标准跳线点：过孔矩阵、I²C/SPI 嗅探、测试点... ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
   </item><item>
     <title>Hardware Reverse Engineering Basics — A Complete PCB Analysis Guide</title>
     <link>https://chokebit.github.io/tech/pcb-reverse-engineering-guide</link>
     <guid>https://chokebit.github.io/tech/pcb-reverse-engineering-guide</guid>
     <description><![CDATA[  Errors are inevitable — read critically. ]]></description>
-    <pubDate>Thu, 24 Sep 2026 15:07:14 GMT</pubDate>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
+  </item><item>
+    <title>想法随笔</title>
+    <link>https://chokebit.github.io/ideas/index.cn</link>
+    <guid>https://chokebit.github.io/ideas/index.cn</guid>
+    <description><![CDATA[ 想法随笔 个人思考、碎片灵感、日常反思。 文章列表 AI 时代下 LLM 构建知识体系 . ]]></description>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
+  </item><item>
+    <title>Ideas</title>
+    <link>https://chokebit.github.io/ideas/</link>
+    <guid>https://chokebit.github.io/ideas/</guid>
+    <description><![CDATA[ Ideas Personal thoughts, fragments, daily reflections. Articles Building a Knowledge System with LLMs . ]]></description>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
+  </item><item>
+    <title>Chokebit</title>
+    <link>https://chokebit.github.io/index.cn</link>
+    <guid>https://chokebit.github.io/index.cn</guid>
+    <description><![CDATA[ Chokebit 是一名独立开发者，专注 AI Native 产品与 AI 业务安全，公开记录产品从想法到发布的全过程。 ]]></description>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
+  </item><item>
+    <title>Chokebit</title>
+    <link>https://chokebit.github.io/</link>
+    <guid>https://chokebit.github.io/</guid>
+    <description><![CDATA[ Chokebit is an independent maker focused on AI-native products and security for AI-powered businesses, documenting the path from idea to launch in public. ]]></description>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
+  </item><item>
+    <title>Chokebit Wiki 产品记录</title>
+    <link>https://chokebit.github.io/products/chokebit-wiki.cn</link>
+    <guid>https://chokebit.github.io/products/chokebit-wiki.cn</guid>
+    <description><![CDATA[ Chokebit Wiki 从碎片笔记到双语安全研究知识系统的公开构建记录。 ]]></description>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
+  </item><item>
+    <title>Chokebit Wiki Product Log</title>
+    <link>https://chokebit.github.io/products/chokebit-wiki</link>
+    <guid>https://chokebit.github.io/products/chokebit-wiki</guid>
+    <description><![CDATA[ The public build log of Chokebit Wiki, from fragmented notes to a bilingual security research knowledge system. ]]></description>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
+  </item><item>
+    <title>产品实验室</title>
+    <link>https://chokebit.github.io/products/index.cn</link>
+    <guid>https://chokebit.github.io/products/index.cn</guid>
+    <description><![CDATA[ 公开记录 Chokebit 的产品、实验、关键判断与构建过程。 ]]></description>
+    <pubDate>Thu, 24 Sep 2026 15:12:53 GMT</pubDate>
   </item>
     </channel>
   </rss>
