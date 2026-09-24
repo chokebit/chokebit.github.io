@@ -5,6 +5,8 @@ import { QuartzComponentProps } from "./quartz/components/types"
 const viewCounter = Component.ViewCounter()
 const isHomePage = ({ fileData }: QuartzComponentProps) =>
   fileData.slug === "index" || fileData.slug === "index.cn"
+const isTechIndex = ({ fileData }: QuartzComponentProps) =>
+  fileData.slug === "tech/index" || fileData.slug === "tech/index.cn"
 
 // 所有页面共享
 export const sharedPageComponents: SharedLayout = {
@@ -38,13 +40,22 @@ const leftSidebar = [
 // 内容页面布局
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
-    Component.Breadcrumbs(),
-    Component.ArticleTitle(),
-    Component.ContentMeta(),
+    Component.ConditionalRender({
+      component: Component.Breadcrumbs(),
+      condition: (props) => !isTechIndex(props),
+    }),
+    Component.ConditionalRender({
+      component: Component.ArticleTitle(),
+      condition: (props) => !isTechIndex(props),
+    }),
+    Component.ConditionalRender({
+      component: Component.ContentMeta(),
+      condition: (props) => !isTechIndex(props),
+    }),
     Component.TagList(),
     Component.ConditionalRender({
       component: viewCounter,
-      condition: (props) => !isHomePage(props),
+      condition: (props) => !isHomePage(props) && !isTechIndex(props),
     }),
   ],
   left: leftSidebar,
