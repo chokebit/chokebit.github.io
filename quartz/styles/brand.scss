@@ -139,6 +139,32 @@ body[data-slug="index.cn"] {
     color: var(--secondary);
   }
 
+  .mh-profile {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 9rem;
+    gap: 2.25rem;
+    align-items: start;
+  }
+
+  .mh-profile-copy {
+    min-width: 0;
+  }
+
+  .mh-avatar {
+    display: block;
+    width: 9rem;
+    height: 9rem;
+    margin-top: 0.25rem;
+    object-fit: cover;
+    border: 1px solid var(--brand-line);
+    border-radius: 1.15rem;
+    box-shadow:
+      0 0 0 0.35rem color-mix(in srgb, var(--light) 88%, transparent),
+      0 1.25rem 3rem color-mix(in srgb, var(--dark) 12%, transparent);
+  }
+
   .mh-positioning {
     max-width: 42rem;
     margin: 0 0 1.2rem;
@@ -295,8 +321,9 @@ body[data-slug="index.cn"] {
 
   .mh-about > div {
     display: flex;
+    flex-wrap: wrap;
     grid-column: 2;
-    gap: 1.2rem;
+    gap: 0.65rem 1.2rem;
     margin-top: -0.45rem;
   }
 }
@@ -326,6 +353,17 @@ body[data-slug="index.cn"] {
       max-width: 15rem;
       margin-bottom: 2rem;
       line-height: 1.6;
+    }
+
+    .mh-profile {
+      grid-template-columns: minmax(0, 1fr) 6.25rem;
+      gap: 1.2rem;
+    }
+
+    .mh-avatar {
+      width: 6.25rem;
+      height: 6.25rem;
+      border-radius: 0.9rem;
     }
 
     .mh-now,
@@ -360,6 +398,17 @@ body[data-slug="index.cn"] {
 @media all and (max-width: 420px) {
   .brand-home .mh-intro h1 {
     font-size: 2.6rem;
+  }
+
+  .brand-home .mh-profile {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-home .mh-avatar {
+    grid-row: 1;
+    width: 5.5rem;
+    height: 5.5rem;
+    margin: 0 0 0.4rem;
   }
 
   .brand-home .mh-section-title {
