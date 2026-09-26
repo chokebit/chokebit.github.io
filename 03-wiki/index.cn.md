@@ -29,7 +29,7 @@ cssclasses:
   <span class="mh-label"><i></i> NOW</span>
   <div>
     <h2>首款产品准备发布</h2>
-    <p>2026 年 9 月 25 日上线，正在完成最后检查。</p>
+    <p>2026 年 9 月 28 日上线，正在完成最后检查。</p>
   </div>
   <a href="./products/index.cn">查看产品 ↗</a>
 </section>

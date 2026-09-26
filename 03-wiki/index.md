@@ -29,7 +29,7 @@ cssclasses:
   <span class="mh-label"><i></i> NOW</span>
   <div>
     <h2>Preparing to launch my first product</h2>
-    <p>Launching September 25, 2026. Final checks are underway.</p>
+    <p>Launching September 28, 2026. Final checks are underway.</p>
   </div>
   <a href="./products/index">View product ↗</a>
 </section>

@@ -24,7 +24,7 @@ tags:
 <div class="pl-project-card">
   <div class="pl-project-topline">
     <span class="pl-status"><i></i> 开发中</span>
-    <span>计划 2026.09.25 发布</span>
+    <span>计划 2026.09.28 发布</span>
   </div>
   <div class="pl-project-body">
     <div>

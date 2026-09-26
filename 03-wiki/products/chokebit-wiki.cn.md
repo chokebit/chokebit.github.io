@@ -10,13 +10,13 @@ tags:
   - build-in-public
   - knowledge-management
   - quartz
-modified: 2026-09-24
+modified: 2026-09-26
 ---
 
 <div class="pl-detail-nav"><a href="../products/index.cn">← 返回产品实验室</a><span>PROJECT / 001</span></div>
 
 <div class="pl-detail-hero">
-  <div class="pl-project-topline"><span class="pl-status"><i></i> 开发中</span><span>计划 2026.09.25 发布</span></div>
+  <div class="pl-project-topline"><span class="pl-status"><i></i> 开发中</span><span>计划 2026.09.28 发布</span></div>
   <h1>Chokebit Wiki</h1>
   <p>把多年积累的碎片笔记，转化成公开、双语、可互联的安全研究知识库。</p>
   <div class="pl-detail-links"><a href="../index.cn">访问站点 ↗</a><a href="https://github.com/chokebit">GitHub ↗</a></div>
@@ -50,4 +50,4 @@ modified: 2026-09-24
 - LLM 最适合承担第一轮整理，人仍然必须负责事实、取舍与公开边界。
 - “公开过程”需要记录假设和判断，否则只是一份更新日志。
 
-<div class="pl-detail-footer"><span>最后更新：2026.09.24</span><a href="../products/index.cn">查看全部产品 →</a></div>
+<div class="pl-detail-footer"><span>最后更新：2026.09.26</span><a href="../products/index.cn">查看全部产品 →</a></div>

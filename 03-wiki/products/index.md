@@ -24,7 +24,7 @@ tags:
 <div class="pl-project-card">
   <div class="pl-project-topline">
     <span class="pl-status"><i></i> BUILDING</span>
-    <span>LAUNCHING 2026.09.25</span>
+    <span>LAUNCHING 2026.09.28</span>
   </div>
   <div class="pl-project-body">
     <div>

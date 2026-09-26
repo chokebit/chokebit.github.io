@@ -10,13 +10,13 @@ tags:
   - build-in-public
   - knowledge-management
   - quartz
-modified: 2026-09-24
+modified: 2026-09-26
 ---
 
 <div class="pl-detail-nav"><a href="../products/index">← Back to Product Lab</a><span>PROJECT / 001</span></div>
 
 <div class="pl-detail-hero">
-  <div class="pl-project-topline"><span class="pl-status"><i></i> BUILDING</span><span>LAUNCHING 2026.09.25</span></div>
+  <div class="pl-project-topline"><span class="pl-status"><i></i> BUILDING</span><span>LAUNCHING 2026.09.28</span></div>
   <h1>Chokebit Wiki</h1>
   <p>Turning years of fragmented notes into a public, bilingual, interconnected security research knowledge base.</p>
   <div class="pl-detail-links"><a href="../index">Visit site ↗</a><a href="https://github.com/chokebit">GitHub ↗</a></div>
@@ -50,4 +50,4 @@ Collecting is not learning. Once raw notes accumulate, the real question is no l
 - LLMs are best used for the first editorial pass; facts, judgment, and publishing boundaries remain human work.
 - Building in public must preserve assumptions and decisions, or it becomes only a changelog.
 
-<div class="pl-detail-footer"><span>Last updated: 2026.09.24</span><a href="../products/index">View all products →</a></div>
+<div class="pl-detail-footer"><span>Last updated: 2026.09.26</span><a href="../products/index">View all products →</a></div>
