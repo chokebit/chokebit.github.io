@@ -18,13 +18,35 @@ tags:
 </div>
 
 <div class="pl-section-head">
-  <h2>正在构建</h2>
+  <h2>首款产品</h2>
 </div>
 
 <div class="pl-project-card">
   <div class="pl-project-topline">
-    <span class="pl-status"><i></i> 开发中</span>
+    <span class="pl-status"><i></i> 准备发布</span>
     <span>计划 2026.09.27 发布</span>
+  </div>
+  <div class="pl-project-body">
+    <div>
+      <p class="pl-project-number">PROJECT / 002 · FIRST PRODUCT</p>
+      <h2><a class="pl-project-title" href="./24-hours-execution.cn">24 小时</a></h2>
+      <p>一个刻意训练注意力和执行力的效率工具：少放几件，一次只做一件。</p>
+    </div>
+    <a class="pl-arrow" href="./24-hours-execution.cn" aria-label="阅读 24 小时产品文章">↗</a>
+  </div>
+  <div class="pl-project-meta">
+    <span>FOCUS</span><span>EXECUTION</span><span>BUILD IN PUBLIC</span><span>AI NATIVE</span>
+  </div>
+</div>
+
+<div class="pl-section-head pl-section-head-secondary">
+  <h2>站点与构建记录</h2>
+</div>
+
+<div class="pl-project-card">
+  <div class="pl-project-topline">
+    <span class="pl-status"><i></i> 持续维护</span>
+    <span>2026.05 首版上线</span>
   </div>
   <div class="pl-project-body">
     <div>

@@ -37,7 +37,7 @@ cssclasses:
 <section class="mh-section">
   <div class="mh-section-title"><h2>最近记录</h2><span>SELECTED NOTES</span></div>
   <div class="mh-list">
-    <a href="./products/chokebit-wiki.cn"><span>2026.09 · BUILD</span><strong>Chokebit Wiki：从知识库走向独立开发者 IP</strong><b>→</b></a>
+    <a href="./products/24-hours-execution.cn"><span>2026.09 · PRODUCT</span><strong>AI 越来越聪明，我却开始害怕失去执行力</strong><b>→</b></a>
     <a href="./tech/data-flow-analysis.cn"><span>2026.08 · AI SECURITY</span><strong>数据流分析：从传统系统到 AI 业务攻防</strong><b>→</b></a>
     <a href="./ideas/building-knowledge-with-llms.cn"><span>2026.05 · IDEA</span><strong>AI 时代下，如何用 LLM 构建知识体系</strong><b>→</b></a>
   </div>

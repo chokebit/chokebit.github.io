@@ -16,7 +16,7 @@ modified: 2026-09-26
 <div class="pl-detail-nav"><a href="../products/index.cn">← 返回产品实验室</a><span>PROJECT / 001</span></div>
 
 <div class="pl-detail-hero">
-  <div class="pl-project-topline"><span class="pl-status"><i></i> 开发中</span><span>计划 2026.09.27 发布</span></div>
+  <div class="pl-project-topline"><span class="pl-status"><i></i> 持续维护</span><span>2026.05 首版上线</span></div>
   <h1>Chokebit Wiki</h1>
   <p>把多年积累的碎片笔记，转化成公开、双语、可互联的安全研究知识库。</p>
   <div class="pl-detail-links"><a href="../index.cn">访问站点 ↗</a><a href="https://github.com/chokebit">GitHub ↗</a></div>

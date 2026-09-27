@@ -37,7 +37,7 @@ cssclasses:
 <section class="mh-section">
   <div class="mh-section-title"><h2>Recent notes</h2><span>SELECTED NOTES</span></div>
   <div class="mh-list">
-    <a href="./products/chokebit-wiki"><span>2026.09 · BUILD</span><strong>Chokebit Wiki: from knowledge base to independent-maker identity</strong><b>→</b></a>
+    <a href="./products/24-hours-execution.cn"><span>2026.09 · PRODUCT / CN</span><strong>24 Hours: why smarter AI made me fear losing execution</strong><b>→</b></a>
     <a href="./tech/data-flow-analysis.cn"><span>2026.08 · AI SECURITY</span><strong>Data flow analysis, from traditional systems to AI business security（中文）</strong><b>→</b></a>
     <a href="./ideas/building-knowledge-with-llms"><span>2026.05 · IDEA</span><strong>Building a knowledge system with LLMs</strong><b>→</b></a>
   </div>
