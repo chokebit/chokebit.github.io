@@ -16,7 +16,7 @@ modified: 2026-09-26
 <div class="pl-detail-nav"><a href="../products/index">← Back to Product Lab</a><span>PROJECT / 001</span></div>
 
 <div class="pl-detail-hero">
-  <div class="pl-project-topline"><span class="pl-status"><i></i> BUILDING</span><span>LAUNCHING 2026.09.28</span></div>
+  <div class="pl-project-topline"><span class="pl-status"><i></i> BUILDING</span><span>LAUNCHING 2026.09.27</span></div>
   <h1>Chokebit Wiki</h1>
   <p>Turning years of fragmented notes into a public, bilingual, interconnected security research knowledge base.</p>
   <div class="pl-detail-links"><a href="../index">Visit site ↗</a><a href="https://github.com/chokebit">GitHub ↗</a></div>
