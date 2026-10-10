@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>一个人做产品的 AI 原生开发流程：从 Vibe Coding 到六关</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="一个人做产品的 AI 原生开发流程：从 Vibe Coding 到六关"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="一个人做产品的 AI 原生开发流程：从 Vibe Coding 到六关"/><meta name="twitter:description" content="我做「24 小时」时中途推倒重来，换成了 AI 原生开发。这篇讲为什么推倒、换成了什么，以及六关流程、文档管理和测试的真实做法。"/><meta property="og:description" content="我做「24 小时」时中途推倒重来，换成了 AI 原生开发。这篇讲为什么推倒、换成了什么，以及六关流程、文档管理和测试的真实做法。"/><meta property="og:image:alt" content="我做「24 小时」时中途推倒重来，换成了 AI 原生开发。这篇讲为什么推倒、换成了什么，以及六关流程、文档管理和测试的真实做法。"/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/ai-native/ai-native-dev-workflow.cn"/><meta property="twitter:url" content="https://chokebit.github.io/ai-native/ai-native-dev-workflow.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="我做「24 小时」时中途推倒重来，换成了 AI 原生开发。这篇讲为什么推倒、换成了什么，以及六关流程、文档管理和测试的真实做法。"/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="ai-native/ai-native-dev-workflow.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../products/index.cn" class="nav-link">产品</a><a href="../ai-native/index.cn" class="nav-link" aria-current="page">AI Native</a><a href="../tech/index.cn" class="nav-link">技术档案</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../ai-native/">AI Native</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>一个人做产品的 AI 原生开发流程：从 Vibe Coding 到六关</a></div></nav><h1 class="article-title">一个人做产品的 AI 原生开发流程：从 Vibe Coding 到六关</h1><p show-comma="true" class="content-meta"><time datetime="2026-09-29T00:00:00.000Z">Sep 29, 2026</time><span>35 min read</span></p><ul class="tags"><li><a href="../tags/ai-native" class="internal tag-link">ai-native</a></li><li><a href="../tags/vibe-coding" class="internal tag-link">vibe-coding</a></li><li><a href="../tags/workflow" class="internal tag-link">workflow</a></li><li><a href="../tags/build-in-public" class="internal tag-link">build-in-public</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><blockquote>
+<p>做「24 小时」这个产品，我中途推倒重来过一次。这篇讲为什么推倒，推倒之后换成了什么，以及每个阶段具体怎么做。用的例子全部来自「24 小时」。</p>
+<p>这篇由我先后发在公众号的三篇合并而成：《AI 原生开发 vs Vibe Coding，到底差在哪》《一个人做产品的 AI 原生开发流程》《一张图看懂我的 AI 原生开发系统》。重复的部分已经合并。</p>
+</blockquote>
+<h2 id="一分钟看完">一分钟看完<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一分钟看完" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>我做第一款产品「24 小时」时，一开始用的是 Vibe Coding：想到一个功能，告诉 AI，它就做出来了。功能越做越多，项目却越来越难管，因为<strong>项目的状态只存在于我的脑子和聊天记录里</strong>。</p>
+<p>后来看到宝玉分享的 AI 原生开发流程，我直接推倒重来，边做边改，慢慢形成了自己的用法。</p>
+<p>两者的区别，一句话：<strong>Vibe Coding 优化的是写代码；AI 原生优化的是整个做产品的过程。</strong></p>
+<p>我现在的做法：</p>
+<ol>
+<li><strong>让 AI 出选项，我来拍板</strong>：AI 是一本百科全书，别让它直接给答案。</li>
+<li><strong>一个人做产品，走六关</strong>：Idea → 可行性 → 设计文档 → 原型 → 实现 → 验证，上线后的反馈再回到第一关。每关一个新对话，对话之间靠文档交接；人只在两处必须拍板：<strong>做不做</strong>，和<strong>原型对不对</strong>。</li>
+<li><strong>用文档管 agent</strong>：一个 AGENT.md 立规矩，一份项目状态文档做所有对话的共同入口。</li>
+<li><strong>上下文是有限的</strong>：人的注意力有限，AI 的上下文也有限，拆分加文档交接，是绕不开的解法。</li>
+</ol>
+<p>几条我自己踩出来的做法：可行性阶段就写好”判死条件”；原型上改一句话的事，别拖到代码里改几天；测试通过不等于做对了，让 AI 在真浏览器里点一遍，人再自己当一回普通用户。</p>
+<hr/>
+<h2 id="1-vibe-coding想到哪让-ai-写到哪">1. Vibe Coding：想到哪，让 AI 写到哪<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-vibe-coding想到哪让-ai-写到哪" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Vibe Coding 这个词，是 AI 研究员 Andrej Karpathy 在 2025 年初提出的：用自然语言告诉 AI 你想要什么，让它去写代码，你只看结果，“顺其自然”。</p>
+<p>我做「24 小时」的第一版就是这样。想到一个功能，描述给 AI，它就做出来了，每个功能单独看都能跑。</p>
+<p><img src=".././assets/ai-native-dev/01-vibe-coding-early-ui.png" alt="Vibe Coding 阶段的早期界面"/></p>
+<p>这是那时候的界面。顶上除了 DoIt，还有健身、医疗、经济、三餐一排标签，想到什么就加什么。</p>
+<p>问题是，那时候我有用户手册和功能说明书，写的是产品”能做什么”；但<strong>没有一份给 agent 看的记录</strong>：项目现在在哪个阶段、定过哪些决定、为什么这么定、下一步做什么，都没写下来。项目小的时候，全凭脑子记；功能一多，改一处要想半天会不会影响别处，新开一个对话，AI 也不知道前面定过什么。</p>
+<p>项目的状态只存在于我的脑子和聊天记录里。功能一多，两边都装不下了。</p>
+<h2 id="2-ai-原生开发推倒重来换一种做法">2. AI 原生开发：推倒重来，换一种做法<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-ai-原生开发推倒重来换一种做法" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>AI 原生开发（AI Native Development），不是”用 AI 写代码”，而是从一开始就按”AI 参与每个环节”来设计做产品的整套流程：从想清楚做什么、设计、原型，到实现、测试，每一步都有 AI 参与；项目的状态和决定写成文档，人读得懂，AI 也查得到。</p>
+<p>正好在那段时间，我看到宝玉分享的 <a href="https://baoyu.io/blog/2026-08-24/ai-native-dev-workflow" class="external">AI 原生开发流程<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。看完觉得逻辑没问题，就直接把项目推倒，按这个思路重来验证。</p>
+<p>传统写代码，推倒重构是件很痛苦的事。但在 AI 编程的时代，难的已经不是执行，而是心理上要克服那一下阵痛。</p>
+<p>宝玉的文章里，很多地方没有讲得很细，但思想我觉得是对的。于是<strong>做中学，学中思</strong>，边用边改，慢慢形成了自己的风格。</p>
+<p>举一个例子：原型阶段要用 Claude Design 做界面，它有网页版，也能在命令行里用 <code>/design</code>。两个到底怎么选，文章里没说，是我自己试出来的。</p>
+<p><strong>真正的区别在于：在哪里用、要不要来回切换、离代码有多近。</strong></p>
+<ul>
+<li>网页版是浏览器里的可视化画布，自然语言描述就能生成可交互的原型。做完要导出设计包，再拿回本地的开发环境里实现。</li>
+<li>命令行里的 <code>/design</code>，就在开发的对话里用，会读现有的代码、贴合现在的界面风格，挑好方案可以直接接着实现。</li>
+</ul>
+<p>我的开发都在命令行里做，所以现在<strong>先用命令行的 <code>/design</code></strong>；效果不好，再回到网页版，或者两者结合着用。网页版做完还要下载文件、放回项目目录，来回切换比较麻烦。</p>
+<p>这类细节，只有自己用过才知道。</p>
+<h2 id="3-差在哪流程没变变的是谁来做">3. 差在哪：流程没变，变的是谁来做<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-差在哪流程没变变的是谁来做" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>很多人第一次用 AI 编程，会形成这样的习惯：</p>
+<blockquote>
+<p>有个想法 → 告诉 AI → AI 写代码 → 跑起来 → 哪里不对继续改</p>
+</blockquote>
+<p>这就是 Vibe Coding。它大大降低了写代码的门槛，但没有改变做产品的方式。</p>
+<p>AI 原生开发里，传统的流程一个环节都没少：想清楚给谁做 → 判断值不值得做 → 设计 → 原型 → 实现 → 测试。变的是<strong>每个环节由谁来做</strong>：人负责判断方向、做决定、最后验收；AI 负责探索方案、生成、实现、检查。</p>
+<p><strong>Vibe Coding 优化的是写代码；AI 原生优化的是整个做产品的过程。</strong></p>
+<h3 id="让-ai-出选项我来拍板">让 AI 出选项，我来拍板<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#让-ai-出选项我来拍板" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>我对 AI 原生的理解是：<strong>AI 是一本知识极其丰富的百科全书。</strong></p>
+<p>所以不该把它当成一问一答的做题机器，问一个问题、要一个标准答案。每遇到一个决策点，我都让它先给建议和几个选项，把每个选项的好处和代价写清楚，再由我来选。</p>
+<p><img src=".././assets/ai-native-dev/02-ai-gives-options.png" alt="AI 按规则给出选项，由人来拍板"/></p>
+<p>这是一个真实的例子：给「24 小时」定收费方式时，AI 列出了四个方案，每个都写了好处和代价，最后由我决定。</p>
+<p>AI 负责把分析面铺开，人负责做最后的判断。</p>
+<p>AI 能做的判断也在变多。像 <a href="https://typesafe.ai/" class="external">TypeSafe<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 的 Jev 这类模型，已经开始把一部分判断做成程序里可以直接调用的能力。但产品的方向、做不做、选哪个，最终还是要人来拍板。</p>
+<h2 id="4-这套系统是什么三样东西加一个习惯">4. 这套系统是什么：三样东西，加一个习惯<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-这套系统是什么三样东西加一个习惯" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>说是”系统”，其实就是三样东西，加一个习惯：</p>
+<ol>
+<li><strong>一份 AGENT.md</strong>：放在项目根目录，写给 AI 的规矩，比如”开始先读项目状态&quot;&quot;遇到产品决策停下来问我”。</li>
+<li><strong>一个 docs/ 文件夹</strong>：每个阶段结束留下一份文档，idea.md、feasibility.md、design-spec.md……人读得懂，AI 也查得到。</li>
+<li><strong>一份项目状态文档</strong> <code>docs/00-project-status.md</code>：现在在哪个阶段、做完了什么、我确认过什么、下一步做什么。</li>
+</ol>
+<p>一个习惯：<strong>每个阶段，在项目目录里开一个新的 AI 对话</strong>（我用的是 Claude Code）。开场先读状态文档，结束前更新它。对话之间不靠记忆，靠文档接力。</p>
+<p><img src=".././assets/ai-native-dev/04-system.png" alt="这套系统：三样东西加一个习惯"/></p>
+<p>「24 小时」的项目目录长这样，文件名都是原样。没有什么特别的工具，就是几个 Markdown 文件，和代码一起放在 Git 里：</p>
+<p><img src=".././assets/ai-native-dev/05-project-tree.png" alt="「24 小时」真实的项目目录"/></p>
+<p>实际用起来是这样的：我在项目目录里开一个新对话，说”读一下项目状态，我们继续做设计文档”。AI 读完就知道前面定过什么，先跟我讨论，我拍板后它生成文档、更新状态。到下一个阶段，再开一个新对话。</p>
+<h3 id="agentmd写给所有-ai-的同一份规章">AGENT.md：写给所有 AI 的同一份规章<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#agentmd写给所有-ai-的同一份规章" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>我的项目根目录下有一个 AGENT.md：</p>
+<p><img src=".././assets/ai-native-dev/03-agent-md.png" alt="我的 AGENT.md"/></p>
+<p>红线标出的几条，是我觉得关键的：</p>
+<ul>
+<li><strong>每个对话开始，先读项目状态文档</strong>，知道现在在哪个阶段；<strong>结束时更新它</strong>，记下做了什么、我确认过什么、下一步是什么。</li>
+<li><strong>未经我确认，不要生成最终文档，先讨论。</strong></li>
+<li><strong>遇到产品决策问题，停下来问我，不要猜。</strong> 上一节那道选择题，就是这条规则的结果。</li>
+</ul>
+<p>每开一个新对话，其实就是一个新的 agent。它不记得前面的对话，但读得到文档。<strong>文档，就是这些 agent 之间交接的方式。</strong></p>
+<p>所以 AGENT.md 本质上就是一份”多 agent 管理说明”：一个阶段开一个对话，前后接力，靠文档交接。宝玉在<a href="https://baoyu.io/blog/2026-08-31/ai-native-thinking" class="external">另一篇文章<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>里说得很直接：每次变更都要同步更新文档，过时的文档比没有文档更有害。这一点我深有体会：文档一旦过时，AI 会非常自信地照着错的往下做。</p>
+<h3 id="为什么要拆成多个对话上下文装不下">为什么要拆成多个对话：上下文装不下<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#为什么要拆成多个对话上下文装不下" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>agent 刚出来那会儿，我自己动手做过多 agent 开发：每个 agent 负责一块功能。起因是一个 agent 塞的上下文太多，记忆不够用了，于是拆成多个，各管一块。</p>
+<p>现在回头看，两次是同一个道理：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th></th><th>问题</th><th>解法</th></tr></thead><tbody><tr><td>当年做多 agent</td><td>一个 agent 装不下</td><td>按功能拆，几个 agent 各管一块</td></tr><tr><td>现在做「24 小时」</td><td>一个对话装不下整个项目</td><td>按阶段拆，一个阶段一个对话，靠文档接力</td></tr></tbody></table></div>
+<p>为什么上下文会装不下？这是当前大模型在技术上的一个硬限制。</p>
+<p>一是<strong>窗口有上限</strong>。模型一次能读的内容是有限的，对话越长，越早的内容越可能被挤掉或压缩；而且就算都还在窗口里，内容一多，模型对前面某条约束的注意力也会被稀释。它不会告诉你它忘了，只会很自信地按不完整的理解接着做。</p>
+<p>二是<strong>越长越贵</strong>。每一轮对话，模型都要把前面的内容重新读一遍。上下文越长，每一轮消耗的 token 越多、算力越多，回复也越慢。一个对话从想法一路聊到上线，不只是容易出错，也是在反复为同一段历史付费。</p>
+<p>所以按阶段拆开，每个新对话只读它需要的那几份文档，既更准，也更省。</p>
+<p><strong>上下文是有限的。</strong> 拆分加文档交接，是 AI 原生开发绕不开的解法。这和我在「24 小时」那篇里写的”注意力是存量，不是产量”，其实是一回事：人的注意力有限，AI 的上下文也有限。</p>
+<h2 id="5-全景六关两个拍板点">5. 全景：六关，两个拍板点<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#5-全景六关两个拍板点" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><img src=".././assets/ai-native-dev/06-six-stages.png" alt="六关，两个人拍板的地方"/></p>
+<p>从想法到上线走六关：<strong>Idea → 可行性 → 设计文档 → 原型 → 实现 → 验证</strong>。每关一个新对话。AI 负责探索、生成、实现、检查；人只在两个地方必须亲自拍板：<strong>做不做</strong>，和<strong>原型对不对</strong>。</p>
+<p>这六关，只有第一关是”从零做产品”才需要的。给已有产品加功能时，想法和用户早就清楚，Idea 可以在脑子里过一遍，直接从可行性开始。</p>
+<p>每一关用什么提示词，我整理在了<a href="../ai-native/ai-native-prompt-templates.cn" class="internal alias" data-slug="ai-native/ai-native-prompt-templates.cn">《AI Native 开发 Prompt：能直接照抄的 6+5 个》</a>里，这篇只讲每关的要点和我是怎么做的。</p>
+<h2 id="6-idea先把事实和我以为分开">6. Idea：先把”事实”和”我以为”分开<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#6-idea先把事实和我以为分开" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>这一关要回答的只有四件事：用户是谁、遇到什么问题、为什么值得解决、产品给什么价值。</p>
+<p>关键做法是<strong>让 AI 先提问，别让它先写</strong>。你丢一句想法过去，它一定能写出一份看起来很完整的文档，但里面大半是它替你补的假设。这些假设会被后面每一关继承，越往后越难发现。</p>
+<p>所以我的 idea.md 里，内容都按证据等级标注：〔事实〕、〔假设〕、〔推测〕。</p>
+<p>这个标注救过「24 小时」一次。它最初的立意是”克服 burnout”：盒子接住想做的事，热身把”起不来”变得可测。自己用了 29 天、197 段专注、81 小时之后，数据显示当初设想的那套”起步”机制几乎没被用到。因为假设和事实一开始就分开写了，推翻起来很干脆：定位改成了”注意力是存量，不是产量”。</p>
+<p><strong>Idea 不是一次写完的。数据一来，就该回头改。</strong></p>
+<h2 id="7-可行性给自己写判死条件">7. 可行性：给自己写”判死条件”<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#7-可行性给自己写判死条件" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>这是最容易被跳过的一关。有想法不等于应该做。</p>
+<p>可行性要回答两件事：用户真的需要吗？我一个人做得出来吗？然后让 AI 列出两三个方案，把复杂度、成本、体验、风险摆在一起比，最后我来选。</p>
+<p>提示词里有一句我觉得最重要：<strong>主动寻找”不应该做”的理由。</strong> AI 默认是顺着你说的，不加这句，可行性分析很容易变成”可行性论证”。</p>
+<p>我在这一关多做了一件事：<strong>写判死条件</strong>，也就是”出现什么数据，就砍掉这个功能”。写在做之前，是为了防止做完以后舍不得砍。数据来了照办，不跟自己讨价还价。</p>
+<p>「24 小时」里真的有功能因此被砍：</p>
+<ul>
+<li><strong>课表</strong>：判死条件是”课表里的事被跳过超过一半”。实测完成 7 次、跳过 14 次，跳过率 67%，条件成立。课表从默认页面撤下来，改成设置里的一个开关。</li>
+<li><strong>档案模块</strong>（上面截图里健身、医疗、经济、三餐那一排标签）：实测 28 天，数据库里一行数据都没有。入口直接撤掉。</li>
+</ul>
+<p><img src=".././assets/ai-native-dev/07-kill-criteria.png" alt="判死条件实测（需求文档节选）"/></p>
+<p>要说清楚的是，<strong>可行性分析不是保险</strong>，它也会看走眼。它更像一个期望值上划算的赌注：大部分时候帮你避坑，偶尔判断错。判死条件就是给看走眼留的出口。</p>
+<h2 id="8-设计文档和原型先把产品做对">8. 设计文档和原型：先把产品做对<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#8-设计文档和原型先把产品做对" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><strong>设计文档</strong>是产品设计和技术设计的混合：要做什么、架构怎么分、数据和接口怎么定义。它的作用有两个：让后面写代码的 AI 有明确参照，让我有一个检查方向的锚点。项目越复杂，越要逐条看，因为在文档上发现问题，比写完代码再推翻便宜得多。</p>
+<p><strong>原型</strong>是整个流程里最值得花时间的一关。</p>
+<p>传统做法是需求文档、线框图、交互、UI 设计各走一遍，每次交接都丢信息。现在可以合成一步：直接做一个能点、能操作的高精度原型，把空状态、出错、数据特别多或特别少这些情况都做进去。</p>
+<p>为什么值得花最多时间？因为改动的成本差太多了。“这个按钮放这里别扭&quot;&quot;这一栏应该折叠”，在原型上是一句话的事；到了代码阶段，就是改代码、改测试、再验证一遍，是几天的事。</p>
+<p>「24 小时」原型目录的说明第一句是：“范围严格等于设计文档，一个功能没多加。“后来实现出来的界面和原型走偏了，我的处理也很直接：按原型重构，而不是反过来改原型迁就代码。<strong>原型确认过，它就是标准。</strong></p>
+<p><img src=".././assets/ai-native-dev/08-prototype-vs-real.png" alt="原型和实际产品"/></p>
+<p>上面是原型，下面是实际产品。原型底部那排开关，能切换空账号、海量数据、网络慢、接口报错。原型我先在命令行里用 <code>/design</code> 做，效果不好再去网页版 Claude Design，原因见第 2 节。</p>
+<h2 id="9-实现人要做的是盯住范围">9. 实现：人要做的是”盯住范围”<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#9-实现人要做的是盯住范围" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>走到这一步，设计和原型都确认过了，写代码对现在的模型来说是很简单的事。人在这一关要做的很少，主要是两件：</p>
+<ol>
+<li><strong>让 AI 先报里程碑，我确认了再开工。</strong> 每完成一个里程碑提交一次，每一步都能单独回滚。</li>
+<li><strong>盯住范围。</strong> AI 写着写着容易”顺手”做点别的，比如重构一下、多加个功能。规则里写明：发现需求、设计、技术方案互相冲突，立刻停下来问我，不要自己猜。</li>
+</ol>
+<p>给「24 小时」加 MCP 模块（让 AI 助手能直接往盒子里放事）那次，拆成了 8 步，每步一个可以单独回滚的提交，测试从 1292 个加到 1390 个。那一轮是过夜做的，有几个需要拍板的小决定，AI 先按自己的判断做了，在文档里标上「待确认」，第二天早上我逐条过了一遍。</p>
+<p><strong>一个技巧：要求 AI 自己验证。</strong> 写完代码自己跑测试，改完界面自己截图看一眼。你拿到的就不是粗糙的初稿，而是它已经查过一遍的结果，被叫回来返工的次数少很多。</p>
+<h2 id="10-验证测试通过不等于做对了">10. 验证：测试通过，不等于做对了<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#10-验证测试通过不等于做对了" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>AI 会写测试、跑测试，但我不会因为测试全过就认为产品没问题。两个真实的例子：</p>
+<p><strong>测试也可能是错的。</strong> 加 MCP 模块时顺手查出一个 bug：归档一件事，本该给盒子里的原件打上”做过”的标记，却从来没打上过。原因是比对时拿错了字段，而原有的测试恰好填了同样错的字段，于是一个坏掉的功能被测试”锁”成了规格。</p>
+<p><strong>要证明测试能抓住 bug。</strong> 修”编辑时切到别的页面，输入就丢了”这个问题时，同一套测试又拿到旧代码上跑了一遍：全部失败。这说明测试真的能抓住这个 bug，而不是碰巧通过。</p>
+<h3 id="让-ai-真的去点一遍">让 AI 真的去点一遍<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#让-ai-真的去点一遍" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>单元测试只能证明”函数返回的值对”，证明不了”用户点下去是对的”。所以我让 AI 用工具直接操作浏览器，像用户一样把产品真的用一遍：</p>
+<ul>
+<li><strong>Playwright</strong>：一个能用代码控制真实浏览器（Chromium）的工具。AI 写一段脚本，就能打开页面、注册、点按钮、输入文字、拖动排序，最后检查页面上显示的内容，以及浏览器控制台有没有报错。</li>
+<li><strong>截图</strong>：跑完让 AI 截图，然后它自己看截图。很多问题只有看了才知道，比如表格的表头被挤得换行、按钮在手机上小得点不中。</li>
+<li><strong>手机尺寸</strong>：同一段脚本把窗口设成手机宽度、开启触屏模拟，就能在电脑上测手机端。</li>
+</ul>
+<p>这样测出来的问题都很具体。做手机端时，脚本把页面关掉 20 秒再打开，确认计时没断，因为计时在服务器上；给主题分配颜色时，脚本发现两个不同的主题撞成了同一个颜色，修完再跑，12 项全过；做拖拽排序时，脚本发现指针停在两行之间的空隙里，列表就不会自动滚动了。这几个问题，单元测试都测不出来。</p>
+<p><img src=".././assets/ai-native-dev/09-playwright.png" alt="Playwright 浏览器实测的真实输出"/></p>
+<p>最后一层是我自己：打开产品，假装第一次见到它，凭直觉乱点、乱输入。开发者会下意识按预期的路径操作，普通用户不会。AI 的自测加上人的黑盒测试，两层缺一不可。</p>
+<h2 id="11-上线以后反馈也是一轮流程">11. 上线以后：反馈也是一轮流程<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#11-上线以后反馈也是一轮流程" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>上线不是终点，用户反馈会带出下一轮 Idea。</p>
+<p>有一次我自己用的时候，一天之内给自己提了 7 条反馈：有的是 bug，比如专注进行中又点了另一件事，弹出一串英文报错；有的是体验问题，比如同主题的事情太多、看着乱。我把自己当成第一个用户，每一条都按同样的步骤处理：</p>
+<ol>
+<li><strong>先查清原因，再说怎么改。</strong> AI 先复现、看代码、查数据，给出方案和影响范围，我确认了才动代码。</li>
+<li><strong>拿数据说话。</strong> 有一条是”盒子里改了，池子没同步”。查了我自己的数据才发现：14 件事里有 5 件从来没和盒子关联上，所以永远不会同步。问题出在关联，不在同步本身。</li>
+<li><strong>复现不了，就不改。</strong> 更早还有一条”改了网址回来，任务就结束了”，本地怎么试都复现不了。没有确定的 bug，就不为它改代码。</li>
+<li><strong>按想法的本意改，不照搬做法。</strong> 我当时想的是”用颜色区分主题”，和 AI 讨论后做成了淡色主题标签，而不是另起一套颜色，免得和原有的分类颜色打架。</li>
+</ol>
+<p>修完、本地验证、上线，两天之内全部闭环。</p>
+<h2 id="12-文档怎么管">12. 文档怎么管<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#12-文档怎么管" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>AI 原生开发里，文档不是写完代码再补的附属品，而是 AI 的记忆。</p>
+<p><strong>一份”项目状态”文档，是所有对话的共同入口。</strong> <code>docs/00-project-status.md</code> 记着：现在在哪个阶段、做完了什么、我确认过哪些决定、还有什么没解决、下一步是什么。每个新对话一开始先读它，结束前更新它。</p>
+<p>它读起来像一份交接记录。比如 MCP 那一轮的状态开头写着：只在本地，没碰线上；新增了哪两份文档；八步全部完成；早上需要我逐条过的五个决定。换一个新对话，AI 读完这几段就知道从哪接着干，我不用把前因后果再讲一遍。</p>
+<p><img src=".././assets/ai-native-dev/10-project-status.png" alt="项目状态文档的真实片段"/></p>
+<p>三条管文档的规矩：</p>
+<ol>
+<li><strong>改需求先改文档，再改代码，永远不要反过来。</strong> 「24 小时」的需求文档我要求每次改功能同一轮就同步更新，不攒着。过时的文档比没有文档更糟：AI 会非常自信地照着错的往下做。</li>
+<li><strong>别预先建一堆空文件。</strong> 一个只有标题的空文件摆在那里，AI 会为了”不能空着”把没确认的猜测填进去，下一个对话读到时会当成事实。文档应该是讨论完之后的产物，不是起点。</li>
+<li><strong>文档和代码一起进 Git。</strong> 每一次改动都能追溯到”当时为什么这么定”。</li>
+</ol>
+<p>换个角度看，这套文档其实是一个状态机。AGENT.md 是状态机的定义：有哪些阶段、每个阶段读什么、产出什么、什么时候必须停下来找人，它也像一张路由表，告诉每个新来的 agent 该去读哪份文档。项目状态文档记录当前状态：现在在哪、做过什么、确认过什么。每个 agent 本身不记事，读完状态、干完活，把结果写回去就结束。</p>
+<p>我现在的路由是自己做的：开哪个新对话、贴哪个模板，由我决定。</p>
+<h2 id="13-第一次试跑三个对话就够">13. 第一次试，跑三个对话就够<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#13-第一次试跑三个对话就够" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>不用一上来就跑满六关。先跑这三个，就能感受到和 Vibe Coding 的差别：</p>
+<ul>
+<li><strong>对话 A</strong>：可行性分析</li>
+<li><strong>对话 B</strong>：设计文档 + 原型</li>
+<li><strong>对话 C</strong>：实现</li>
+</ul>
+<p>开工前只需要准备三样东西：一个 Git 仓库，一份写规矩的 AGENT.md，一份只写着”当前阶段：Idea”的项目状态文档。其余文件由各个阶段自己生成。</p>
+<p>先跑通一个薄的闭环，再按需要往里加阶段，比一开始就搭全套靠谱得多。</p>
+<h2 id="14-还没验证的想法路由能不能交给-ai">14. 还没验证的想法：路由能不能交给 AI<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#14-还没验证的想法路由能不能交给-ai" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>下面这些是我接下来想试的，还没实际跑过，写出来一起讨论。</p>
+<p>我的第一反应是加一个专门的”路由 agent”，但想了想觉得没必要。下一步做什么，状态文档里基本已经写着了，不需要一个模型专门去判断；多一个 agent，就多一次读上下文、多一份 token，也多一个可能出错的环节。</p>
+<p>更可能的做法是让每个 agent 自己路由：</p>
+<ul>
+<li><strong>开场自己判断阶段</strong>：AGENT.md 加一条”开场先读状态文档，判断当前阶段，加载对应的模板；进入下一阶段前先问我”。开新对话只说一句”继续”。</li>
+<li><strong>模板做成 Skill</strong>：按阶段名字加载，不用一直占着上下文。</li>
+<li><strong>重活交给子 agent</strong>：像 Playwright 验证这种输出很多的活，在独立的上下文里做完，只带回结论。</li>
+<li><strong>关口还是人来守</strong>：AI 负责”下一步该干什么”，“要不要进入下一步”还是我拍板。</li>
+</ul>
+<p>真正值得交给 AI 判断的，可能是上线后的反馈分流：一条反馈进来，是 bug、设计问题，还是新需求，这需要理解内容。等用户多了再试。</p>
+<p>另外有两个隐患要提前想：状态文档会越写越长，反过来吃掉上下文，所以它只该放”现在”，历史交给 Git；这套设计也默认 agent 是一个接一个跑的，同时开几个对话改同一份状态文档，会互相覆盖。</p>
+<h2 id="15-一人产品不是一人公司第一个产品是在建生产系统">15. 一人产品，不是一人公司；第一个产品，是在建生产系统<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#15-一人产品不是一人公司第一个产品是在建生产系统" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>最近常听到”一人公司”（One Person Company）。我觉得对大多数人来说不太现实：一个人时间有限，财务、运营、开发、客服都要管，哪怕累死也很难出好活。</p>
+<p>但”一人产品”（One Person Product）是可行的。一个人专心做好一个产品，AI 补上执行的带宽；而且一个人做，想法从头到尾是一致的，省掉了多人之间反复对齐的时间。</p>
+<p><strong>AI 没有让一个人变成一家公司，但让一个人第一次有可能把一个产品做好。</strong></p>
+<p>做完「24 小时」，我手上留下的不只是一个产品：还有一套开发流程、一份项目约定、一套提示词模板、一套测试方法，以及几千行记录着”当时为什么这么定”的文档。</p>
+<p>下一个产品，这些都能直接复用。<strong>第一个产品，是在建生产系统；从第二个产品开始，是在复用它。</strong></p>
+<hr/>
+<h2 id="最后">最后<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#最后" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>「24 小时」就是用这套方式做出来的，也是我自己每天在用的执行力工具。产品介绍见 <a href="../products/24-hours-execution.cn" class="internal alias" data-slug="products/24-hours-execution.cn">AI 越来越聪明，我却开始害怕失去执行力</a>，也可以直接打开 <a href="https://doitbox.cn/?ref=blog" class="external">doitbox.cn<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>。</p>
+<p>相关：<a href="../ai-native/ai-native-prompt-templates.cn" class="internal alias" data-slug="ai-native/ai-native-prompt-templates.cn">AI Native 开发 Prompt：能直接照抄的 6+5 个</a>，把上面每一关用的提示词整理成了能直接复制的版本。</p>
+<p>遇到问题或者有想法，可以通过 <a href="https://x.com/chokebit3xp" class="external">X / @chokebit3xp<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 联系我。</p>
+<h2 id="参考">参考<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#参考" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>宝玉，《我的 AI 原生开发流程：一个真实案例的完整复盘》，<a href="https://baoyu.io/blog/2026-08-24/ai-native-dev-workflow" class="external">https://baoyu.io/blog/2026-08-24/ai-native-dev-workflow<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>宝玉，《AI 原生思维——像训练大模型一样训练自己》，<a href="https://baoyu.io/blog/2026-08-31/ai-native-thinking" class="external">https://baoyu.io/blog/2026-08-31/ai-native-thinking<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>Claude Design 官方教程，<a href="https://academy.claude.com/tutorials/using-claude-design-for-prototypes-and-ux" class="external">https://academy.claude.com/tutorials/using-claude-design-for-prototypes-and-ux<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>TypeSafe，<a href="https://typesafe.ai/" class="external">https://typesafe.ai/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-1" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#一分钟看完" data-for="一分钟看完">一分钟看完</a></li><li class="depth-0"><a href="#1-vibe-coding想到哪让-ai-写到哪" data-for="1-vibe-coding想到哪让-ai-写到哪">1. Vibe Coding：想到哪，让 AI 写到哪</a></li><li class="depth-0"><a href="#2-ai-原生开发推倒重来换一种做法" data-for="2-ai-原生开发推倒重来换一种做法">2. AI 原生开发：推倒重来，换一种做法</a></li><li class="depth-0"><a href="#3-差在哪流程没变变的是谁来做" data-for="3-差在哪流程没变变的是谁来做">3. 差在哪：流程没变，变的是谁来做</a></li><li class="depth-1"><a href="#让-ai-出选项我来拍板" data-for="让-ai-出选项我来拍板">让 AI 出选项，我来拍板</a></li><li class="depth-0"><a href="#4-这套系统是什么三样东西加一个习惯" data-for="4-这套系统是什么三样东西加一个习惯">4. 这套系统是什么：三样东西，加一个习惯</a></li><li class="depth-1"><a href="#agentmd写给所有-ai-的同一份规章" data-for="agentmd写给所有-ai-的同一份规章">AGENT.md：写给所有 AI 的同一份规章</a></li><li class="depth-1"><a href="#为什么要拆成多个对话上下文装不下" data-for="为什么要拆成多个对话上下文装不下">为什么要拆成多个对话：上下文装不下</a></li><li class="depth-0"><a href="#5-全景六关两个拍板点" data-for="5-全景六关两个拍板点">5. 全景：六关，两个拍板点</a></li><li class="depth-0"><a href="#6-idea先把事实和我以为分开" data-for="6-idea先把事实和我以为分开">6. Idea：先把”事实”和”我以为”分开</a></li><li class="depth-0"><a href="#7-可行性给自己写判死条件" data-for="7-可行性给自己写判死条件">7. 可行性：给自己写”判死条件”</a></li><li class="depth-0"><a href="#8-设计文档和原型先把产品做对" data-for="8-设计文档和原型先把产品做对">8. 设计文档和原型：先把产品做对</a></li><li class="depth-0"><a href="#9-实现人要做的是盯住范围" data-for="9-实现人要做的是盯住范围">9. 实现：人要做的是”盯住范围”</a></li><li class="depth-0"><a href="#10-验证测试通过不等于做对了" data-for="10-验证测试通过不等于做对了">10. 验证：测试通过，不等于做对了</a></li><li class="depth-1"><a href="#让-ai-真的去点一遍" data-for="让-ai-真的去点一遍">让 AI 真的去点一遍</a></li><li class="depth-0"><a href="#11-上线以后反馈也是一轮流程" data-for="11-上线以后反馈也是一轮流程">11. 上线以后：反馈也是一轮流程</a></li><li class="depth-0"><a href="#12-文档怎么管" data-for="12-文档怎么管">12. 文档怎么管</a></li><li class="depth-0"><a href="#13-第一次试跑三个对话就够" data-for="13-第一次试跑三个对话就够">13. 第一次试，跑三个对话就够</a></li><li class="depth-0"><a href="#14-还没验证的想法路由能不能交给-ai" data-for="14-还没验证的想法路由能不能交给-ai">14. 还没验证的想法：路由能不能交给 AI</a></li><li class="depth-0"><a href="#15-一人产品不是一人公司第一个产品是在建生产系统" data-for="15-一人产品不是一人公司第一个产品是在建生产系统">15. 一人产品，不是一人公司；第一个产品，是在建生产系统</a></li><li class="depth-0"><a href="#最后" data-for="最后">最后</a></li><li class="depth-0"><a href="#参考" data-for="参考">参考</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../ai-native/ai-native-prompt-templates.cn" class="internal">AI Native 开发 Prompt：能直接照抄的 6+5 个</a></li><li><a href="../ai-native/index.cn" class="internal">AI Native</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>
