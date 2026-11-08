@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>Quant + AI Quant 学习路线图（完整版）</title><meta charset="utf-8"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="Quant + AI Quant 学习路线图（完整版）"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Quant + AI Quant 学习路线图（完整版）"/><meta name="twitter:description" content="0 基础自学量化投资的完整路线图：12 个 Stage、每个 Stage 的目标、知识点清单和阶段产出。空白版，可复制去自己打勾。学习记录，非投资建议。"/><meta property="og:description" content="0 基础自学量化投资的完整路线图：12 个 Stage、每个 Stage 的目标、知识点清单和阶段产出。空白版，可复制去自己打勾。学习记录，非投资建议。"/><meta property="og:image:alt" content="0 基础自学量化投资的完整路线图：12 个 Stage、每个 Stage 的目标、知识点清单和阶段产出。空白版，可复制去自己打勾。学习记录，非投资建议。"/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/quant/quant-learning-roadmap-full.cn"/><meta property="twitter:url" content="https://chokebit.github.io/quant/quant-learning-roadmap-full.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="0 基础自学量化投资的完整路线图：12 个 Stage、每个 Stage 的目标、知识点清单和阶段产出。空白版，可复制去自己打勾。学习记录，非投资建议。"/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="quant/quant-learning-roadmap-full.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../quant/index.cn" class="nav-link" aria-current="page">量化</a><a href="../ai-native/index.cn" class="nav-link">AI Native</a><a href="../tech/index.cn" class="nav-link">技术档案</a><a href="../build/index.cn" class="nav-link">归档</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../quant/">quant</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>Quant + AI Quant 学习路线图（完整版）</a></div></nav><h1 class="article-title">Quant + AI Quant 学习路线图（完整版）</h1><p show-comma="true" class="content-meta"><time datetime="2026-10-25T00:00:00.000Z">Oct 25, 2026</time><span>21 min read</span></p><ul class="tags"><li><a href="../tags/quant" class="internal tag-link">quant</a></li><li><a href="../tags/roadmap" class="internal tag-link">roadmap</a></li><li><a href="../tags/learning" class="internal tag-link">learning</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><blockquote>
+<p>这是我自学量化的完整路线图，<strong>空白版</strong>，可以复制去自己打勾。为什么这样排、怎么用 AI 学，见<a href="../quant/quant-learning-roadmap.cn" class="internal alias" data-slug="quant/quant-learning-roadmap.cn">连载开篇</a>；也可以打开<a href="../quant/lab" data-router-ignore class="internal alias" data-slug="quant/lab">交互路线图</a>。学习记录，非投资建议。</p>
+</blockquote>
+<blockquote>
+<p>最终目标：<strong>具备独立投资能力 + 量化研究能力 + Python/数据工程能力 + AI
+辅助量化系统构建能力</strong>，能够从”投资假设”走到”回测、验证、小资金实盘、复盘”，并逐步把研究流程AI 化。</p>
+<p>使用方式：按阶段推进，每完成一个知识点就打勾。<strong>不要追求一次学完所有内容</strong>；路线图是地图，不是课程目录。</p>
+<p>教学约束：后续学习按本路线推进，避免跳跃；每次最多引入 <strong>3
+个新概念</strong>。每节课会明确”当前位置、当前节点、今天学什么、学完什么”。</p>
+</blockquote>
+<hr/>
+<h2 id="0-总体路线">0. 总体路线<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#0-总体路线" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>投资基础</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>Python / 数据</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>概率 / 统计</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>Quant Fundamentals</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>信号 / 因子</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>Backtesting</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>防止回测造假</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>Portfolio / Risk</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>小资金实盘</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>AI Quant Research System</span></span></code></pre></figure>
+<p>最终形成：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>投资假设</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>数据</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>研究</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>策略</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>回测</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>样本外验证</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>风险分析</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>Paper Trading</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>Small Capital Live</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>复盘</span></span>
+<span data-line><span>   ↓</span></span>
+<span data-line><span>AI 自动化研究</span></span></code></pre></figure>
+<hr/>
+<h1 id="stage-0python数据与工程基础">Stage 0：Python、数据与工程基础<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-0python数据与工程基础" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>让你能够<strong>自己处理金融数据，而不是依赖别人已经写好的分析结果</strong>。</p>
+<p>量化投资的底层不是”指标”，而是数据和程序。</p>
+<p>如果这一阶段不过关，后面的回测、因子和 AI
+都容易变成”会调用工具但不知道结果是否正确”。</p>
+<h2 id="阶段目标">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>完成后，你应该能够：</p>
+<ul>
+<li>获取股票历史数据</li>
+<li>看懂 DataFrame</li>
+<li>清洗数据</li>
+<li>计算指标</li>
+<li>画图</li>
+<li>编写简单的数据处理程序</li>
+<li>阅读和修改量化代码</li>
+<li>使用 Git 管理自己的研究代码</li>
+</ul>
+<h2 id="01-python-基础">0.1 Python 基础<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#01-python-基础" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> 变量</li>
+<li class="task-list-item"><input type="checkbox" disabled/> List</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>for</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> 函数</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Dictionary</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Tuple</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Set</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 条件判断</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 异常处理</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Module / Package</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 文件读写</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 虚拟环境</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Git 基础</li>
+</ul>
+<h2 id="02-numpy">0.2 NumPy<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#02-numpy" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Array</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Vectorized Operation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Boolean Indexing</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 基础统计计算</li>
+</ul>
+<h2 id="03-pandas">0.3 Pandas<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#03-pandas" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> DataFrame</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Series（已接触，后续正式掌握）</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Column</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Index</li>
+<li class="task-list-item"><input type="checkbox" disabled/> MultiIndex</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>droplevel()</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>loc</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>iloc</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> Filtering</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Sorting</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>groupby</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>merge</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>concat</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>shift</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>rolling</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>resample</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> Missing Data</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Datetime</li>
+</ul>
+<h2 id="04-visualization">0.4 Visualization<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#04-visualization" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Matplotlib</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Line Chart</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Candlestick</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Equity Curve</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Drawdown Curve</li>
+</ul>
+<h3 id="阶段产出">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>一个可以运行的 Python Notebook / 项目：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>AAPL 数据</span></span>
+<span data-line><span>→ 清洗</span></span>
+<span data-line><span>→ 收益率</span></span>
+<span data-line><span>→ 指标</span></span>
+<span data-line><span>→ 图表</span></span></code></pre></figure>
+<h3 id="这个阶段真的有用吗">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>非常有用，属于必修。</strong></p>
+<p>它不是为了让你成为 Python
+开发者，而是让你拥有”自己验证数据和想法”的能力。</p>
+<hr/>
+<h1 id="stage-1金融市场与股票数据基础">Stage 1：金融市场与股票数据基础<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-1金融市场与股票数据基础" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-1">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>建立”市场语言”。</p>
+<p>你需要知道每一个数字到底代表什么，否则很容易把一个看似合理的回测建立在错误的数据上。</p>
+<h2 id="阶段目标-1">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>看到一份股票行情数据，你能够解释：</p>
+<blockquote>
+<p>每一列是什么、价格为什么会变化、公司行为为什么会改变历史数据、交易为什么存在成本。</p>
+</blockquote>
+<h2 id="11-股票市场">1.1 股票市场<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#11-股票市场" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Stock</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Share</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Market Cap</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Outstanding Shares</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Float</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Exchange</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Ticker</li>
+</ul>
+<h2 id="12-股票价格">1.2 股票价格<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#12-股票价格" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Open</li>
+<li class="task-list-item"><input type="checkbox" disabled/> High</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Low</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Close</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Volume</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Raw Close</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Adjusted Close</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Corporate Actions</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Bid</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Ask</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Bid-Ask Spread</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Liquidity</li>
+</ul>
+<h2 id="13-公司行为">1.3 公司行为<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#13-公司行为" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Stock Split</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Reverse Split</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Dividend</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Buyback</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Stock Issuance</li>
+</ul>
+<h2 id="14-交易">1.4 交易<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#14-交易" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Market Order</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Limit Order</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Stop Order</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Short Selling</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Margin</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Settlement</li>
+</ul>
+<h3 id="阶段产出-1">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>能够：</p>
+<ol>
+<li>获取可靠的历史行情。</li>
+<li>区分 Raw Price 与 Adjusted Price。</li>
+<li>理解分红、拆股对历史价格和收益计算的影响。</li>
+<li>理解真实交易和”理论价格”的区别。</li>
+</ol>
+<h3 id="这个阶段真的有用吗-1">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>非常有用，属于必修。</strong></p>
+<p>尤其是 Adjusted
+Price、公司行为、Bid/Ask、Liquidity，会直接影响后面的收益计算和回测真实性。</p>
+<hr/>
+<h1 id="stage-2基本面投资分析">Stage 2：基本面投资分析<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-2基本面投资分析" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-2">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>让你先成为一个<strong>懂企业的投资者</strong>，而不只是”会跑策略的人”。</p>
+<p>量化并不意味着完全不需要理解公司。</p>
+<p>尤其是你的最终目标是 AI 辅助量化，AI
+最适合帮助你处理大量公司信息，而你必须知道这些信息为什么重要。</p>
+<h2 id="阶段目标-2">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>给你 AAPL / MSFT / NVDA 等公司，你能够自己回答：</p>
+<blockquote>
+<p>这家公司怎么赚钱？增长来自哪里？利润质量如何？资产负债是否健康？市场给它什么估值？主要风险是什么？</p>
+</blockquote>
+<h2 id="21-财务报表">2.1 财务报表<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#21-财务报表" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Income Statement</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Balance Sheet</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Cash Flow Statement</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Revenue</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Gross Profit</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Operating Income</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Net Income</li>
+<li class="task-list-item"><input type="checkbox" disabled/> EPS</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Free Cash Flow</li>
+</ul>
+<h2 id="22-财务指标">2.2 财务指标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#22-财务指标" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Gross Margin</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Operating Margin</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Net Margin</li>
+<li class="task-list-item"><input type="checkbox" disabled/> ROE</li>
+<li class="task-list-item"><input type="checkbox" disabled/> ROIC</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Debt / Equity</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Current Ratio</li>
+</ul>
+<h2 id="23-估值">2.3 估值<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#23-估值" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> P/E</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Forward P/E</li>
+<li class="task-list-item"><input type="checkbox" disabled/> P/S</li>
+<li class="task-list-item"><input type="checkbox" disabled/> P/B</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Enterprise Value</li>
+<li class="task-list-item"><input type="checkbox" disabled/> EV/EBITDA</li>
+<li class="task-list-item"><input type="checkbox" disabled/> FCF Yield</li>
+<li class="task-list-item"><input type="checkbox" disabled/> DCF</li>
+</ul>
+<h2 id="24-公司研究">2.4 公司研究<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#24-公司研究" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Business Model</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Competitive Advantage</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Moat</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Management</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Industry</li>
+<li class="task-list-item"><input type="checkbox" disabled/> TAM</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Growth</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Risks</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Investment Thesis</li>
+</ul>
+<h3 id="阶段产出-2">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>写出第一份完整的公司研究报告：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>公司</span></span>
+<span data-line><span>→ 商业模式</span></span>
+<span data-line><span>→ 财务状况</span></span>
+<span data-line><span>→ 增长</span></span>
+<span data-line><span>→ 估值</span></span>
+<span data-line><span>→ 竞争优势</span></span>
+<span data-line><span>→ 风险</span></span>
+<span data-line><span>→ Investment Thesis</span></span></code></pre></figure>
+<h3 id="这个阶段真的有用吗-2">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>有用，但不需要一开始学到专业 CFA 深度。</strong></p>
+<p>你的目标是投资和 AI Quant，不是成为传统证券研究员。</p>
+<p>这里优先掌握”看懂公司和财务数据”的能力，避免把大量时间花在暂时用不到的细枝末节。</p>
+<hr/>
+<h1 id="stage-3概率统计与金融数学基础">Stage 3：概率、统计与金融数学基础<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-3概率统计与金融数学基础" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-3">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>让你能够判断：</p>
+<blockquote>
+<p>“这个策略赚钱”到底是有规律，还是只是随机结果。</p>
+</blockquote>
+<p>这是量化研究的核心分水岭。</p>
+<h2 id="阶段目标-3">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>能够理解：</p>
+<ul>
+<li>收益为什么有随机性</li>
+<li>风险如何衡量</li>
+<li>两个变量是否相关</li>
+<li>一个结果是否具有统计意义</li>
+<li>回归结果应该如何解释</li>
+</ul>
+<h2 id="31-概率">3.1 概率<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#31-概率" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Probability</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Conditional Probability</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Expected Value</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Random Variable</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Distribution</li>
+</ul>
+<h2 id="32-描述统计">3.2 描述统计<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#32-描述统计" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Mean</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Median</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Variance</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Standard Deviation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Percentile</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Z-score</li>
+</ul>
+<h2 id="33-相关性">3.3 相关性<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#33-相关性" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Covariance</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Correlation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Correlation Matrix</li>
+</ul>
+<h2 id="34-统计推断">3.4 统计推断<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#34-统计推断" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Sampling</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Population</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Hypothesis Testing</li>
+<li class="task-list-item"><input type="checkbox" disabled/> p-value</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Confidence Interval</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Statistical Significance</li>
+</ul>
+<h2 id="35-回归">3.5 回归<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#35-回归" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Linear Regression</li>
+<li class="task-list-item"><input type="checkbox" disabled/> OLS</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Residual</li>
+<li class="task-list-item"><input type="checkbox" disabled/> R²</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Regression Coefficient</li>
+</ul>
+<h2 id="36-后续数学基础">3.6 后续数学基础<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#36-后续数学基础" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>这些不是现在学，但进入高级量化时需要：</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Linear Algebra</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Calculus</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Optimization</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Time Series</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Stochastic Processes</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Stochastic Calculus（高级方向）</li>
+</ul>
+<h3 id="阶段产出-3">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>能够对一个策略提出：</p>
+<blockquote>
+<p>“这个结果的统计证据是什么？”</p>
+</blockquote>
+<p>而不是只看收益曲线。</p>
+<h3 id="这个阶段真的有用吗-3">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>非常有用。</strong></p>
+<p>但要注意：</p>
+<p><strong>现在不需要为了”量化”先学一整套高等数学。</strong></p>
+<p>先学能直接用于数据分析和策略验证的概率统计；高级数学在进入更复杂的 Quant
+Research 后再补。</p>
+<hr/>
+<h1 id="stage-4quant-fundamentals">Stage 4：Quant Fundamentals<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-4quant-fundamentals" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-4">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>开始真正理解”量化投资是如何衡量收益和风险的”。</p>
+<h2 id="阶段目标-4">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>给你一个策略，你能够回答：</p>
+<blockquote>
+<p>赚了多少？ 波动多大？ 最大亏损是多少？ 是否跑赢市场？
+承担单位风险获得了多少收益？</p>
+</blockquote>
+<h2 id="41-return">4.1 Return<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#41-return" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Simple Return</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Log Return</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Cumulative Return</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Compound Return</li>
+</ul>
+<h2 id="42-risk">4.2 Risk<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#42-risk" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Volatility</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Variance</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Maximum Drawdown</li>
+<li class="task-list-item"><input type="checkbox" disabled/> VaR</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Expected Shortfall</li>
+</ul>
+<h2 id="43-risk-adjusted-performance">4.3 Risk-adjusted Performance<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#43-risk-adjusted-performance" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Sharpe Ratio</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Sortino Ratio</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Calmar Ratio</li>
+</ul>
+<h2 id="44-benchmark">4.4 Benchmark<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#44-benchmark" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Benchmark</li>
+<li class="task-list-item"><input type="checkbox" disabled/> SPY</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Excess Return</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Alpha</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Beta</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Tracking Error</li>
+</ul>
+<h3 id="阶段产出-4">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>建立第一个 Strategy Report：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Return</span></span>
+<span data-line><span>CAGR</span></span>
+<span data-line><span>Volatility</span></span>
+<span data-line><span>Sharpe</span></span>
+<span data-line><span>Maximum Drawdown</span></span>
+<span data-line><span>Alpha</span></span>
+<span data-line><span>Beta</span></span>
+<span data-line><span>vs SPY</span></span></code></pre></figure>
+<h3 id="这个阶段真的有用吗-4">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-4" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>极其有用，属于量化投资必修。</strong></p>
+<p>因为：</p>
+<blockquote>
+<p>“年化 30%“本身没有意义。</p>
+</blockquote>
+<p>必须同时知道它承担了什么风险，以及有没有只是承担了更多市场风险。</p>
+<hr/>
+<h1 id="stage-5quant-signals--technical-signals">Stage 5：Quant Signals / Technical Signals<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-5quant-signals--technical-signals" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-5">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>把”我觉得市场会涨”变成：</p>
+<blockquote>
+<p><strong>可以写成程序、可以验证的规则。</strong></p>
+</blockquote>
+<h2 id="阶段目标-5">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>能够把一个交易想法写成明确的：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Input</span></span>
+<span data-line><span>→ Signal</span></span>
+<span data-line><span>→ Position</span></span>
+<span data-line><span>→ Return</span></span></code></pre></figure>
+<h2 id="51-trend">5.1 Trend<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#51-trend" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> SMA</li>
+<li class="task-list-item"><input type="checkbox" disabled/> EMA</li>
+<li class="task-list-item"><input type="checkbox" disabled/> MA20</li>
+<li class="task-list-item"><input type="checkbox" disabled/> MA50</li>
+<li class="task-list-item"><input type="checkbox" disabled/> MA200</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Moving Average Crossover</li>
+</ul>
+<h2 id="52-momentum">5.2 Momentum<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#52-momentum" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Price Momentum</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 12-1 Momentum</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Relative Strength</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Momentum Ranking</li>
+</ul>
+<h2 id="53-mean-reversion">5.3 Mean Reversion<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#53-mean-reversion" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Reversal</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Mean Reversion</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Z-score</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Bollinger Bands</li>
+</ul>
+<h2 id="54-oscillators">5.4 Oscillators<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#54-oscillators" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> RSI</li>
+<li class="task-list-item"><input type="checkbox" disabled/> MACD</li>
+</ul>
+<h2 id="55-volatility">5.5 Volatility<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#55-volatility" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Historical Volatility</li>
+<li class="task-list-item"><input type="checkbox" disabled/> ATR</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Low Volatility Signal</li>
+</ul>
+<h3 id="阶段产出-5">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>完成第一个自己的策略：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>例如：</span></span>
+<span data-line> </span>
+<span data-line><span>MA20 > MA50</span></span>
+<span data-line><span>    ↓</span></span>
+<span data-line><span>Long</span></span>
+<span data-line> </span>
+<span data-line><span>MA20 &lt; MA50</span></span>
+<span data-line><span>    ↓</span></span>
+<span data-line><span>Cash</span></span></code></pre></figure>
+<p>并能进行历史回测。</p>
+<h3 id="这个阶段真的有用吗-5">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-5" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>有用，但要正确理解。</strong></p>
+<p>这些指标本身不是”赚钱公式”。</p>
+<p>真正有价值的是学习：</p>
+<blockquote>
+<p>如何把市场现象转换成可测试的假设。</p>
+</blockquote>
+<p>不要把 RSI / MACD 当成圣杯。</p>
+<hr/>
+<h1 id="stage-6factor-investing">Stage 6：Factor Investing<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-6factor-investing" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-6">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-6" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>从”研究一只股票”升级到：</p>
+<blockquote>
+<p><strong>在一个股票池中系统寻找具有某种特征的股票。</strong></p>
+</blockquote>
+<p>这是理解 <code>quant.ai</code> 的关键阶段。</p>
+<h2 id="阶段目标-6">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-6" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>能够：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>股票池</span></span>
+<span data-line><span>→ 计算因子</span></span>
+<span data-line><span>→ 排名</span></span>
+<span data-line><span>→ 选股</span></span>
+<span data-line><span>→ 构建组合</span></span>
+<span data-line><span>→ 回测</span></span></code></pre></figure>
+<h2 id="61-factor-基础">6.1 Factor 基础<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#61-factor-基础" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Factor</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Factor Exposure</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Factor Return</li>
+</ul>
+<h2 id="62-classic-factors">6.2 Classic Factors<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#62-classic-factors" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Momentum</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Value</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Size</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Quality</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Low Volatility</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Profitability</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Growth</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Reversal</li>
+</ul>
+<h2 id="63-cross-sectional-analysis">6.3 Cross-sectional Analysis<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#63-cross-sectional-analysis" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Ranking</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Quantile</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Decile</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Long-only</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Long-short</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Equal Weight</li>
+</ul>
+<h2 id="64-factor-combination">6.4 Factor Combination<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#64-factor-combination" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Factor Weight</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Composite Score</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Signal Combination</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Factor Correlation</li>
+</ul>
+<h3 id="阶段产出-6">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-6" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>完成自己的第一个 Factor Strategy：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>股票池</span></span>
+<span data-line><span>→ Momentum Ranking</span></span>
+<span data-line><span>→ Top 10%</span></span>
+<span data-line><span>→ Equal Weight</span></span>
+<span data-line><span>→ 每月调仓</span></span>
+<span data-line><span>→ 回测</span></span></code></pre></figure>
+<p>然后增加：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Momentum</span></span>
+<span data-line><span>+</span></span>
+<span data-line><span>Quality</span></span>
+<span data-line><span>+</span></span>
+<span data-line><span>Low Volatility</span></span></code></pre></figure>
+<h3 id="这个阶段真的有用吗-6">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-6" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>非常有用。</strong></p>
+<p>这是从”个人技术分析”进入系统化量化研究的重要一步。</p>
+<p>你之前看到 <code>quant.ai</code> 中的：</p>
+<blockquote>
+<p>12-1 Momentum、Trend、Reversal、Low Volatility、信号权重搜索</p>
+</blockquote>
+<p>主要就属于这一层。</p>
+<hr/>
+<h1 id="stage-7backtesting">Stage 7：Backtesting<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-7backtesting" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-7">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-7" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>把策略放进历史市场，模拟：</p>
+<blockquote>
+<p>如果过去按照这个规则交易，会发生什么？</p>
+</blockquote>
+<p>同时理解为什么”回测赚钱”并不等于”未来赚钱”。</p>
+<h2 id="阶段目标-7">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-7" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>自己能够构建一个基础 Backtesting Engine。</p>
+<h2 id="71-基础回测">7.1 基础回测<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#71-基础回测" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Signal</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Position</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Entry</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Exit</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Holding Period</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Rebalancing</li>
+</ul>
+<h2 id="72-portfolio-backtest">7.2 Portfolio Backtest<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#72-portfolio-backtest" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Position Sizing</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Equal Weight</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Cash</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Portfolio Return</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Equity Curve</li>
+</ul>
+<h2 id="73-realistic-backtest">7.3 Realistic Backtest<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#73-realistic-backtest" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Commission</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Transaction Cost</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Slippage</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Market Impact</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Liquidity</li>
+</ul>
+<h2 id="74-backtest-evaluation">7.4 Backtest Evaluation<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#74-backtest-evaluation" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> CAGR</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Sharpe</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Maximum Drawdown</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Win Rate</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Turnover</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Profit Factor</li>
+</ul>
+<h3 id="阶段产出-7">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-7" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>自己的：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>data.py</span></span>
+<span data-line><span>strategy.py</span></span>
+<span data-line><span>backtest.py</span></span>
+<span data-line><span>metrics.py</span></span></code></pre></figure>
+<p>能够跑：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Data</span></span>
+<span data-line><span>→ Signal</span></span>
+<span data-line><span>→ Position</span></span>
+<span data-line><span>→ Portfolio</span></span>
+<span data-line><span>→ Equity Curve</span></span>
+<span data-line><span>→ Metrics</span></span></code></pre></figure>
+<h3 id="这个阶段真的有用吗-7">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-7" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>极其有用，是核心技能。</strong></p>
+<p>这是把”理论策略”变成”可验证系统”的关键。</p>
+<hr/>
+<h1 id="stage-8防止回测欺骗--robust-research">Stage 8：防止回测欺骗 / Robust Research<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-8防止回测欺骗--robust-research" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-8">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-8" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>这是整个路线中最重要的阶段之一。</p>
+<p>防止自己因为：</p>
+<blockquote>
+<p>数据错误、未来数据、幸存者偏差、过拟合</p>
+</blockquote>
+<p>而误以为找到了赚钱策略。</p>
+<h2 id="阶段目标-8">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-8" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>看到一个漂亮回测结果，你第一反应不是：</p>
+<blockquote>
+<p>“发财了。”</p>
+</blockquote>
+<p>而是：</p>
+<blockquote>
+<p>“这个结果可信吗？“</p>
+</blockquote>
+<h2 id="81-bias">8.1 Bias<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#81-bias" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Look-ahead Bias</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Survivorship Bias</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Selection Bias</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Data Snooping</li>
+</ul>
+<h2 id="82-overfitting">8.2 Overfitting<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#82-overfitting" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Overfitting</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Underfitting</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Parameter Optimization</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Degrees of Freedom</li>
+</ul>
+<h2 id="83-validation">8.3 Validation<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#83-validation" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> In-sample</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Out-of-sample</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Train / Test</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Walk-forward</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Rolling Window</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Cross-validation（了解适用场景，不机械套用）</li>
+</ul>
+<h2 id="84-robustness">8.4 Robustness<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#84-robustness" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Parameter Stability</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Regime Stability</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Sensitivity Analysis</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Stress Testing</li>
+</ul>
+<h3 id="阶段产出-8">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-8" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>拿一个历史上非常漂亮的策略：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>年化 50%</span></span></code></pre></figure>
+<p>尝试证明：</p>
+<blockquote>
+<p>它为什么可能不是真的。</p>
+</blockquote>
+<p>然后修改研究流程，得到更可信的结果。</p>
+<h3 id="这个阶段真的有用吗-8">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-8" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>极其有用。</strong></p>
+<p>这是”写回测代码”和”做严肃量化研究”的分水岭。</p>
+<hr/>
+<h1 id="stage-9portfolio--risk--real-trading">Stage 9：Portfolio / Risk / Real Trading<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-9portfolio--risk--real-trading" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-9">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-9" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>从：</p>
+<blockquote>
+<p>“一个策略能不能赚钱？”</p>
+</blockquote>
+<p>进入：</p>
+<blockquote>
+<p><strong>“我应该拿多少钱做、怎么分配、如何活下来？“</strong></p>
+</blockquote>
+<h2 id="阶段目标-9">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-9" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>建立从研究到真实资金的完整流程：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Research</span></span>
+<span data-line><span>→ Backtest</span></span>
+<span data-line><span>→ Out-of-sample</span></span>
+<span data-line><span>→ Paper Trading</span></span>
+<span data-line><span>→ Small Capital</span></span>
+<span data-line><span>→ Live</span></span>
+<span data-line><span>→ Journal</span></span>
+<span data-line><span>→ Review</span></span></code></pre></figure>
+<h2 id="91-portfolio">9.1 Portfolio<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#91-portfolio" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Diversification</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Correlation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Covariance Matrix</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Position Sizing</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Concentration</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Exposure</li>
+</ul>
+<h2 id="92-portfolio-optimization">9.2 Portfolio Optimization<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#92-portfolio-optimization" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Mean-Variance</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Efficient Frontier</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Risk Parity</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Volatility Targeting</li>
+</ul>
+<h2 id="93-risk-management">9.3 Risk Management<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#93-risk-management" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Maximum Position</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Portfolio Exposure</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Drawdown Control</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Risk Budget</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Exit Rules</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Cash Management</li>
+</ul>
+<h2 id="94-trading-infrastructure">9.4 Trading Infrastructure<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#94-trading-infrastructure" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Broker API</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Order Management</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Execution</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Position Reconciliation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Trading Logs</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Monitoring</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Alerts</li>
+</ul>
+<h3 id="阶段产出-9">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-9" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>建立自己的：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Portfolio</span></span>
+<span data-line><span>+</span></span>
+<span data-line><span>Risk Engine</span></span>
+<span data-line><span>+</span></span>
+<span data-line><span>Trading Journal</span></span>
+<span data-line><span>+</span></span>
+<span data-line><span>Live Monitoring</span></span></code></pre></figure>
+<p>并用<strong>极小的、亏损后不影响生活的资金</strong>进行真实验证。</p>
+<h3 id="这个阶段真的有用吗-9">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-9" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>对”靠投资养活自己”的目标非常有用。</strong></p>
+<p>但必须强调：</p>
+<blockquote>
+<p>投资能力 ≠ 保证稳定收入。</p>
+</blockquote>
+<p>尤其在本金很小的阶段，靠投资收益直接养活自己通常不现实。</p>
+<p>因此你的职业路线应该同时积累：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>投资能力</span></span>
+<span data-line><span>+</span></span>
+<span data-line><span>软件 / AI / Quant 工程能力</span></span></code></pre></figure>
+<p>前者让你管理资本，后者让你在没有大量本金时也能创造现金流。</p>
+<hr/>
+<h1 id="stage-10ai-quant-engineering">Stage 10：AI Quant Engineering<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-10ai-quant-engineering" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<h2 id="目的-10">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-10" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>把前面学到的量化研究流程变成：</p>
+<blockquote>
+<p><strong>AI 可以协助执行、研究、解释、监控的系统。</strong></p>
+</blockquote>
+<p>不是让 AI 直接”预测股票”。</p>
+<h2 id="阶段目标-10">阶段目标<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段目标-10" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>最终能够对 AI 说：</p>
+<blockquote>
+<p>“研究美股中 Momentum + Quality + Low Volatility
+的组合，并进行严格的样本外验证。”</p>
+</blockquote>
+<p>AI 可以自动：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>理解任务</span></span>
+<span data-line><span>→ 制定研究计划</span></span>
+<span data-line><span>→ 调用数据</span></span>
+<span data-line><span>→ 计算因子</span></span>
+<span data-line><span>→ 生成策略</span></span>
+<span data-line><span>→ 调用回测引擎</span></span>
+<span data-line><span>→ 运行验证</span></span>
+<span data-line><span>→ 分析结果</span></span>
+<span data-line><span>→ 生成研究报告</span></span></code></pre></figure>
+<p>但核心计算仍由确定性程序负责。</p>
+<h2 id="101-llm-基础">10.1 LLM 基础<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#101-llm-基础" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> LLM</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Prompt</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Structured Output</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Function Calling</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Tool Use</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Context</li>
+<li class="task-list-item"><input type="checkbox" disabled/> RAG</li>
+</ul>
+<h2 id="102-agent">10.2 Agent<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#102-agent" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Agent</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Tool Calling</li>
+<li class="task-list-item"><input type="checkbox" disabled/> MCP</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Workflow</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Memory</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Evaluation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Guardrails</li>
+</ul>
+<h2 id="103-ai-research">10.3 AI Research<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#103-ai-research" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> 财报阅读</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 新闻分析</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 公司研究</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 投资假设生成</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 策略代码生成</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 回测解释</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 异常检测</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Research Report</li>
+</ul>
+<h2 id="104-deterministic-quant-engine">10.4 Deterministic Quant Engine<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#104-deterministic-quant-engine" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>AI 不应该直接决定：</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> 原始数据计算</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 收益率计算</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 风险计算</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 回测结果</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 订单执行</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 风控</li>
+</ul>
+<p>这些应该由确定性的程序完成。</p>
+<h3 id="阶段产出-10">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-10" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>自己的：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>AI Quant Research Assistant</span></span></code></pre></figure>
+<p>例如：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>User</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>AI Agent</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>Research Planner</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>Data Tools</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>Quant Engine</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>Backtest</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>Validation</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>Risk Engine</span></span>
+<span data-line><span> ↓</span></span>
+<span data-line><span>AI Research Report</span></span></code></pre></figure>
+<h3 id="这个阶段真的有用吗-10">这个阶段真的有用吗？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#这个阶段真的有用吗-10" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>非常有用，而且与你的个人目标高度匹配。</strong></p>
+<p>你的竞争力不应该是：</p>
+<blockquote>
+<p>“我让 AI 告诉我买什么。”</p>
+</blockquote>
+<p>而应该是：</p>
+<blockquote>
+<p><strong>“我能构建一个可靠的研究系统，让 AI
+帮我更快地提出、实现、验证和复盘投资假设。“</strong></p>
+</blockquote>
+<hr/>
+<h1 id="stage-11职业化与长期能力">Stage 11：职业化与长期能力<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-11职业化与长期能力" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p>这一阶段不是为了马上学，而是为了让”会量化”最终变成职业能力。</p>
+</blockquote>
+<h2 id="目的-11">目的<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#目的-11" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>让你的能力可以被别人验证、使用、购买或雇佣。</p>
+<h2 id="111-quant--ai-工程能力">11.1 Quant / AI 工程能力<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#111-quant--ai-工程能力" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Clean Architecture</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Testing</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Logging</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Monitoring</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Configuration Management</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Data Versioning</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Experiment Tracking</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Reproducibility</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Docker</li>
+<li class="task-list-item"><input type="checkbox" disabled/> CI/CD</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Cloud Basics</li>
+</ul>
+<h2 id="112-quant-research-workflow">11.2 Quant Research Workflow<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#112-quant-research-workflow" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Research Notebook</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Experiment Log</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Hypothesis Registry</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Backtest Registry</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Model / Strategy Versioning</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Data Provenance</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Reproducible Research</li>
+</ul>
+<h2 id="113-portfolio--career">11.3 Portfolio / Career<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#113-portfolio--career" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> GitHub Quant Portfolio</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 公开研究报告</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 可复现 Backtest</li>
+<li class="task-list-item"><input type="checkbox" disabled/> AI Quant Demo</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Technical Writing</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Quant / Data / AI 项目经历</li>
+</ul>
+<h3 id="阶段产出-11">阶段产出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#阶段产出-11" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>至少拥有：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>GitHub</span></span>
+<span data-line><span>├── Quant Research</span></span>
+<span data-line><span>├── Backtesting Engine</span></span>
+<span data-line><span>├── Factor Research</span></span>
+<span data-line><span>├── Portfolio / Risk</span></span>
+<span data-line><span>└── AI Quant Agent</span></span></code></pre></figure>
+<p>这时候你就不只是：</p>
+<blockquote>
+<p>“学过量化。”</p>
+</blockquote>
+<p>而是：</p>
+<blockquote>
+<p><strong>有一套可以展示、验证、继续迭代的真实作品。</strong></p>
+</blockquote>
+<hr/>
+<h1 id="-哪些阶段最重要">⭐ 哪些阶段最重要？<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#-哪些阶段最重要" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<p>如果你的时间和精力有限，优先级不是平均分配。</p>
+<h2 id="s-级必须掌握">S 级：必须掌握<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#s-级必须掌握" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Python / Pandas</span></span>
+<span data-line><span>金融数据</span></span>
+<span data-line><span>Return / Risk</span></span>
+<span data-line><span>Statistics</span></span>
+<span data-line><span>Factor</span></span>
+<span data-line><span>Backtesting</span></span>
+<span data-line><span>Bias / Overfitting</span></span>
+<span data-line><span>Portfolio / Risk</span></span></code></pre></figure>
+<h2 id="a-级强烈建议掌握">A 级：强烈建议掌握<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#a-级强烈建议掌握" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>基本面</span></span>
+<span data-line><span>Regression</span></span>
+<span data-line><span>Time Series</span></span>
+<span data-line><span>Optimization</span></span>
+<span data-line><span>Trading Infrastructure</span></span>
+<span data-line><span>AI Agent</span></span>
+<span data-line><span>MCP</span></span></code></pre></figure>
+<h2 id="b-级后期深入">B 级：后期深入<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#b-级后期深入" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>Stochastic Calculus</span></span>
+<span data-line><span>Derivatives Pricing</span></span>
+<span data-line><span>Monte Carlo</span></span>
+<span data-line><span>复杂数学金融模型</span></span>
+<span data-line><span>高频交易</span></span>
+<span data-line><span>Market Microstructure 深度研究</span></span></code></pre></figure>
+<p><strong>不要因为看到 Quant 就立刻去学随机微积分。</strong></p>
+<p>如果你的目标是：</p>
+<blockquote>
+<p><strong>自己投资 + AI 辅助量化 + 最终形成职业能力</strong></p>
+</blockquote>
+<p>前面的 S 级内容带来的实际价值远高于一开始钻进高级数学。</p>
+<hr/>
+<h1 id="-与-quantai-的对应关系">📌 与 <code>quant.ai</code> 的对应关系<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#-与-quantai-的对应关系" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<p>你现在研究的项目可以作为整条路线的”实战地图”。</p>
+<p><code>quant.ai</code> 中的东西   对应学习阶段</p>
+<hr/>
+<p>AAPL 分析             Stage 0—2
+RSI                   Stage 5
+Volatility            Stage 4—5
+MA20 / MA50           Stage 5
+12-1 Momentum         Stage 6
+Reversal              Stage 5—6
+Low Volatility        Stage 5—6
+Factor Ranking        Stage 6
+Signal Weight         Stage 6
+Backtest              Stage 7
+Walk-forward          Stage 8
+SPY Benchmark         Stage 4
+Alpha / Beta          Stage 4
+Portfolio             Stage 9
+AI Research           Stage 10</p>
+<p>所以我们不是”学完以后再看 <code>quant.ai</code>”。</p>
+<p>而是：</p>
+<blockquote>
+<p><strong>边学边拆 <code>quant.ai</code>，把它当作第一份真实量化工程案例。</strong></p>
+</blockquote>
+<hr/>
+<h1 id="-当前进度">📍 当前进度<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#-当前进度" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<p>截至目前：</p>
+<h2 id="stage-0">Stage 0<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-0" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> DataFrame</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Column</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Series 基本接触</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Index 基本接触</li>
+<li class="task-list-item"><input type="checkbox" disabled/> MultiIndex</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>droplevel()</code></li>
+</ul>
+<h2 id="stage-1">Stage 1<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#stage-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Open</li>
+<li class="task-list-item"><input type="checkbox" disabled/> High</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Low</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Close</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Volume</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Raw Close</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Adjusted Close</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Corporate Actions</li>
+</ul>
+<pre><code>
+---
+# 🧭 我们以后每节课固定使用这个格式
+
+```text
+当前位置：
+Stage X → Node X.X
+
+本节点目的：
+为什么学它？
+
+本节点知识树：
+□ 概念 A
+□ 概念 B
+□ 概念 C
+
+今天：
+只学习最多 3 个概念
+
+实践：
+写代码 / 看真实数据
+
+验证：
+你自己解释结果
+
+完成：
+□ A
+□ B
+□ C
+
+下一步：
+明确告诉你下一节点
+</code></pre>
+<p>这样你始终知道：</p>
+<p><strong>我在哪里 → 为什么学 → 学什么 → 学完有什么用 → 下一步去哪。</strong></p>
+<hr/>
+<h1 id="最终验收标准">最终验收标准<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#最终验收标准" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<p>不是”把所有框打勾”。</p>
+<p>而是最终你能够独立完成：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="text" data-theme="github-light github-dark"><code data-language="text" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>① 找到投资问题</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>② 提出可验证假设</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>③ 获取正确数据</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>④ 清洗数据</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑤ 构造因子 / 信号</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑥ 构建策略</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑦ 回测</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑧ 检查 Bias</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑨ Walk-forward / Out-of-sample</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑩ 风险与组合</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑪ Paper Trading</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑫ 小资金实盘</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑬ 记录与复盘</span></span>
+<span data-line><span>        ↓</span></span>
+<span data-line><span>⑭ AI 自动化研究流程</span></span></code></pre></figure>
+<p><strong>这才是我们的毕业标准。</strong></p>
+<p>而不是”学会 100 个金融术语”。</p>
+<hr/>
+<h2 id="当前任务">当前任务<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#当前任务" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>路线图已经确定。</p>
+<p><strong>不要往后跳。</strong></p></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-13" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-1"><a href="#0-总体路线" data-for="0-总体路线">0. 总体路线</a></li><li class="depth-0"><a href="#stage-0python数据与工程基础" data-for="stage-0python数据与工程基础">Stage 0：Python、数据与工程基础</a></li><li class="depth-1"><a href="#目的" data-for="目的">目的</a></li><li class="depth-1"><a href="#阶段目标" data-for="阶段目标">阶段目标</a></li><li class="depth-1"><a href="#01-python-基础" data-for="01-python-基础">0.1 Python 基础</a></li><li class="depth-1"><a href="#02-numpy" data-for="02-numpy">0.2 NumPy</a></li><li class="depth-1"><a href="#03-pandas" data-for="03-pandas">0.3 Pandas</a></li><li class="depth-1"><a href="#04-visualization" data-for="04-visualization">0.4 Visualization</a></li><li class="depth-2"><a href="#阶段产出" data-for="阶段产出">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗" data-for="这个阶段真的有用吗">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-1金融市场与股票数据基础" data-for="stage-1金融市场与股票数据基础">Stage 1：金融市场与股票数据基础</a></li><li class="depth-1"><a href="#目的-1" data-for="目的-1">目的</a></li><li class="depth-1"><a href="#阶段目标-1" data-for="阶段目标-1">阶段目标</a></li><li class="depth-1"><a href="#11-股票市场" data-for="11-股票市场">1.1 股票市场</a></li><li class="depth-1"><a href="#12-股票价格" data-for="12-股票价格">1.2 股票价格</a></li><li class="depth-1"><a href="#13-公司行为" data-for="13-公司行为">1.3 公司行为</a></li><li class="depth-1"><a href="#14-交易" data-for="14-交易">1.4 交易</a></li><li class="depth-2"><a href="#阶段产出-1" data-for="阶段产出-1">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-1" data-for="这个阶段真的有用吗-1">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-2基本面投资分析" data-for="stage-2基本面投资分析">Stage 2：基本面投资分析</a></li><li class="depth-1"><a href="#目的-2" data-for="目的-2">目的</a></li><li class="depth-1"><a href="#阶段目标-2" data-for="阶段目标-2">阶段目标</a></li><li class="depth-1"><a href="#21-财务报表" data-for="21-财务报表">2.1 财务报表</a></li><li class="depth-1"><a href="#22-财务指标" data-for="22-财务指标">2.2 财务指标</a></li><li class="depth-1"><a href="#23-估值" data-for="23-估值">2.3 估值</a></li><li class="depth-1"><a href="#24-公司研究" data-for="24-公司研究">2.4 公司研究</a></li><li class="depth-2"><a href="#阶段产出-2" data-for="阶段产出-2">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-2" data-for="这个阶段真的有用吗-2">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-3概率统计与金融数学基础" data-for="stage-3概率统计与金融数学基础">Stage 3：概率、统计与金融数学基础</a></li><li class="depth-1"><a href="#目的-3" data-for="目的-3">目的</a></li><li class="depth-1"><a href="#阶段目标-3" data-for="阶段目标-3">阶段目标</a></li><li class="depth-1"><a href="#31-概率" data-for="31-概率">3.1 概率</a></li><li class="depth-1"><a href="#32-描述统计" data-for="32-描述统计">3.2 描述统计</a></li><li class="depth-1"><a href="#33-相关性" data-for="33-相关性">3.3 相关性</a></li><li class="depth-1"><a href="#34-统计推断" data-for="34-统计推断">3.4 统计推断</a></li><li class="depth-1"><a href="#35-回归" data-for="35-回归">3.5 回归</a></li><li class="depth-1"><a href="#36-后续数学基础" data-for="36-后续数学基础">3.6 后续数学基础</a></li><li class="depth-2"><a href="#阶段产出-3" data-for="阶段产出-3">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-3" data-for="这个阶段真的有用吗-3">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-4quant-fundamentals" data-for="stage-4quant-fundamentals">Stage 4：Quant Fundamentals</a></li><li class="depth-1"><a href="#目的-4" data-for="目的-4">目的</a></li><li class="depth-1"><a href="#阶段目标-4" data-for="阶段目标-4">阶段目标</a></li><li class="depth-1"><a href="#41-return" data-for="41-return">4.1 Return</a></li><li class="depth-1"><a href="#42-risk" data-for="42-risk">4.2 Risk</a></li><li class="depth-1"><a href="#43-risk-adjusted-performance" data-for="43-risk-adjusted-performance">4.3 Risk-adjusted Performance</a></li><li class="depth-1"><a href="#44-benchmark" data-for="44-benchmark">4.4 Benchmark</a></li><li class="depth-2"><a href="#阶段产出-4" data-for="阶段产出-4">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-4" data-for="这个阶段真的有用吗-4">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-5quant-signals--technical-signals" data-for="stage-5quant-signals--technical-signals">Stage 5：Quant Signals / Technical Signals</a></li><li class="depth-1"><a href="#目的-5" data-for="目的-5">目的</a></li><li class="depth-1"><a href="#阶段目标-5" data-for="阶段目标-5">阶段目标</a></li><li class="depth-1"><a href="#51-trend" data-for="51-trend">5.1 Trend</a></li><li class="depth-1"><a href="#52-momentum" data-for="52-momentum">5.2 Momentum</a></li><li class="depth-1"><a href="#53-mean-reversion" data-for="53-mean-reversion">5.3 Mean Reversion</a></li><li class="depth-1"><a href="#54-oscillators" data-for="54-oscillators">5.4 Oscillators</a></li><li class="depth-1"><a href="#55-volatility" data-for="55-volatility">5.5 Volatility</a></li><li class="depth-2"><a href="#阶段产出-5" data-for="阶段产出-5">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-5" data-for="这个阶段真的有用吗-5">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-6factor-investing" data-for="stage-6factor-investing">Stage 6：Factor Investing</a></li><li class="depth-1"><a href="#目的-6" data-for="目的-6">目的</a></li><li class="depth-1"><a href="#阶段目标-6" data-for="阶段目标-6">阶段目标</a></li><li class="depth-1"><a href="#61-factor-基础" data-for="61-factor-基础">6.1 Factor 基础</a></li><li class="depth-1"><a href="#62-classic-factors" data-for="62-classic-factors">6.2 Classic Factors</a></li><li class="depth-1"><a href="#63-cross-sectional-analysis" data-for="63-cross-sectional-analysis">6.3 Cross-sectional Analysis</a></li><li class="depth-1"><a href="#64-factor-combination" data-for="64-factor-combination">6.4 Factor Combination</a></li><li class="depth-2"><a href="#阶段产出-6" data-for="阶段产出-6">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-6" data-for="这个阶段真的有用吗-6">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-7backtesting" data-for="stage-7backtesting">Stage 7：Backtesting</a></li><li class="depth-1"><a href="#目的-7" data-for="目的-7">目的</a></li><li class="depth-1"><a href="#阶段目标-7" data-for="阶段目标-7">阶段目标</a></li><li class="depth-1"><a href="#71-基础回测" data-for="71-基础回测">7.1 基础回测</a></li><li class="depth-1"><a href="#72-portfolio-backtest" data-for="72-portfolio-backtest">7.2 Portfolio Backtest</a></li><li class="depth-1"><a href="#73-realistic-backtest" data-for="73-realistic-backtest">7.3 Realistic Backtest</a></li><li class="depth-1"><a href="#74-backtest-evaluation" data-for="74-backtest-evaluation">7.4 Backtest Evaluation</a></li><li class="depth-2"><a href="#阶段产出-7" data-for="阶段产出-7">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-7" data-for="这个阶段真的有用吗-7">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-8防止回测欺骗--robust-research" data-for="stage-8防止回测欺骗--robust-research">Stage 8：防止回测欺骗 / Robust Research</a></li><li class="depth-1"><a href="#目的-8" data-for="目的-8">目的</a></li><li class="depth-1"><a href="#阶段目标-8" data-for="阶段目标-8">阶段目标</a></li><li class="depth-1"><a href="#81-bias" data-for="81-bias">8.1 Bias</a></li><li class="depth-1"><a href="#82-overfitting" data-for="82-overfitting">8.2 Overfitting</a></li><li class="depth-1"><a href="#83-validation" data-for="83-validation">8.3 Validation</a></li><li class="depth-1"><a href="#84-robustness" data-for="84-robustness">8.4 Robustness</a></li><li class="depth-2"><a href="#阶段产出-8" data-for="阶段产出-8">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-8" data-for="这个阶段真的有用吗-8">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-9portfolio--risk--real-trading" data-for="stage-9portfolio--risk--real-trading">Stage 9：Portfolio / Risk / Real Trading</a></li><li class="depth-1"><a href="#目的-9" data-for="目的-9">目的</a></li><li class="depth-1"><a href="#阶段目标-9" data-for="阶段目标-9">阶段目标</a></li><li class="depth-1"><a href="#91-portfolio" data-for="91-portfolio">9.1 Portfolio</a></li><li class="depth-1"><a href="#92-portfolio-optimization" data-for="92-portfolio-optimization">9.2 Portfolio Optimization</a></li><li class="depth-1"><a href="#93-risk-management" data-for="93-risk-management">9.3 Risk Management</a></li><li class="depth-1"><a href="#94-trading-infrastructure" data-for="94-trading-infrastructure">9.4 Trading Infrastructure</a></li><li class="depth-2"><a href="#阶段产出-9" data-for="阶段产出-9">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-9" data-for="这个阶段真的有用吗-9">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-10ai-quant-engineering" data-for="stage-10ai-quant-engineering">Stage 10：AI Quant Engineering</a></li><li class="depth-1"><a href="#目的-10" data-for="目的-10">目的</a></li><li class="depth-1"><a href="#阶段目标-10" data-for="阶段目标-10">阶段目标</a></li><li class="depth-1"><a href="#101-llm-基础" data-for="101-llm-基础">10.1 LLM 基础</a></li><li class="depth-1"><a href="#102-agent" data-for="102-agent">10.2 Agent</a></li><li class="depth-1"><a href="#103-ai-research" data-for="103-ai-research">10.3 AI Research</a></li><li class="depth-1"><a href="#104-deterministic-quant-engine" data-for="104-deterministic-quant-engine">10.4 Deterministic Quant Engine</a></li><li class="depth-2"><a href="#阶段产出-10" data-for="阶段产出-10">阶段产出</a></li><li class="depth-2"><a href="#这个阶段真的有用吗-10" data-for="这个阶段真的有用吗-10">这个阶段真的有用吗？</a></li><li class="depth-0"><a href="#stage-11职业化与长期能力" data-for="stage-11职业化与长期能力">Stage 11：职业化与长期能力</a></li><li class="depth-1"><a href="#目的-11" data-for="目的-11">目的</a></li><li class="depth-1"><a href="#111-quant--ai-工程能力" data-for="111-quant--ai-工程能力">11.1 Quant / AI 工程能力</a></li><li class="depth-1"><a href="#112-quant-research-workflow" data-for="112-quant-research-workflow">11.2 Quant Research Workflow</a></li><li class="depth-1"><a href="#113-portfolio--career" data-for="113-portfolio--career">11.3 Portfolio / Career</a></li><li class="depth-2"><a href="#阶段产出-11" data-for="阶段产出-11">阶段产出</a></li><li class="depth-0"><a href="#-哪些阶段最重要" data-for="-哪些阶段最重要">⭐ 哪些阶段最重要？</a></li><li class="depth-1"><a href="#s-级必须掌握" data-for="s-级必须掌握">S 级：必须掌握</a></li><li class="depth-1"><a href="#a-级强烈建议掌握" data-for="a-级强烈建议掌握">A 级：强烈建议掌握</a></li><li class="depth-1"><a href="#b-级后期深入" data-for="b-级后期深入">B 级：后期深入</a></li><li class="depth-0"><a href="#-与-quantai-的对应关系" data-for="-与-quantai-的对应关系">📌 与 quant.ai 的对应关系</a></li><li class="depth-0"><a href="#-当前进度" data-for="-当前进度">📍 当前进度</a></li><li class="depth-1"><a href="#stage-0" data-for="stage-0">Stage 0</a></li><li class="depth-1"><a href="#stage-1" data-for="stage-1">Stage 1</a></li><li class="depth-0"><a href="#最终验收标准" data-for="最终验收标准">最终验收标准</a></li><li class="depth-1"><a href="#当前任务" data-for="当前任务">当前任务</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../quant/index.cn" class="internal">量化学习</a></li><li><a href="../quant/quant-learning-roadmap.cn" class="internal">0 基础用 AI 学量化：我给自己画了张 12 步路线图</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>

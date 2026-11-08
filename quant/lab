@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>交互路线图 · 量化学习 · CHOKEBIT</title>
+<meta name="description" content="0 基础自学量化投资的 12 步交互路线图：每个 Stage 的目的、子主题和学习笔记。学习记录，非投资建议。">
+<link rel="icon" href="../static/icon.png">
+<style>
+:root{
+  /* 夜晚（默认）：取自产品 BJJ Sequence */
+  --bg:#110e17; --bg2:#16121d; --panel:#1a1622; --panel2:#221d2c; --line:#2c2637; --line2:#3a3348;
+  --ink:#ece9f1; --sub:#c3bdd0; --muted:#a29cb0; --dim:#8b849e;
+  --acc:#c4b5fd; --acc-soft:rgba(196,181,253,.13); --acc-line:rgba(196,181,253,.42); --on-acc:#18122a;
+  --blue:#5b9cf0; --blue-soft:rgba(91,156,240,.13); --blue-line:rgba(91,156,240,.42);
+  --green:#4fb783; --green-soft:rgba(79,183,131,.14);
+  --glass:rgba(17,14,23,.86); --dotc:rgba(236,233,241,.045); --shadow:var(--shadow); --pub-node:#1d2a26;
+  --mono:'JetBrains Mono','DejaVu Sans Mono',ui-monospace,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC","Noto Sans CJK SC",system-ui,sans-serif;
+  --serif:var(--sans);
+  --r:16px; color-scheme:dark;
+}
+:root[saved-theme="light"]{
+  --bg:#faf9f5; --bg2:#f6f3ec; --panel:#ffffff; --panel2:#f3f0e8; --line:#e6e2d8; --line2:#d8d2c4;
+  --ink:#1f1e1d; --sub:#57534b; --muted:#66625a; --dim:#8a857a;
+  --acc:#5b3fb0; --acc-soft:rgba(91,63,176,.09); --acc-line:rgba(91,63,176,.35); --on-acc:#ffffff;
+  --blue:#2f6fca; --blue-soft:rgba(47,111,202,.09); --blue-line:rgba(47,111,202,.35);
+  --green:#1f7a4d; --green-soft:rgba(31,122,77,.10);
+  --glass:rgba(250,249,245,.88); --dotc:rgba(31,30,29,.05); --shadow:rgba(31,30,29,.08); --pub-node:#e7f3ec;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px,var(--dotc) 1px,transparent 0);background-size:22px 22px}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.app{display:grid;grid-template-columns:268px 1fr;min-height:100vh}
+
+/* ---------- 侧栏 ---------- */
+.side{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:var(--glass);backdrop-filter:blur(6px);padding:26px 18px 20px;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}
+.logo{width:38px;height:38px;border-radius:11px;background:var(--acc);display:grid;place-items:center;font-family:var(--mono);font-weight:800;color:var(--on-acc);font-size:15px;box-shadow:0 0 24px var(--acc-soft)}
+.brand b{font-size:19px;letter-spacing:-.3px} .brand b span{color:var(--muted);font-weight:400}
+.tag{padding:0 8px;margin:6px 0 22px;font-size:12.5px;color:var(--muted)}
+.grp{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--dim);margin:16px 8px 8px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:10px;font-size:13.5px;color:var(--sub);text-align:left;transition:.15s}
+.nav:hover{background:var(--panel2);color:var(--ink)}
+.nav .no{font-family:var(--mono);font-size:11px;width:26px;height:22px;border-radius:6px;border:1px solid var(--line2);display:grid;place-items:center;color:var(--muted);flex:none}
+.nav .dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--line2);flex:none}
+.nav.pub .dot{background:var(--green);box-shadow:0 0 8px var(--green)}
+.nav.on{background:var(--acc-soft);color:var(--ink)}
+.nav.on .no{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:700}
+.nav.off{opacity:.35}
+.side .bottom{margin-top:auto;padding:16px 8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.7}
+
+/* ---------- 主区 ---------- */
+.main{min-width:0}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;padding:14px 40px;border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(8px);font-size:13px;color:var(--muted)}
+.top .crumb b{color:var(--ink);font-weight:500}
+.top .sp{flex:1}
+.theme-toggle{width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);color:var(--sub);font-size:15px;display:grid;place-items:center;flex:none;transition:.15s}
+.theme-toggle:hover{color:var(--ink);border-color:var(--muted)}
+.mtop{display:none}
+.pill{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line2);border-radius:999px;padding:4px 11px;color:var(--sub)}
+.pill.warn{border-color:var(--acc-line);color:var(--acc)}
+.wrap{max-width:1040px;margin:0 auto;padding:44px 40px 70px}
+
+.kick{font-family:var(--mono);font-size:12px;letter-spacing:2.5px;color:var(--acc)}
+h1{font-family:var(--sans);font-size:50px;line-height:1.18;font-weight:800;letter-spacing:-.5px;margin:14px 0 16px}
+h1 em{font-style:normal;color:var(--acc)}
+.lede{color:var(--sub);font-size:16px;max-width:720px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.chip{font-size:12px;border:1px solid var(--line2);border-radius:8px;padding:3px 10px;color:var(--sub)}
+
+/* 统计 */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);margin:32px 0 0;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);overflow:hidden}
+.stat{padding:16px 18px;border-right:1px solid var(--line)} .stat:last-child{border:none}
+.stat b{display:block;font-family:var(--mono);font-size:26px;color:var(--ink);font-weight:700;line-height:1.2}
+.stat b i{font-style:normal;color:var(--acc)}
+.stat span{font-size:12px;color:var(--muted)}
+
+/* 实验面板 */
+.lab{margin-top:36px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,var(--panel),var(--bg2));overflow:hidden;box-shadow:0 20px 60px var(--shadow)}
+.lab-h{display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--line)}
+.lab-h .ic{width:30px;height:30px;border-radius:9px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font-family:var(--mono);font-size:13px}
+.lab-h b{font-size:14.5px}
+.lab-h .sp{flex:1}
+.seg{display:flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.seg button{font-size:12.5px;padding:6px 13px;color:var(--muted);transition:.15s}
+.seg button.on{background:var(--ink);color:var(--bg);font-weight:700}
+.lab-b{padding:22px 22px 8px}
+.hint{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.hint kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--sub)}
+svg.map{width:100%;height:auto;display:block}
+.trk{fill:none;stroke:var(--line2);stroke-width:3}
+.trk-flow{fill:none;stroke:url(#g);stroke-width:3;stroke-dasharray:6 14;animation:flow 1.6s linear infinite;opacity:.8}
+@keyframes flow{to{stroke-dashoffset:-40}}
+.band{font-family:var(--mono);font-size:11px;fill:var(--dim);letter-spacing:1px}
+.bandn{font-family:var(--sans);font-size:14px;font-weight:700;fill:var(--sub)}
+.node{cursor:pointer;outline:none}
+.node .halo{fill:var(--acc);opacity:0;transition:.2s}
+.node .c{fill:var(--panel);stroke:var(--line2);stroke-width:2;transition:.2s}
+.node.S .c{stroke:var(--acc)} .node.A .c{stroke:var(--blue)}
+.node text{font-family:var(--mono);font-size:15px;font-weight:700;fill:var(--sub);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.node.pub .c{fill:var(--pub-node)}
+.node .pd{fill:var(--green);opacity:0}
+.node.pub .pd{opacity:1}
+.node:hover .c,.node:focus-visible .c{stroke-width:3}
+.node.on .halo{opacity:.18}
+.node.on .c{fill:var(--acc);stroke:var(--acc)}
+.node.on text{fill:var(--on-acc)}
+.node.off{opacity:.22}
+.pulse{fill:var(--acc);filter:drop-shadow(0 0 6px var(--acc))}
+
+/* 详情 */
+.det{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;padding:6px 22px 22px}
+.dbox{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:20px 22px}
+.dno{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:1.5px}
+.dno b{color:var(--acc)}
+.dt{font-size:22px;font-weight:800;margin:6px 0 10px;line-height:1.35}
+.pri{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:3px}
+.pri.S{background:var(--acc-soft);color:var(--acc);border:1px solid var(--acc-line)}
+.pri.A{background:var(--blue-soft);color:var(--blue);border:1px solid var(--blue-line)}
+.goal{font-size:14.5px;color:var(--sub);border-left:3px solid var(--acc);padding:2px 0 2px 12px;margin:4px 0 14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font-family:var(--mono);font-size:11.5px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:3px 9px;color:var(--sub);opacity:0;transform:translateY(4px);animation:in .35s forwards}
+@keyframes in{to{opacity:1;transform:none}}
+.st{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.st i{width:8px;height:8px;border-radius:50%}
+.st.pub{color:var(--green)} .st.pub i{background:var(--green);box-shadow:0 0 8px var(--green)}
+.st.soon{color:var(--muted)} .st.soon i{background:var(--line2)}
+.post{display:block;border:1px solid var(--line2);border-radius:12px;padding:14px 16px;transition:.2s}
+.post:hover{border-color:var(--acc);background:var(--acc-soft)}
+.post small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px}
+.post b{display:block;font-size:15px;margin-top:4px}
+.post .go{font-family:var(--mono);font-size:12px;color:var(--acc);margin-top:6px;display:block}
+.post.empty{border-style:dashed;color:var(--muted);font-size:13.5px}
+.nx{display:flex;justify-content:space-between;margin-top:14px}
+.nx button{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line2);border-radius:9px;padding:6px 12px;transition:.15s}
+.nx button:hover:not(:disabled){color:var(--ink);border-color:var(--sub)}
+.nx button:disabled{opacity:.3;cursor:default}
+
+/* 开篇 */
+.sh{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:56px 0 18px;flex-wrap:wrap}
+.sh h2{font-family:var(--serif);font-size:26px;font-weight:900}
+.sh h2 small{font-family:var(--mono);font-size:12px;color:var(--dim);font-weight:400;margin-left:8px;letter-spacing:1px}
+.sh p{font-size:13px;color:var(--muted)}
+.lead{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:26px 28px;background:linear-gradient(120deg,var(--acc-soft),var(--blue-soft) 45%,transparent 70%),var(--panel);position:relative;overflow:hidden}
+.lead:after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--acc-soft),transparent 70%)}
+.lead small{font-family:var(--mono);font-size:11.5px;color:var(--acc);letter-spacing:2px}
+.lead h3{font-family:var(--serif);font-size:24px;font-weight:900;margin:6px 0 8px;line-height:1.4}
+.lead p{font-size:14px;color:var(--sub)}
+.btns{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.btn{font-size:13.5px;font-weight:700;border-radius:11px;padding:11px 18px;text-align:center;border:1px solid var(--line2);transition:.15s;white-space:nowrap}
+.btn.p{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.btn.p:hover{filter:brightness(1.08);box-shadow:0 0 22px var(--acc-line)}
+.btn.g:hover{border-color:var(--sub)}
+
+/* 卡片 */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+.disc{margin-top:60px;border-top:1px solid var(--line);padding-top:22px;font-size:12.5px;color:var(--dim);line-height:1.9;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+/* ---------- 手机 ---------- */
+.mnav{display:none}
+.hint .mb{display:none}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .mnav{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:6;background:var(--glass);backdrop-filter:blur(8px);scrollbar-width:none}
+  .mnav::-webkit-scrollbar{display:none}
+  .mnav button{flex:none;font-family:var(--mono);font-size:12px;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;color:var(--sub)}
+  .mnav button.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:700}
+  .mnav button.pub:not(.on){border-color:var(--green);color:var(--green)}
+  .top{display:none}
+  .mtop{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0;font-size:16px}
+  .mtop b span{color:var(--muted);font-weight:400}
+  .mnav{top:0}
+  .wrap{padding:28px 16px 50px}
+  h1{font-size:32px}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .stat{border-bottom:1px solid var(--line)}
+  .stat:nth-child(3){border-right:none}
+  .det{grid-template-columns:1fr;padding:6px 14px 16px}
+  .lab-b{padding:16px 14px 4px}
+  .lab-h{flex-wrap:wrap;padding:14px}
+  .lead{grid-template-columns:1fr;padding:22px 18px}
+  .grid{grid-template-columns:1fr}
+  .hint .pc{display:none} .hint .mb{display:inline}
+  .band{font-size:13px} .bandn{font-size:19px} .node text{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script>
+// 日夜主题与博客（Quartz）共用：localStorage "theme" + <html saved-theme>，没选过就跟随系统
+(function(){
+  var root=document.documentElement;
+  var media=window.matchMedia?window.matchMedia('(prefers-color-scheme: light)'):null;
+  function stored(){try{var v=localStorage.getItem('theme');return v==='light'||v==='dark'?v:null}catch(e){return null}}
+  function resolved(){return stored()||(media&&media.matches?'light':'dark')}
+  function apply(th){root.setAttribute('saved-theme',th);
+    document.querySelectorAll('.theme-toggle').forEach(function(b){b.textContent=th==='light'?'☾':'☀';b.setAttribute('aria-label',th==='light'?'切换到夜晚':'切换到白天');b.title=b.getAttribute('aria-label')})}
+  apply(resolved());
+  if(media&&media.addEventListener)media.addEventListener('change',function(){if(!stored())apply(resolved())});
+  document.addEventListener('DOMContentLoaded',function(){apply(resolved());
+    document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('.theme-toggle'))return;
+      var next=root.getAttribute('saved-theme')==='light'?'dark':'light';try{localStorage.setItem('theme',next)}catch(err){}apply(next)})});
+})();
+</script>
+</head>
+<body>
+<div class="app">
+
+<aside class="side">
+  <a class="brand" href="./index.cn"><div class="logo">Q</div><b>quant <span>/</span> lab</b></a>
+  <div class="tag">0 基础学量化 · 公开学习连载</div>
+  <div id="sidenav"></div>
+  <div class="bottom">全部是学习记录，不是投资建议。<br>不荐股、不引战。</div>
+</aside>
+
+<div class="main">
+  <div class="mtop"><a href="./index.cn"><b>← quant <span>/</span> lab</b></a><button class="theme-toggle" type="button"></button></div>
+  <div class="mnav" id="mnav"></div>
+  <div class="top">
+    <span class="crumb"><a href="./index.cn" style="color:var(--acc)">← 量化学习</a> &nbsp;/&nbsp; <b>交互路线图</b></span>
+    <span class="sp"></span>
+    <span class="pill">12 STAGES · 50 TOPICS</span>
+    <button class="theme-toggle" type="button"></button>
+  </div>
+
+  <div class="wrap">
+    <div class="kick">QUANT + AI QUANT · ROADMAP 00—11</div>
+    <h1>从投资假设，<br>走到 <em>AI 量化研究系统</em>。</h1>
+    <p class="lede">找了不少入门视频和教程，要么教 Python API，要么孤立地列概念。于是我用 AI 当助教，先生成这张路线图，再一个 Stage 一个 Stage 往下学，笔记全部公开。欢迎内行指出路线和概念上的问题。</p>
+    <div class="chips"><span class="chip">学习记录</span><span class="chip">非投资建议</span><span class="chip">AI 当助教</span><span class="chip">做中学</span></div>
+
+
+    <!-- 交互路线图 -->
+    <section class="lab" aria-label="交互路线图">
+      <div class="lab-h">
+        <div class="ic">⌁</div><b>交互路线图 · 点一个 Stage 看看</b>
+        <span class="sp"></span>
+        <div class="seg" id="seg">
+          <button data-f="all" class="on">全部</button><button data-f="S">S 必须掌握</button><button data-f="A">A 强烈建议</button>
+        </div>
+      </div>
+      <div class="lab-b">
+        <div class="hint"><span class="pc">点击节点，或用 <kbd>←</kbd> <kbd>→</kbd> 切换。</span><span class="mb">点一个节点看看。</span>绿色小点表示笔记已发布。</div>
+        <svg class="map" id="map" viewBox="0 0 640 300" role="img" aria-label="12 步路线图">
+          <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="var(--acc)" style="stop-color:var(--acc)"/><stop offset="1" stop-color="var(--blue)" style="stop-color:var(--blue)"/></linearGradient></defs>
+          <path id="track" class="trk" d="M60 95 H580 C632 95 632 215 580 215 H60"/>
+          <path class="trk-flow" d="M60 95 H580 C632 95 632 215 580 215 H60"/>
+          <circle r="5" class="pulse"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#track"/></animateMotion></circle>
+          <text class="band" x="60" y="40">STAGE 0–2</text><text class="bandn" x="60" y="60">I 打基础</text>
+          <text class="band" x="372" y="40">STAGE 3–5</text><text class="bandn" x="372" y="60">II 做研究</text>
+          <text class="band" x="372" y="262">STAGE 6–8</text><text class="bandn" x="372" y="282">III 验证策略</text>
+          <text class="band" x="60" y="262">STAGE 9–11</text><text class="bandn" x="60" y="282">IV 落地与进阶</text>
+          <g id="nodes"></g>
+        </svg>
+      </div>
+      <div class="det">
+        <div class="dbox">
+          <div class="dno">STAGE <b id="dNo">00</b> / 11 · <span id="dPh"></span></div>
+          <div class="dt"><span id="dT"></span><span id="dP"></span></div>
+          <div class="goal" id="dG"></div>
+          <div class="tags" id="dTags"></div>
+        </div>
+        <div class="dbox">
+          <div class="st" id="dS"></div>
+          <div id="dPost"></div>
+          <div class="nx"><button id="prev">← 上一个</button><button id="next">下一个 →</button></div>
+        </div>
+      </div>
+    </section>
+
+
+    <div class="disc" style="margin-top:40px"><span>本栏目全部是个人学习记录，不是投资建议，将来也不会给任何买卖建议；不荐股、不引战。</span><span>欢迎专业的从业者指导、分享经验。</span></div>
+  </div>
+</div>
+</div>
+
+<script>
+const SHORT=['Python 与数据基础','金融市场与行情数据','基本面投资分析','概率、统计与数学','Quant 基础','信号 / 技术指标','因子投资','回测','防止回测欺骗','组合、风险与实盘','AI 量化工程','职业化与长期能力'];
+const PH=['I 打基础','II 做研究','III 验证策略','IV 落地与进阶'];
+const D=[
+ [0,'Python、数据与工程基础','S',0,'让你能够自己处理金融数据，而不是依赖别人已经写好的分析结果。',['Python 基础','NumPy','Pandas','Visualization'],'pub'],
+ [1,'金融市场与股票数据基础','S',0,'建立“市场语言”：知道每一个数字到底代表什么。',['股票市场','股票价格','公司行为','交易'],'pub'],
+ [2,'基本面投资分析','A',0,'先成为一个懂企业的投资者，而不只是“会跑策略的人”。',['财务报表','财务指标','估值','公司研究'],''],
+ [3,'概率、统计与金融数学基础','S',1,'判断“这个策略赚钱”到底是有规律，还是只是随机结果。',['概率','描述统计','相关性','统计推断','回归','后续数学基础'],''],
+ [4,'Quant Fundamentals','S',1,'理解量化投资是如何衡量收益和风险的。',['Return','Risk','Risk-adjusted Performance','Benchmark'],''],
+ [5,'Quant Signals / Technical Signals','',1,'把“我觉得市场会涨”变成可以写成程序、可以验证的规则。',['Trend','Momentum','Mean Reversion','Oscillators','Volatility'],''],
+ [6,'Factor Investing','S',2,'在一个股票池中，系统地寻找具有某种特征的股票。',['Factor 基础','Classic Factors','Cross-sectional Analysis','Factor Combination'],''],
+ [7,'Backtesting','S',2,'如果过去按这个规则交易会怎样？以及为什么“回测赚钱”不等于“未来赚钱”。',['基础回测','Portfolio Backtest','Realistic Backtest','Backtest Evaluation'],''],
+ [8,'防止回测欺骗 / Robust Research','S',2,'防止因为数据错误、未来数据、幸存者偏差、过拟合，误以为找到了赚钱策略。',['Bias','Overfitting','Validation','Robustness'],''],
+ [9,'Portfolio / Risk / Real Trading','S',3,'我应该拿多少钱做、怎么分配、如何活下来？',['Portfolio','Portfolio Optimization','Risk Management','Trading Infrastructure'],''],
+ [10,'AI Quant Engineering','A',3,'把研究流程变成 AI 可以协助执行、研究、解释、监控的系统，不是让 AI 直接“预测股票”。',['LLM 基础','Agent','AI Research','Deterministic Quant Engine'],''],
+ [11,'职业化与长期能力','',3,'让能力可以被别人验证、使用、购买或雇佣。',['Quant / AI 工程能力','Quant Research Workflow','Portfolio / Career'],''],
+];
+// 已发布的 Stage：{编号: ['链接', '标题']}；发布时同时把上面 D 里对应项最后一位改成 'pub'
+// 已发布：[链接, 标题, 笔记覆盖的 Stage]
+const POST={0:['./stage-0-1.cn','0 基础用 AI 学量化：第一份笔记全公开，代码复制就能跑','0–1'],1:['./stage-0-1.cn','0 基础用 AI 学量化：第一份笔记全公开，代码复制就能跑','0–1']};
+// 节点坐标：上排 0–5 左→右，下排 6–11 右→左
+const XY=D.map((_,i)=>i<6?[60+i*104,95]:[580-(i-6)*104,215]);
+let cur=0, filt='all';
+const $=id=>document.getElementById(id);
+const ns='http://www.w3.org/2000/svg';
+const match=d=>filt==='all'||d[2]===filt;
+
+// 生成节点
+D.forEach((d,i)=>{
+  const g=document.createElementNS(ns,'g');
+  g.setAttribute('class','node '+(d[2]||'')+(d[6]==='pub'?' pub':''));
+  g.setAttribute('tabindex','0'); g.setAttribute('role','button');
+  g.setAttribute('aria-label','Stage '+d[0]+' '+d[1]);
+  const [x,y]=XY[i];
+  g.innerHTML=`<circle class="halo" cx="${x}" cy="${y}" r="34"/><circle class="c" cx="${x}" cy="${y}" r="22"/><text x="${x}" y="${y+1}">${String(d[0]).padStart(2,'0')}</text><circle class="pd" cx="${x+17}" cy="${y-17}" r="5"/>`;
+  g.onclick=()=>sel(i); g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();sel(i)}};
+  $('nodes').appendChild(g);
+});
+// 侧栏
+let side='', phase=-1;
+D.forEach((d,i)=>{
+  if(d[3]!==phase){phase=d[3]; side+=`<div class="grp">0${phase+1} — ${PH[phase].split(' ')[1]}</div>`}
+  side+=`<button class="nav${d[6]==='pub'?' pub':''}" data-i="${i}"><span class="no">${String(d[0]).padStart(2,'0')}</span>${SHORT[i]}<span class="dot"></span></button>`;
+});
+$('sidenav').innerHTML=side;
+$('mnav').innerHTML=D.map((d,i)=>`<button class="${d[6]==='pub'?'pub':''}" data-i="${i}">${String(d[0]).padStart(2,'0')}</button>`).join('');
+document.querySelectorAll('.nav,.mnav button').forEach(b=>b.onclick=()=>sel(+b.dataset.i));
+
+function sel(i){
+  cur=i; const d=D[i];
+  document.querySelectorAll('.node').forEach((n,k)=>n.classList.toggle('on',k===i));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('on',+n.dataset.i===i));
+  document.querySelectorAll('.mnav button').forEach(n=>{n.classList.toggle('on',+n.dataset.i===i); if(+n.dataset.i===i) n.scrollIntoView({inline:'center',block:'nearest'})});
+  $('dNo').textContent=String(d[0]).padStart(2,'0');
+  $('dPh').textContent=PH[d[3]];
+  $('dT').textContent=d[1];
+  $('dP').innerHTML=d[2]?`<span class="pri ${d[2]}">${d[2]==='S'?'S 必须掌握':'A 强烈建议'}</span>`:'';
+  $('dG').textContent=d[4];
+  $('dTags').innerHTML=d[5].map((t,k)=>`<span style="animation-delay:${k*45}ms">${t}</span>`).join('');
+  $('dS').className='st '+(d[6]==='pub'?'pub':'soon');
+  $('dS').innerHTML='<i></i>'+(d[6]==='pub'?'笔记已发布':'笔记待更新');
+  $('dPost').innerHTML=d[6]==='pub'
+    ? `<a class="post" href="${POST[i][0]}"><small>NOTE · STAGE ${POST[i][2]||String(d[0]).padStart(2,'0')}</small><b>${POST[i][1]}</b><span class="go">打开笔记 →</span></a>`
+    : `<div class="post empty">这个 Stage 的笔记还没发布。发布后会在这里出现链接。</div>`;
+  $('prev').disabled=i===0; $('next').disabled=i===D.length-1;
+}
+function applyFilter(){
+  document.querySelectorAll('.node').forEach((n,k)=>n.classList.toggle('off',!match(D[k])));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('off',!match(D[+n.dataset.i])));
+}
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{
+  filt=b.dataset.f; document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b)); applyFilter();
+});
+$('prev').onclick=()=>sel(Math.max(0,cur-1));
+$('next').onclick=()=>sel(Math.min(D.length-1,cur+1));
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea'))return;
+  if(e.key==='ArrowRight')sel(Math.min(D.length-1,cur+1));
+  if(e.key==='ArrowLeft')sel(Math.max(0,cur-1));
+});
+const h=location.hash.match(/^#s(\d+)$/); sel(h?Math.min(11,+h[1]):0);
+</script>
+</body>
+</html>

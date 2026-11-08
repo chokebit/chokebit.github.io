@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="cn" dir="ltr"><head><title>0 基础用 AI 学量化：我给自己画了张 12 步路线图</title><meta charset="utf-8"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="CHOKEBIT"/><meta property="og:title" content="0 基础用 AI 学量化：我给自己画了张 12 步路线图"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="0 基础用 AI 学量化：我给自己画了张 12 步路线图"/><meta name="twitter:description" content="一个做产品的独立开发者，用 AI 当助教自学量化投资：为什么做这件事、怎么用 AI 学、分享的目标和边界，以及 12 步路线图。学习记录，非投资建议。"/><meta property="og:description" content="一个做产品的独立开发者，用 AI 当助教自学量化投资：为什么做这件事、怎么用 AI 学、分享的目标和边界，以及 12 步路线图。学习记录，非投资建议。"/><meta property="og:image:alt" content="一个做产品的独立开发者，用 AI 当助教自学量化投资：为什么做这件事、怎么用 AI 学、分享的目标和边界，以及 12 步路线图。学习记录，非投资建议。"/><meta property="og:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:url" content="https://chokebit.github.io/static/og-image.png"/><meta name="twitter:image" content="https://chokebit.github.io/static/og-image.png"/><meta property="og:image:type" content="image/.png"/><meta property="twitter:domain" content="chokebit.github.io"/><meta property="og:url" content="https://chokebit.github.io/quant/quant-learning-roadmap.cn"/><meta property="twitter:url" content="https://chokebit.github.io/quant/quant-learning-roadmap.cn"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="一个做产品的独立开发者，用 AI 当助教自学量化投资：为什么做这件事、怎么用 AI 学、分享的目标和边界，以及 12 步路线图。学习记录，非投资建议。"/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://chokebit.github.io/index.xml"/></head><body data-slug="quant/quant-learning-roadmap.cn"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"></div><div class="center"><div class="page-header"><header><nav class="nav-links" aria-label="主导航"><a href="../index.cn" class="brand-link" aria-label="Chokebit 首页"><span class="brand-mark">C_</span><span class="brand-name">CHOKEBIT</span></a><div class="nav-link-list"><a href="../quant/index.cn" class="nav-link" aria-current="page">量化</a><a href="../ai-native/index.cn" class="nav-link">AI Native</a><a href="../tech/index.cn" class="nav-link">技术档案</a><a href="../build/index.cn" class="nav-link">归档</a><a href="../index.cn#about" class="nav-link">关于</a></div></nav><div class="language-toggle"><button class="lang-btn " data-lang="en" data-href aria-label="English">EN</button><span class="lang-sep">/</span><button class="lang-btn active" data-lang="cn" data-href aria-label="中文">中文</button></div><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></header><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../quant/">quant</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>0 基础用 AI 学量化：我给自己画了张 12 步路线图</a></div></nav><h1 class="article-title">0 基础用 AI 学量化：我给自己画了张 12 步路线图</h1><p show-comma="true" class="content-meta"><time datetime="2026-10-25T00:00:00.000Z">Oct 25, 2026</time><span>13 min read</span></p><ul class="tags"><li><a href="../tags/quant" class="internal tag-link">quant</a></li><li><a href="../tags/learning" class="internal tag-link">learning</a></li><li><a href="../tags/build-in-public" class="internal tag-link">build-in-public</a></li></ul><div class="view-counter view-counter--page" data-view-counter="true" data-counter-mode="page" role="status" aria-live="polite"><span class="view-counter__signal" aria-hidden="true"></span><span class="view-counter__label">阅读</span><strong class="view-counter__value" data-counter-value="true">—</strong></div></div></div><article class="popover-hint"><p>2026-10-25 · 作者 chokebit3xp · 学习记录，非投资建议</p>
+<p>开始对量化感兴趣，是因为 Alpha Arena。它刚出来的时候我就觉得很有趣，脑子里一直留着“想研究研究”的念头。</p>
+<p>Alpha Arena 是 AI 研究公司 Nof1 做的大模型实盘交易竞技场：给 GPT、Claude、Gemini、Grok、DeepSeek、Qwen 这几个模型每个发 1 万美元真钱，让它们在真实市场里自主交易，收益排名、持仓和每笔交易都全程公开。第一季交易的是加密货币合约，据我了解后来又转到了美股。Nof1 的说法是，想让 AI 的评测更接近真实世界。</p>
+<p><img src=".././assets/quant-learning/alpha-arena.png" alt="Alpha Arena 第一季页面：六个模型各从 1 万美元起步的账户总值曲线"/></p>
+<p>图：Alpha Arena 第一季页面截图，六个模型各从 1 万美元起步（2025 年 10 月的数据）</p>
+<p>对我来说，它就像一个围观站：看不同模型怎么做决策、怎么亏钱，顺带学交易思路。</p>
+<p>后来真想入门，我找了不少视频和教程，发现学完后没收获太多：很多要么是教 Python API 的说明，要么就是孤立地列出概念。然后我就想到，用 AI 试试怎么样？</p>
+<h2 id="一分钟看完">一分钟看完<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一分钟看完" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li>这是一个量化学习的公开连载，这篇先发路线图和分享目标，后面会按 Stage 陆续公开学习笔记。</li>
+<li>这也是一个实验：AI 时代，怎么让 AI 帮我们学习。</li>
+<li>为什么公开：不想闭门造车，希望有经验的人指出实际问题；也想作为一个 AI 示例，展示我怎么用 AI 帮助学习，做中学。</li>
+<li>路线图一共 12 个 Stage，从投资基础、Python 和数据，一直到回测、防止回测造假、组合与风险、小资金实盘和 AI 量化研究系统。</li>
+<li>我怎么用 AI 当助教：先让 AI 生成路线图，再定好学习方式每天推进；最重要的是不断反思 AI 是不是在讨好我、是不是在低水平打转，拿几个 AI 对比着调整。</li>
+<li>笔记里的数据和例子都以美股为参照（比如用 AAPL 演示），只是学习样本，不代表推荐。</li>
+<li>没有任何投资建议，将来也不会给任何建议。</li>
+</ul>
+<hr/>
+<h2 id="为什么做这件事">为什么做这件事<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#为什么做这件事" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>这份 roadmap 我还没有全部学完，就直接公开了。分享的同时，也是希望不是闭门造车，让大家反馈，有经验的人指出实际问题。还有，也是作为一个 AI 示例：我是如何用 AI 帮助学习、做中学的。</p>
+<p>这本身也是一个实验：在 AI 时代，怎么让 AI 帮我们学习。很多人对一个新东西想学，但要么停在想，要么觉得难，要么觉得自己已经过了最佳学习年龄。其实这些统统不是问题，先试试再说，在做中迭代，干中学。AI 很好的一点，就是能让你马上去实践，然后验证、拿到反馈，再接着学。</p>
+<p>不要有“我怕学不会”的思维。最好的开始是十年前，其次是现在。</p>
+<hr/>
+<h2 id="12-步路线图">12 步路线图<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#12-步路线图" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><img src=".././assets/quant-learning/roadmap-overview.png" alt="12 步路线图一图总览"/></p>
+<p>一句话版本：</p>
+<p>投资基础 → Python / 数据 → 概率 / 统计 → Quant 基础 → 信号 / 因子 → 回测 → 防止回测造假 → 组合 / 风险 → 小资金实盘 → AI 量化研究系统</p>
+<p>最终目标是从“投资假设”走到“回测、验证、小资金实盘、复盘”，并逐步把研究流程 AI 化。</p>
+<p>几条用法：</p>
+<ul>
+<li><strong>路线图是地图，不是课程目录</strong>。不要追求一次学完所有内容，按阶段推进，每完成一个知识点就打勾。</li>
+<li><strong>每次最多引入 3 个新概念。</strong></li>
+<li><strong>优先级不是平均分配的</strong>。S 级必须掌握，A 级强烈建议掌握；B 级放到后期深入，比如随机微积分、衍生品定价、蒙特卡洛、高频交易。</li>
+</ul>
+<hr/>
+<h2 id="我怎么用-ai-当助教">我怎么用 AI 当助教<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#我怎么用-ai-当助教" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><strong>先生成路线图</strong>。最开始，我把收集到的一些资料、我自己的想法，还有实际看到的项目作品，一起交给 AI。主线 GPT，Claude 负责校准，让它们生成 roadmap。然后我不断校正、提问，最后才有了上面这张图。</p>
+<p><strong>再定好学习方式，每天推进</strong>。我拿着 roadmap 开一个新窗口对话，先和 AI 定好学习方式和每节课的结构，然后每天按这个结构往下学。</p>
+<p><strong>最重要的是不断反思和调整</strong>。一开始会遇到各种问题，我得自己不断反思：AI 给我的内容到底对不对？它是不是在一味地讨好我？是不是一直在某个低水平的教学里打转？所以我会拿几个 AI 对比分析，比如 DeepSeek 对知识点的讲解和 GPT 是否一致，学的是否能用到真实市场场景中，我不断提出问题反问，不断调整，快速迭代出适合自己的方法。</p>
+<p><strong>时间投入少不了</strong>。最开始没有把每天高度专注时间放在量化，但是发现学到后面知识点越学越多，忘得也快，逻辑推导必须在你基础牢固的前提下，因此把每天的黄金时间投入在这。后续可能会稍微调整下，因为有更紧急事件。</p>
+<p>后面的 Stage 笔记里，你会看到学习结构在变：实际学的时候发现，有些知识点 AI 一开始教得脱离实际，我就赶紧自己引导它调整。还有前面 Stage 学的觉得容易，后续当多个知识点需要串联的时候，GPT 仍用早先的方式的话，你很难掌握因果串联，如何在众多变量中，梳理出一条合理逻辑判断投资价值。</p>
+<p>我的一切内容都是给大家参考，当然照着学也没问题，但一定得自己思考，不能拿来主义。</p>
+<hr/>
+<h2 id="开始前装好-python-3">开始前：装好 Python 3<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#开始前装好-python-3" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>量化要写代码跑数据，电脑上先装好 <strong>Python 3</strong>。</p>
+<p>用到什么包再装什么，不用一开始把清单全背下来。比如处理数据常用 pandas、numpy，画图常用 matplotlib。遇到 <code>No module named xxx</code> 这种报错，直接把报错贴给 AI，说明你用的是什么系统，让它告诉你怎么装就行。</p>
+<p>装环境不是重点，别在这一步卡太久。</p>
+<hr/>
+<h2 id="分享目标与边界">分享目标与边界<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#分享目标与边界" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ol>
+<li>
+<p><strong>想赚钱，就去离钱近的地方</strong>。笔记内容分享给大家，是希望大家多学点知识，控制风险、亏钱也知道亏在哪了。</p>
+</li>
+<li>
+<p><strong>没有任何投资建议，将来也不会给任何建议。</strong></p>
+</li>
+<li>
+<p><strong>量化我个人认为是偏投机的</strong>，但这不妨碍你通过量化学习金融知识。我自己就收获很多，比如如何看懂财报、判断一家公司未来是否有价值。</p>
+<p>不过越学到后面，加上读了一些行业前辈的观点，我越觉得万事万物都得辩证地看，看到它的两面性。我刚开始对量化也有片面的刻板印象，觉得它就是投机；但客观上，它也给市场带来了流动性。</p>
+</li>
+<li>
+<p><strong>整个系列免费公开</strong>。这些知识我也是从互联网上免费学来的。我认为每个人无法决定自己的出生，但都有权利免费学习到任何知识，这也算是互联网时代的红利吧。</p>
+</li>
+</ol>
+<hr/>
+<h2 id="两点学习观">两点学习观<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#两点学习观" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p><strong>传统学习方式也不能抛弃</strong>。总之你觉得有效的就去试试，试了看反馈再迭代。比如这里我要强烈安利两本：《经济学原理·微观经济学分册（第 8 版）》和《经济学原理·宏观经济学分册（第 8 版）》（[美] N. 格里高利·曼昆 著，梁小民 译），先读微观再读宏观。书中用朴实生动的语言传播知识。人的一生离不开经济学，要学会从经济学角度看问题。</p>
+<p><strong>我觉得量化很有意思，入门数学知识也不难</strong>，只是大家没接触过，在认知上觉得难。更高级的数学，后面也可以慢慢攻破。我甚至觉得，从小学基础教育教数学的时候，就应该结合着经济一起教，多么有趣啊！同时也能更早地让你培养“在社会生存中资产如何运转”的认知，学以致用是关键。</p>
+<hr/>
+<h2 id="一点小经验和资料">一点小经验和资料<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#一点小经验和资料" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>目前个人的一点小经验，觉得值得一直思考的两个问题：</p>
+<ol>
+<li><strong>钱流向哪？</strong> 看资金都流向哪、可能流向哪、为什么流向那。</li>
+<li><strong>无限子弹。</strong> 投资得先有资金，也就是子弹。</li>
+</ol>
+<p>一些看到的不错资料（网址在文末参考）：</p>
+<ol>
+<li>whale-quant：Datawhale 的开源量化课程，讲量化金融知识和用 Python 做量化开发</li>
+<li>《AI 量化交易从 0 到 1：多智能体量化交易系统实战》，Wayland Zhang 著</li>
+<li>聚宽（JoinQuant）量化课堂</li>
+<li>BigQuant 的文章《量化交易：它根本不是你想的那样》</li>
+</ol>
+<hr/>
+<h2 id="最后">最后<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#最后" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>后面会按 Stage 陆续公开学习笔记。</p>
+<p>笔记里的代码都是我跑过的最小完整示例，唯一需要的是网络。访问不了境外数据源时，把代码丢给 AI，换成国内的数据库（比如 AKShare），知识结构是一模一样的。</p>
+<p>欢迎专业的从业者指导、分享经验，帮我避免路线走偏，或者哪里理解错了。</p>
+<p>本文为个人学习记录，非投资建议，不构成任何收益承诺。市场有风险，决策需谨慎。</p>
+<hr/>
+<ul>
+<li>完整路线图（每个 Stage 的目标、知识点清单和阶段产出，空白版）：<a href="../quant/quant-learning-roadmap-full.cn" class="internal alias" data-slug="quant/quant-learning-roadmap-full.cn">Quant + AI Quant 学习路线图（完整版）</a></li>
+<li>交互路线图：<a href="../quant/lab" data-router-ignore class="internal alias" data-slug="quant/lab">点这里打开</a></li>
+</ul>
+<p>可以通过 <a href="https://x.com/chokebit3xp" class="external">X / @chokebit3xp<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 联系我，指出路线和概念上的问题。</p>
+<hr/>
+<p>参考：</p>
+<ul>
+<li>Alpha Arena：<a href="https://alpha-arena.io/" class="external">https://alpha-arena.io/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>（2026-10-25 查看）</li>
+<li>whale-quant：<a href="https://github.com/datawhalechina/whale-quant" class="external">https://github.com/datawhalechina/whale-quant<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>（2026-10-25 查看）</li>
+<li>《AI 量化交易从 0 到 1》：<a href="https://waylandz.com/quant-book/" class="external">https://waylandz.com/quant-book/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>（2026-10-25 查看）</li>
+<li>聚宽量化课堂：<a href="https://test.demo.joinquant.com/study" class="external">https://test.demo.joinquant.com/study<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>（2026-10-11 查看）</li>
+<li>BigQuant《量化交易：它根本不是你想的那样》：<a href="https://bigquant.com/wiki/doc/HqKp2N2ioA" class="external">https://bigquant.com/wiki/doc/HqKp2N2ioA<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>（2026-10-25 查看）</li>
+<li>AKShare（开源财经数据接口库）：<a href="https://github.com/akfamily/akshare" class="external">https://github.com/akfamily/akshare<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>（2026-10-25 查看）</li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-14" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#一分钟看完" data-for="一分钟看完">一分钟看完</a></li><li class="depth-0"><a href="#为什么做这件事" data-for="为什么做这件事">为什么做这件事</a></li><li class="depth-0"><a href="#12-步路线图" data-for="12-步路线图">12 步路线图</a></li><li class="depth-0"><a href="#我怎么用-ai-当助教" data-for="我怎么用-ai-当助教">我怎么用 AI 当助教</a></li><li class="depth-0"><a href="#开始前装好-python-3" data-for="开始前装好-python-3">开始前：装好 Python 3</a></li><li class="depth-0"><a href="#分享目标与边界" data-for="分享目标与边界">分享目标与边界</a></li><li class="depth-0"><a href="#两点学习观" data-for="两点学习观">两点学习观</a></li><li class="depth-0"><a href="#一点小经验和资料" data-for="一点小经验和资料">一点小经验和资料</a></li><li class="depth-0"><a href="#最后" data-for="最后">最后</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>Backlinks</h3><ul id="list-1" class="overflow"><li><a href="../index.cn" class="internal">Chokebit</a></li><li><a href="../" class="internal">Chokebit</a></li><li><a href="../quant/index.cn" class="internal">量化学习</a></li><li><a href="../quant/quant-learning-roadmap-full.cn" class="internal">Quant + AI Quant 学习路线图（完整版）</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v1.0.0</a> © 2026</p><ul><li><a href="https://x.com/chokebit3xp">X</a></li><li><a href="mailto:chokebit3xp@gmail.com">Email</a></li><li><a href="https://github.com/chokebit">GitHub</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>
