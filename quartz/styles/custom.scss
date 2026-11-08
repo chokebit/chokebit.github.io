@@ -1,5 +1,6 @@
 @use "./base.scss";
 @use "./brand.scss";
+@use "./quant.scss";
 
 // Center content max-width
 .center {
@@ -130,8 +131,8 @@ body[data-slug$="/index.cn"]:not([data-slug^="tags/"]) article {
 
 // Product Lab — isolated build-in-public showcase
 body[data-slug^="products/"] {
-  --product-accent: #4f7600;
-  --product-accent-soft: rgba(79, 118, 0, 0.09);
+  --product-accent: #5b3fb0;
+  --product-accent-soft: rgba(91, 63, 176, 0.09);
 
   .page-header > .popover-hint > :not(.view-counter) {
     display: none;
@@ -156,8 +157,8 @@ body[data-slug^="products/"] {
 }
 
 :root[saved-theme="dark"] body[data-slug^="products/"] {
-  --product-accent: #b8ff57;
-  --product-accent-soft: rgba(184, 255, 87, 0.09);
+  --product-accent: #c4b5fd;
+  --product-accent-soft: rgba(196, 181, 253, 0.12);
 }
 
 .product-lab-index,
