@@ -23,8 +23,8 @@ tags:
 
 <div class="pl-project-card">
   <div class="pl-project-topline">
-    <span class="pl-status"><i></i> PREPARING LAUNCH</span>
-    <span>LAUNCHING 2026.09.27</span>
+    <span class="pl-status"><i></i> PERSONAL USE</span>
+    <span>LAUNCHED 2026.09.27 · NO LONGER PROMOTED</span>
   </div>
   <div class="pl-project-body">
     <div>

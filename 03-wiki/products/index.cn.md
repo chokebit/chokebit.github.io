@@ -23,8 +23,8 @@ tags:
 
 <div class="pl-project-card">
   <div class="pl-project-topline">
-    <span class="pl-status"><i></i> 准备发布</span>
-    <span>计划 2026.09.27 发布</span>
+    <span class="pl-status"><i></i> 自用中</span>
+    <span>2026.09.27 上线 · 不再推广</span>
   </div>
   <div class="pl-project-body">
     <div>
