@@ -303,6 +303,15 @@ body[data-slug="index.cn"] {
     transform: translateX(0.25rem);
   }
 
+  /* 站外链接：和站内条目同底色，去掉 Quartz 自动加的外链图标（行尾已有 ↗） */
+  .mh-list a.external {
+    background-color: var(--highlight);
+  }
+
+  .mh-list a .external-icon {
+    display: none;
+  }
+
   .mh-about {
     display: grid;
     grid-template-columns: 5.5rem minmax(0, 1fr);
