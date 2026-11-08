@@ -8,12 +8,16 @@ const NavLinks: QuartzComponent = ({ fileData }: QuartzComponentProps) => {
   const homeSlug = (lang === "cn" ? "index.cn" : "index") as FullSlug
 
   const links = [
-    {
-      label: lang === "cn" ? "产品" : "Products",
-      slug: (lang === "cn" ? "products/index.cn" : "products/index") as FullSlug,
-      section: "products/",
-      matchChildren: true,
-    },
+    ...(lang === "cn"
+      ? [
+          {
+            label: "量化",
+            slug: "quant/index.cn" as FullSlug,
+            section: "quant/",
+            matchChildren: true,
+          },
+        ]
+      : []),
     {
       label: "AI Native",
       slug: (lang === "cn" ? "ai-native/index.cn" : "ai-native/index") as FullSlug,
@@ -24,6 +28,12 @@ const NavLinks: QuartzComponent = ({ fileData }: QuartzComponentProps) => {
       label: lang === "cn" ? "技术档案" : "Tech Archive",
       slug: (lang === "cn" ? "tech/index.cn" : "tech/index") as FullSlug,
       section: "tech/",
+      matchChildren: true,
+    },
+    {
+      label: lang === "cn" ? "归档" : "Archive",
+      slug: (lang === "cn" ? "build/index.cn" : "products/index") as FullSlug,
+      section: lang === "cn" ? "build/" : "products/",
       matchChildren: true,
     },
   ]
